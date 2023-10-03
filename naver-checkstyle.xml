@@ -173,16 +173,6 @@ The following rules in the Naver coding convention cannot be checked by this con
 
 		<!-- Start of Indentation chapter -->
 
-		<!-- [4-spaces-tab] -->
-		<property name="tabWidth" value="4"/>
-
-		<!-- [indentation-tab] -->
-		<module name="RegexpSinglelineJava">
-			<property name="format" value="^\t* "/>
-			<property name="message" value="[indentation-tab] Indent must use tab characters"/>
-			<property name="ignoreComments" value="true"/>
-		</module>
-
 		<!-- End of Indentation chapter -->
 
 		<!-- Start of Braces chapter -->
