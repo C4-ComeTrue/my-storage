@@ -97,7 +97,7 @@ class FileControllerTest {
 
     @Test
     @DisplayName("파일 업로드 실패 - 파일 없음(Null)")
-    void uploadFileFailFileNull() throws Exception {
+    void uploadFileFailFileNull() {
         // 요청 payload
         String username = "haeun";
 
