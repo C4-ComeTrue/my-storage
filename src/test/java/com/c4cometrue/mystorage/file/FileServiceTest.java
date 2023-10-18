@@ -8,6 +8,8 @@ import static org.springframework.test.util.AssertionErrors.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -86,8 +88,7 @@ class FileServiceTest {
 
 	@Test
 	@DisplayName("업로드 실패 테스트")
-	void uploadFileSuccessTest() throws IOException {
-		// 모킹 설정
+	void uploadFileIoFailTest() throws IOException {
 		MultipartFile mockFile = mock(MultipartFile.class);
 		when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(mockMultipartFile.getBytes()));
 		when(mockFile.getOriginalFilename()).thenReturn(OriginalFileName);
@@ -99,5 +100,27 @@ class FileServiceTest {
 			ServiceException.class,
 			() -> fileService.uploadFile(request)
 		);
+	}
+
+	@Test
+	@DisplayName("파일 다운로드 실패 : 메타 데이터 없음")
+	void downloadNoMetadataTest() {
+
+		when(fileDataAccessService.findBy(fileId)).thenReturn(null);
+
+		FileDownloadRequest request = new FileDownloadRequest(fileId, userPath, userId);
+
+		assertThrows(NullPointerException.class, () -> fileService.downloadFile(request));
+	}
+
+	@Test
+	@DisplayName("파일 삭제 실패 : 메타데이터 없음")
+	void deleteNoMetadataTest() {
+
+		when(fileDataAccessService.findBy(fileId)).thenReturn(null);
+
+		FileDeleteRequest request = new FileDeleteRequest(fileId, userId);
+
+		assertThrows(NullPointerException.class, () -> fileService.deleteFile(request));
 	}
 }
