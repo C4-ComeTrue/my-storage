@@ -17,6 +17,7 @@ import com.c4cometrue.mystorage.dto.FileUploadRequest;
 import com.c4cometrue.mystorage.exception.ErrorCode;
 import com.c4cometrue.mystorage.exception.ServiceException;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,6 +31,7 @@ public class FileService {
 	@Value("${file.buffer}")
 	private Integer bufferSize;
 
+	@Transactional
 	public void uploadFile(FileUploadRequest request) {
 		MultipartFile file = request.multipartFile();
 		Long userId = request.userId();
@@ -37,18 +39,18 @@ public class FileService {
 		String storedFileName = Metadata.storedName();
 		Path path = Paths.get(storagePath, storedFileName);
 
+		Metadata metadata = Metadata.of(file.getOriginalFilename(), storedFileName, path.toString(), userId);
+		fileDataAccessService.persist(metadata);
+
 		try (InputStream is = file.getInputStream(); OutputStream os = Files.newOutputStream(path)) {
 			byte[] buffer = new byte[bufferSize];
 			int bytesRead;
-			while ((bytesRead = is.read(buffer)) != -1)	{
+			while ((bytesRead = is.read(buffer)) != -1) {
 				os.write(buffer, 0, bytesRead);
 			}
 		} catch (IOException e) {
 			throw new ServiceException(ErrorCode.FILE_COPY_ERROR);
 		}
-
-		Metadata metadata = Metadata.of(file.getOriginalFilename(), storedFileName, path.toString(), userId);
-		fileDataAccessService.persist(metadata);
 	}
 
 	public void downloadFile(FileDownloadRequest request) {
@@ -73,10 +75,12 @@ public class FileService {
 		}
 	}
 
+	@Transactional
 	public void deleteFile(FileDeleteRequest request) {
 		Long fileId = request.fileId();
 		Long userId = request.userId();
 
+		fileDataAccessService.deleteBy(fileId);
 		Metadata metadata = fileDataAccessService.findBy(fileId);
 		metadata.validate(userId);
 		Path path = Paths.get(metadata.getFilePath());
@@ -85,6 +89,5 @@ public class FileService {
 		} catch (IOException e) {
 			throw new ServiceException(ErrorCode.FILE_DELETE_ERROR);
 		}
-		fileDataAccessService.deleteBy(fileId);
 	}
 }

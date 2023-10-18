@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.util.AssertionErrors.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -15,14 +16,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.dto.FileDeleteRequest;
 import com.c4cometrue.mystorage.dto.FileDownloadRequest;
 import com.c4cometrue.mystorage.dto.FileUploadRequest;
 import com.c4cometrue.mystorage.exception.ErrorCode;
 import com.c4cometrue.mystorage.exception.ServiceException;
-@DisplayName("파일 서시브 테스트")
+
+@DisplayName("파일 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class FileServiceTest {
 	@Mock
@@ -64,7 +68,6 @@ class FileServiceTest {
 			ServiceException.class,
 			() -> fileService.downloadFile(request)
 		);
-
 		assertEquals(ErrorCode.FILE_COPY_ERROR, thrown.getCode());
 	}
 
@@ -79,5 +82,22 @@ class FileServiceTest {
 		);
 
 		assertEquals(ErrorCode.FILE_DELETE_ERROR, thrown.getCode());
+	}
+
+	@Test
+	@DisplayName("업로드 실패 테스트")
+	void uploadFileSuccessTest() throws IOException {
+		// 모킹 설정
+		MultipartFile mockFile = mock(MultipartFile.class);
+		when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(mockMultipartFile.getBytes()));
+		when(mockFile.getOriginalFilename()).thenReturn(OriginalFileName);
+
+		FileUploadRequest request = FileUploadRequest.of(mockFile, userId);
+
+		doNothing().when(fileDataAccessService).persist(any(Metadata.class));
+		ServiceException thrown = assertThrows(
+			ServiceException.class,
+			() -> fileService.uploadFile(request)
+		);
 	}
 }
