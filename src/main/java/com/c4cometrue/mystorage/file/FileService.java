@@ -40,7 +40,7 @@ public class FileService {
 		try (InputStream is = file.getInputStream(); OutputStream os = Files.newOutputStream(path)) {
 			byte[] buffer = new byte[bufferSize];
 			int bytesRead;
-			while ((bytesRead = is.read(buffer)) != -1) {
+			while ((bytesRead = is.read(buffer)) != -1)	{
 				os.write(buffer, 0, bytesRead);
 			}
 		} catch (IOException e) {

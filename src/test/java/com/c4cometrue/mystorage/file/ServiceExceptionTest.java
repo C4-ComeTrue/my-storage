@@ -11,7 +11,7 @@ import com.c4cometrue.mystorage.exception.ErrorCode;
 import com.c4cometrue.mystorage.exception.ServiceException;
 
 @DisplayName("예외 테스트")
-public class ServiceExceptionTest {
+class ServiceExceptionTest {
 	@Test
 	@DisplayName("에러 코드 테스트")
 	void errorCodeTest() {
