@@ -2,21 +2,27 @@ package com.c4cometrue.mystorage.file;
 
 import static com.c4cometrue.mystorage.file.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.util.AssertionErrors.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.tomcat.util.http.fileupload.FileUpload;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -100,5 +106,33 @@ class FileServiceTest {
 			ServiceException.class,
 			() -> fileService.uploadFile(request)
 		);
+	}
+
+	@Test
+	@DisplayName("감동의 업로드 성공 테스트")
+	void uploadFileTest22() throws IOException {
+		// given
+		var multipartFile = mock(MultipartFile.class);
+		var inputStream = mock(InputStream.class);
+		var outStream = mock(OutputStream.class);
+		var files = mockStatic(Files.class);
+		var request = new FileUploadRequest(multipartFile, userId);
+
+		given(multipartFile.getInputStream()).willReturn(inputStream);
+		given(multipartFile.getOriginalFilename()).willReturn(OriginalFileName);
+		given(Files.newOutputStream(any())).willReturn(outStream);
+		given(inputStream.read(any()))
+				.willReturn(10)
+				.willReturn(20)
+				.willReturn(30)
+				.willReturn(-1);
+
+		// when
+		fileService.uploadFile(request);
+
+		// then
+		then(outStream).should(times(3)).write(any(), eq(0), anyInt());
+
+		files.close();
 	}
 }
