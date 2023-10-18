@@ -35,8 +35,8 @@ dependencies {
 
 checkstyle {
     configFile = file("${rootDir}/naver-checkstyle.xml")
-    configProperties = ["suppressionFile" : "${rootDir}/naver-checkstyle-suppressions.xml"]
-    toolVersion ="8.24"
+    configProperties = ["suppressionFile": "${rootDir}/naver-checkstyle-suppressions.xml"]
+    toolVersion = "9.2"
 }
 
 tasks.named('test') {
