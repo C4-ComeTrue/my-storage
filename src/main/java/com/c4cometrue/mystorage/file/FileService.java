@@ -35,7 +35,7 @@ public class FileService {
 		MultipartFile file = request.multipartFile();
 		Long userId = request.userId();
 
-		String storedFileName = Metadata.storedName(file.getOriginalFilename() + UUID.randomUUID());
+		String storedFileName = Metadata.storedName();
 		Path path = Paths.get(storagePath, storedFileName);
 
 		try (InputStream is = file.getInputStream(); OutputStream os = Files.newOutputStream(path)) {

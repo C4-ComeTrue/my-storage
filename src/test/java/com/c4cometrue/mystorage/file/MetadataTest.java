@@ -40,11 +40,8 @@ class MetadataTest {
 	@Test
 	@DisplayName("디비에 저장된 이름")
 	void storedName() {
-		String result = Metadata.storedName(TestConstants.OriginalFileName);
-		assertTrue(result.startsWith(TestConstants.OriginalFileName));
-
-		String uuidPart = result.replace(TestConstants.OriginalFileName, "");
-		assertTrue(Pattern.matches(TestConstants.uuidPattern, uuidPart));
+		String result = Metadata.storedName();
+		assertTrue(Pattern.matches(TestConstants.uuidPattern, result));
 
 	}
 

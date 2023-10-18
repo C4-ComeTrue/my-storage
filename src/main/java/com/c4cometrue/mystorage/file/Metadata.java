@@ -32,13 +32,13 @@ public class Metadata {
 	private Long uploaderId;
 
 	public void validate(Long userId) {
-		if (!this.uploaderId.equals(userId)){
+		if (!this.uploaderId.equals(userId)) {
 			throw new ServiceException(ErrorCode.UNAUTHORIZED_FILE_ACCESS);
 		}
 	}
 
-	public static String storedName(String fileName){
-		return fileName + UUID.randomUUID();
+	public static String storedName() {
+		return UUID.randomUUID().toString();
 	}
 
 	private Metadata(String originalFileName, String storedFileName, String filePath, Long uploaderId) {
@@ -48,7 +48,7 @@ public class Metadata {
 		this.uploaderId = uploaderId;
 	}
 
-	public static Metadata of(String originalFileName, String storedFileName, String filePath, Long uploaderId){
+	public static Metadata of(String originalFileName, String storedFileName, String filePath, Long uploaderId) {
 		return new Metadata(originalFileName, storedFileName, filePath, uploaderId);
 	}
 }
