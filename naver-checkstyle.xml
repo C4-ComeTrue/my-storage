@@ -4,10 +4,10 @@
 		"http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
 <!-- Naver coding convention for Java (version 1.2)  -->
-<!-- This rule metadata requires Checkstyle version 8.24 or above. -->
+<!-- This rule file requires Checkstyle version 8.24 or above. -->
 
 <!--
-The following rules in the Naver coding convention cannot be checked by this configuration metadata.
+The following rules in the Naver coding convention cannot be checked by this configuration file.
 
 - [avoid-korean-pronounce]
 - [class-noun]
@@ -112,7 +112,7 @@ The following rules in the Naver coding convention cannot be checked by this con
 		<!-- [1-top-level-class] -->
 		<module name="OneTopLevelClass"/>
 		<message key="name.invalidPattern"
-				 value="[1-top-level-class] one.top.level.class=Top-level class {0} has to reside in its own source metadata."/>
+				 value="[1-top-level-class] one.top.level.class=Top-level class {0} has to reside in its own source file."/>
 
 		<!-- [avoid-star-import] -->
 		<module name="AvoidStarImport">
@@ -411,7 +411,7 @@ The following rules in the Naver coding convention cannot be checked by this con
 
 	<!--- Suppression -->
 	<module name="SuppressionFilter">
-		<property name="metadata" value="${suppressionFile}"/>
+		<property name="file" value="${suppressionFile}"/>
 		<property name="optional" value="true"/>
 	</module>
 
