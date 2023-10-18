@@ -18,19 +18,19 @@ public class FileController {
 	private final FileService fileService;
 
 	@PostMapping("/files/upload")
-	public ResponseEntity<Void> uploadFile(FileUploadRequest fileUploadRequest){
+	public ResponseEntity<Void> uploadFile(FileUploadRequest fileUploadRequest) {
 		fileService.uploadFile(fileUploadRequest);
 		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("/files/delete")
-	public ResponseEntity<Void> deleteFile(FileDeleteRequest request){
+	public ResponseEntity<Void> deleteFile(FileDeleteRequest request) {
 		fileService.deleteFile(request);
 		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/files/download")
-	public ResponseEntity<Void> downloadFile(FileDownloadRequest request){
+	public ResponseEntity<Void> downloadFile(FileDownloadRequest request) {
 		fileService.downloadFile(request);
 		return ResponseEntity.noContent().build();
 	}

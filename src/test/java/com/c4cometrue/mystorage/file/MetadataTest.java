@@ -16,7 +16,7 @@ class MetadataTest {
 	private Metadata testMetadata;
 
 	@BeforeEach
-	void setUp(){
+	void setUp() {
 		testMetadata = TestConstants.METADATA;
 	}
 
@@ -39,7 +39,7 @@ class MetadataTest {
 
 	@Test
 	@DisplayName("디비에 저장된 이름")
-	void storedName(){
+	void storedName() {
 		String result = Metadata.storedName(TestConstants.OriginalFileName);
 		assertTrue(result.startsWith(TestConstants.OriginalFileName));
 
@@ -47,8 +47,5 @@ class MetadataTest {
 		assertTrue(Pattern.matches(TestConstants.uuidPattern, uuidPart));
 
 	}
-
-
-
 
 }

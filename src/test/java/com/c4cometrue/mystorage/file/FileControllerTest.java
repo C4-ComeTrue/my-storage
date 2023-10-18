@@ -26,13 +26,13 @@ class FileControllerTest {
 	private FileService fileService;
 
 	@BeforeEach
-	public void setUp(){
+	public void setUp() {
 		MockitoAnnotations.openMocks(this);
 	}
 
 	@Test
 	@DisplayName("업로드 컨트롤러 테스트")
-	void uploadFile(){
+	void uploadFile() {
 		ResponseEntity<Void> response = fileController.uploadFile(FileUploadRequest.of(mockMultipartFile, userId));
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 		verify(fileService, times(1)).uploadFile(any());
@@ -40,7 +40,7 @@ class FileControllerTest {
 
 	@Test
 	@DisplayName("파일 다운로드 컨트롤러 테스트")
-	void downloadFile(){
+	void downloadFile() {
 		ResponseEntity<Void> response = fileController.downloadFile(FileDownloadRequest.of(fileId, userPath, userId));
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 		verify(fileService, times(1)).downloadFile(any());
@@ -48,7 +48,7 @@ class FileControllerTest {
 
 	@Test
 	@DisplayName("삭제 컨트롤러 테스트")
-	void deleteFile(){
+	void deleteFile() {
 		ResponseEntity<Void> response = fileController.deleteFile(FileDeleteRequest.of(fileId, userId));
 		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 		verify(fileService, times(1)).deleteFile(any());

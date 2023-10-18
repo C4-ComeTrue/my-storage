@@ -38,11 +38,10 @@ public class FileService {
 		String storedFileName = Metadata.storedName(file.getOriginalFilename() + UUID.randomUUID());
 		Path path = Paths.get(storagePath, storedFileName);
 
-		try (InputStream is = file.getInputStream();
-			 OutputStream os = Files.newOutputStream(path)){
+		try (InputStream is = file.getInputStream(); OutputStream os = Files.newOutputStream(path)) {
 			byte[] buffer = new byte[bufferSize];
 			int bytesRead;
-			while ((bytesRead = is.read(buffer)) != -1){
+			while ((bytesRead = is.read(buffer)) != -1) {
 				os.write(buffer, 0, bytesRead);
 			}
 		} catch (IOException e) {
@@ -63,11 +62,11 @@ public class FileService {
 		Path originalPath = Paths.get(metadata.getFilePath());
 		Path userDesignatedPath = Paths.get(userPath).resolve(metadata.getOriginalFileName()).normalize();
 
-		try (InputStream is = Files.newInputStream(originalPath);
-			 OutputStream os = Files.newOutputStream(userDesignatedPath)) {
+		try (InputStream is = Files.newInputStream(originalPath); OutputStream os = Files.newOutputStream(
+			userDesignatedPath)) {
 			byte[] buffer = new byte[bufferSize];
 			int byteRead;
-			while ((byteRead = is.read(buffer)) != -1){
+			while ((byteRead = is.read(buffer)) != -1) {
 				os.write(buffer, 0, byteRead);
 			}
 		} catch (IOException e) {
@@ -75,7 +74,7 @@ public class FileService {
 		}
 	}
 
-	public void deleteFile(FileDeleteRequest request){
+	public void deleteFile(FileDeleteRequest request) {
 		Long fileId = request.fileId();
 		Long userId = request.userId();
 

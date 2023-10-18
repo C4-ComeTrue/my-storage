@@ -12,17 +12,17 @@ import lombok.RequiredArgsConstructor;
 public class FileDataAccessService implements FileReader, FileWriter {
 	private final FileRepository fileRepository;
 
-	public void deleteBy(Long fileId){
+	public void deleteBy(Long fileId) {
 		fileRepository.deleteById(fileId);
 	}
 
-	public Metadata findBy(Long fileId){
+	public Metadata findBy(Long fileId) {
 		return fileRepository.findById(fileId).orElseThrow(
 			() -> new ServiceException(ErrorCode.CANNOT_FOUND_FILE)
 		);
 	}
 
-	public void persist(Metadata metadata){
+	public void persist(Metadata metadata) {
 		fileRepository.save(metadata);
 	}
 }

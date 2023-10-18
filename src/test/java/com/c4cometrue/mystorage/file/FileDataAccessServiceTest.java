@@ -23,21 +23,20 @@ class FileDataAccessServiceTest {
 	FileRepository fileRepository;
 
 	@BeforeEach
-	public void setUp(){
+	public void setUp() {
 		MockitoAnnotations.openMocks(this);
 	}
 
-
 	@Test
 	@DisplayName("파일 삭제 테스트")
-	void shouldDeleteByFileId(){
+	void shouldDeleteByFileId() {
 		fileDataAccessService.deleteBy(fileId);
 		verify(fileRepository, times(1)).deleteById(fileId);
 	}
 
 	@Test
 	@DisplayName("파일 조회 테스트")
-	void shouldFindByFileId(){
+	void shouldFindByFileId() {
 		Metadata metadata = TestConstants.METADATA;
 		when(fileRepository.findById(fileId)).thenReturn(Optional.of(metadata));
 
@@ -48,7 +47,7 @@ class FileDataAccessServiceTest {
 
 	@Test
 	@DisplayName("파일 조회 테스트 : 실패")
-	void shouldThrowExceptionWhenFileNotFount(){
+	void shouldThrowExceptionWhenFileNotFount() {
 		when(fileRepository.findById(fileId)).thenReturn(Optional.empty());
 		assertThrows(ServiceException.class,
 			() -> fileDataAccessService.findBy(fileId)
@@ -57,7 +56,7 @@ class FileDataAccessServiceTest {
 
 	@Test
 	@DisplayName("파일 저장 테스트")
-	void shouldPersistFile(){
+	void shouldPersistFile() {
 		Metadata metadata = TestConstants.METADATA;
 
 		fileDataAccessService.persist(metadata);
