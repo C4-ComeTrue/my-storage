@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.dto.FileDeleteRequest;
 import com.c4cometrue.mystorage.dto.FileDownloadRequest;
