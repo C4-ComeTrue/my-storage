@@ -1,9 +1,11 @@
 package com.c4cometrue.mystorage.file;
 
+import static com.c4cometrue.mystorage.file.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,13 +19,13 @@ class MetadataTest {
 
 	@BeforeEach
 	void setUp() {
-		testMetadata = TestConstants.METADATA;
+		testMetadata = METADATA;
 	}
 
 	@Test
 	@DisplayName("승인된 사용자 요쳥")
 	void validateWithAuthorizedAccess() {
-		assertDoesNotThrow(() -> testMetadata.validate(TestConstants.userId));
+		assertDoesNotThrow(() -> testMetadata.validate(userId));
 	}
 
 	@Test
@@ -31,7 +33,7 @@ class MetadataTest {
 	void validateWithUnauthorizedAccess() {
 		ServiceException exception = assertThrows(
 			ServiceException.class,
-			() -> testMetadata.validate(TestConstants.nonMatchingUserId)
+			() -> testMetadata.validate(nonMatchingUserId)
 		);
 
 		assertEquals(ErrorCode.UNAUTHORIZED_FILE_ACCESS, exception.getCode());
@@ -41,8 +43,19 @@ class MetadataTest {
 	@DisplayName("디비에 저장된 이름")
 	void storedName() {
 		String result = Metadata.storedName();
-		assertTrue(Pattern.matches(TestConstants.uuidPattern, result));
+		assertTrue(Pattern.matches(uuidPattern, result));
+	}
 
+	@Test
+	@DisplayName("메타데이터 생성")
+	void testMetadataCreation() {
+		Metadata data = Metadata.of(OriginalFileName, storedFileName,
+			userPath, userId);
+		Assertions.assertNotNull(data);
+		Assertions.assertEquals(OriginalFileName, data.getOriginalFileName());
+		Assertions.assertEquals(storedFileName, data.getStoredFileName());
+		Assertions.assertEquals(userPath, data.getFilePath());
+		Assertions.assertEquals(userId, data.getUploaderId());
 	}
 
 }
