@@ -15,7 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.c4cometrue.mystorage.exception.ServiceException;
 
-@DisplayName("파일 데이터어세스 서비스 테스트")
+@DisplayName("파일 데이터 액세스 서비스 테스트")
 class FileDataAccessServiceTest {
 	@InjectMocks
 	private FileDataAccessService fileDataAccessService;
@@ -36,13 +36,12 @@ class FileDataAccessServiceTest {
 
 	@Test
 	@DisplayName("파일 조회 테스트")
-	void shouldFindByFileId() {
-		Metadata metadata = TestConstants.METADATA;
-		when(fileRepository.findById(fileId)).thenReturn(Optional.of(metadata));
+	void shouldFindByFileIdAndUserId() {
+		when(fileRepository.findByIdAndUploaderId(fileId, userId)).thenReturn(Optional.of(METADATA));
 
-		Metadata result = fileDataAccessService.findBy(fileId);
+		fileDataAccessService.findBy(fileId, userId);
 
-		verify(fileRepository, times(1)).findById(fileId);
+		verify(fileRepository, times(1)).findByIdAndUploaderId(fileId, userId);
 	}
 
 	@Test
@@ -50,17 +49,15 @@ class FileDataAccessServiceTest {
 	void shouldThrowExceptionWhenFileNotFount() {
 		when(fileRepository.findById(fileId)).thenReturn(Optional.empty());
 		assertThrows(ServiceException.class,
-			() -> fileDataAccessService.findBy(fileId)
+			() -> fileDataAccessService.findBy(fileId, userId)
 		);
 	}
 
 	@Test
 	@DisplayName("파일 저장 테스트")
 	void shouldPersistFile() {
-		Metadata metadata = TestConstants.METADATA;
+		fileDataAccessService.persist(METADATA);
 
-		fileDataAccessService.persist(metadata);
-
-		verify(fileRepository, times(1)).save(TestConstants.METADATA);
+		verify(fileRepository, times(1)).save(METADATA);
 	}
 }

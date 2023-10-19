@@ -32,9 +32,7 @@ public class FileService {
 	private Integer bufferSize;
 
 	@Transactional
-	public void uploadFile(FileUploadRequest request) {
-		MultipartFile file = request.multipartFile();
-		Long userId = request.userId();
+	public void uploadFile(MultipartFile file, Long userId) {
 
 		String storedFileName = Metadata.storedName();
 		Path path = Paths.get(storagePath, storedFileName);
@@ -53,13 +51,8 @@ public class FileService {
 		}
 	}
 
-	public void downloadFile(FileDownloadRequest request) {
-		Long fileId = request.fileId();
-		Long userId = request.userId();
-		String userPath = request.userPath();
-
-		Metadata metadata = fileDataAccessService.findBy(fileId);
-		metadata.validate(userId);
+	public void downloadFile(Long fileId, String userPath, Long userId) {
+		Metadata metadata = fileDataAccessService.findBy(fileId, userId);
 		Path originalPath = Paths.get(metadata.getFilePath());
 		Path userDesignatedPath = Paths.get(userPath).resolve(metadata.getOriginalFileName()).normalize();
 
@@ -76,13 +69,9 @@ public class FileService {
 	}
 
 	@Transactional
-	public void deleteFile(FileDeleteRequest request) {
-		Long fileId = request.fileId();
-		Long userId = request.userId();
-
+	public void deleteFile(Long fileId, Long userId) {
 		fileDataAccessService.deleteBy(fileId);
-		Metadata metadata = fileDataAccessService.findBy(fileId);
-		metadata.validate(userId);
+		Metadata metadata = fileDataAccessService.findBy(fileId, userId);
 		Path path = Paths.get(metadata.getFilePath());
 		try {
 			Files.delete(path.toAbsolutePath());

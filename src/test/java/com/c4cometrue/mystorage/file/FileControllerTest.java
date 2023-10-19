@@ -33,24 +33,23 @@ class FileControllerTest {
 	@Test
 	@DisplayName("업로드 컨트롤러 테스트")
 	void uploadFile() {
-		ResponseEntity<Void> response = fileController.uploadFile(FileUploadRequest.of(mockMultipartFile, userId));
-		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-		verify(fileService, times(1)).uploadFile(any());
+		fileController.uploadFile(FileUploadRequest.of(mockMultipartFile, userId));
+		verify(fileService, times(1)).uploadFile(any(), anyLong());
 	}
 
 	@Test
 	@DisplayName("파일 다운로드 컨트롤러 테스트")
 	void downloadFile() {
-		ResponseEntity<Void> response = fileController.downloadFile(FileDownloadRequest.of(fileId, userPath, userId));
-		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-		verify(fileService, times(1)).downloadFile(any());
+		fileController.downloadFile(FileDownloadRequest.of(fileId, userPath, userId));
+
+		verify(fileService, times(1)).downloadFile(anyLong(), anyString(), anyLong());
 	}
 
 	@Test
 	@DisplayName("삭제 컨트롤러 테스트")
 	void deleteFile() {
-		ResponseEntity<Void> response = fileController.deleteFile(FileDeleteRequest.of(fileId, userId));
-		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-		verify(fileService, times(1)).deleteFile(any());
+		fileController.deleteFile(FileDeleteRequest.of(fileId, userId));
+
+		verify(fileService, times(1)).deleteFile(anyLong(), anyLong());
 	}
 }

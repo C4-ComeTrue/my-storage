@@ -10,10 +10,4 @@ public class ServiceException extends RuntimeException {
 	public ServiceException(ErrorCode errorCode) {
 		this.code = errorCode;
 	}
-
-	public ServiceException(ErrorCode errorCode, Object... args) {
-		super(String.format(errorCode.getMessage(), args));
-		this.code = errorCode;
-	}
-
 }

@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ErrorCode {
-	UNAUTHORIZED_FILE_ACCESS(HttpStatus.UNAUTHORIZED, "비정상적인 요청입니다."),
+	UNAUTHORIZED_FILE_ACCESS(HttpStatus.FORBIDDEN, "비정상적인 요청입니다."),
 
 	CANNOT_FOUND_FILE(HttpStatus.NOT_FOUND, "해당 파일을 찾을 수 없습니다."),
 

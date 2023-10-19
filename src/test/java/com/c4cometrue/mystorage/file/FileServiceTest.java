@@ -52,10 +52,9 @@ class FileServiceTest {
 	@Test
 	@DisplayName("업로드 실패 테스트")
 	void uploadFileFailTest() throws IOException {
-		FileUploadRequest request = FileUploadRequest.of(mockMultipartFile, userId);
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
-			() -> fileService.uploadFile(request)
+			() -> fileService.uploadFile(mockMultipartFile, userId)
 		);
 
 		assertEquals(ErrorCode.FILE_COPY_ERROR, thrown.getCode());
@@ -64,17 +63,11 @@ class FileServiceTest {
 	@Test
 	@DisplayName("다운로드 실패 테스트")
 	void downloadFileFailTest() throws IOException {
-		FileDownloadRequest request = mock(FileDownloadRequest.class);
-		when(request.fileId()).thenReturn(fileId);
-		when(request.userId()).thenReturn(userId);
-		when(request.userPath()).thenReturn(userPath);
-
-		Metadata mockMetadata = METADATA;
-		when(fileDataAccessService.findBy(anyLong())).thenReturn(mockMetadata);
+		when(fileDataAccessService.findBy(anyLong(), anyLong())).thenReturn(METADATA);
 
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
-			() -> fileService.downloadFile(request)
+			() -> fileService.downloadFile(fileId, userPath, userId)
 		);
 		assertEquals(ErrorCode.FILE_COPY_ERROR, thrown.getCode());
 	}
@@ -82,11 +75,10 @@ class FileServiceTest {
 	@Test
 	@DisplayName("삭제 실패 테스트")
 	void deleteFileFailTest() throws IOException {
-		FileDeleteRequest request = FileDeleteRequest.of(fileId, userId);
-		when(fileDataAccessService.findBy(fileId)).thenReturn(METADATA);
+		when(fileDataAccessService.findBy(fileId, userId)).thenReturn(METADATA);
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
-			() -> fileService.deleteFile(request)
+			() -> fileService.deleteFile(fileId, userId)
 		);
 
 		assertEquals(ErrorCode.FILE_DELETE_ERROR, thrown.getCode());
@@ -99,12 +91,11 @@ class FileServiceTest {
 		when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(mockMultipartFile.getBytes()));
 		when(mockFile.getOriginalFilename()).thenReturn(OriginalFileName);
 
-		FileUploadRequest request = FileUploadRequest.of(mockFile, userId);
 
 		doNothing().when(fileDataAccessService).persist(any(Metadata.class));
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
-			() -> fileService.uploadFile(request)
+			() -> fileService.uploadFile(mockFile, userId)
 		);
 	}
 
@@ -116,7 +107,6 @@ class FileServiceTest {
 		var inputStream = mock(InputStream.class);
 		var outStream = mock(OutputStream.class);
 		var files = mockStatic(Files.class);
-		var request = new FileUploadRequest(multipartFile, userId);
 
 		given(multipartFile.getInputStream()).willReturn(inputStream);
 		given(multipartFile.getOriginalFilename()).willReturn(OriginalFileName);
@@ -128,7 +118,7 @@ class FileServiceTest {
 				.willReturn(-1);
 
 		// when
-		fileService.uploadFile(request);
+		fileService.uploadFile(multipartFile, userId);
 
 		// then
 		then(outStream).should(times(3)).write(any(), eq(0), anyInt());

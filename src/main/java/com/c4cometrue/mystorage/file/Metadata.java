@@ -31,12 +31,6 @@ public class Metadata {
 	@Column(nullable = false)
 	private Long uploaderId;
 
-	public void validate(Long userId) {
-		if (!this.uploaderId.equals(userId)) {
-			throw new ServiceException(ErrorCode.UNAUTHORIZED_FILE_ACCESS);
-		}
-	}
-
 	public static String storedName() {
 		return UUID.randomUUID().toString();
 	}

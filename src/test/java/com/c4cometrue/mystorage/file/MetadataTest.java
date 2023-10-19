@@ -15,30 +15,6 @@ import com.c4cometrue.mystorage.exception.ServiceException;
 
 @DisplayName("파일 엔티티 테스트")
 class MetadataTest {
-	private Metadata testMetadata;
-
-	@BeforeEach
-	void setUp() {
-		testMetadata = METADATA;
-	}
-
-	@Test
-	@DisplayName("승인된 사용자 요쳥")
-	void validateWithAuthorizedAccess() {
-		assertDoesNotThrow(() -> testMetadata.validate(userId));
-	}
-
-	@Test
-	@DisplayName("미승인된 사용자 요쳥")
-	void validateWithUnauthorizedAccess() {
-		ServiceException exception = assertThrows(
-			ServiceException.class,
-			() -> testMetadata.validate(nonMatchingUserId)
-		);
-
-		assertEquals(ErrorCode.UNAUTHORIZED_FILE_ACCESS, exception.getCode());
-	}
-
 	@Test
 	@DisplayName("디비에 저장된 이름")
 	void storedName() {

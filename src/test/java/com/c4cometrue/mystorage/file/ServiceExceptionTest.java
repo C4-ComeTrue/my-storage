@@ -25,8 +25,5 @@ class ServiceExceptionTest {
 		ServiceException exception = new ServiceException(ErrorCode.CANNOT_FOUND_FILE);
 
 		assertEquals(ErrorCode.CANNOT_FOUND_FILE, exception.getCode());
-
-		ServiceException exceptionWithMessage = new ServiceException(ErrorCode.CANNOT_FOUND_FILE, fileId);
-		assertEquals("해당 파일을 찾을 수 없습니다.", exceptionWithMessage.getMessage());
 	}
 }

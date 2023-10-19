@@ -16,9 +16,9 @@ public class FileDataAccessService implements FileReader, FileWriter {
 		fileRepository.deleteById(fileId);
 	}
 
-	public Metadata findBy(Long fileId) {
-		return fileRepository.findById(fileId).orElseThrow(
-			() -> new ServiceException(ErrorCode.CANNOT_FOUND_FILE)
+	public Metadata findBy(Long fileId, Long userId) {
+		return fileRepository.findByIdAndUploaderId(fileId, userId).orElseThrow(
+			() -> new ServiceException(ErrorCode.UNAUTHORIZED_FILE_ACCESS)
 		);
 	}
 
