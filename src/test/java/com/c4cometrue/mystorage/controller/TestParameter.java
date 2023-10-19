@@ -1,7 +1,7 @@
 package com.c4cometrue.mystorage.controller;
 
 import com.c4cometrue.mystorage.dto.response.CreateFileRes;
-import com.c4cometrue.mystorage.dto.response.FileDownloadRes;
+//import com.c4cometrue.mystorage.dto.response.FileDownloadRes;
 import com.c4cometrue.mystorage.entity.FileMetaData;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -41,10 +41,10 @@ public class TestParameter {
         }
     };
 
-    public static FileDownloadRes fileDownloadRes = FileDownloadRes.builder()
-        .fileMetaData(fileMetaData)
-        .resource(fileResource)
-        .build();
+//    public static FileDownloadRes fileDownloadRes = FileDownloadRes.builder()
+//        .fileMetaData(fileMetaData)
+//        .resource(fileResource)
+//        .build();
     public static CreateFileRes createFileRes = new CreateFileRes(fileMetaData);
 
     public static String rootPath = "C:/Users/pear/study/C4/storage";
