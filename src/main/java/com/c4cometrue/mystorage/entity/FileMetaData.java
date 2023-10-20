@@ -30,15 +30,15 @@ public class FileMetaData {
     private String mime;
 
     @NotBlank
-    private String owner;
+    private String username;
 
     @Builder
-    public FileMetaData(String fileName, String fileStorageName, long size, String mime, String owner) {
+    public FileMetaData(String fileName, String fileStorageName, long size, String mime, String username) {
         this.fileName = fileName;
         this.fileStorageName = fileStorageName;
         this.size = size;
         this.mime = mime;
-        this.owner = owner;
+        this.username = username;
     }
 
 }

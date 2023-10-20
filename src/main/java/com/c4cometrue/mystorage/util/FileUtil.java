@@ -10,6 +10,9 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * 파일을 물리적으로 처리
+ */
 public class FileUtil {
     private FileUtil() {
         throw new AssertionError("should not be invoked");
@@ -17,8 +20,8 @@ public class FileUtil {
 
     /**
      * 파일 업로드를 수행한다.
-     * @param multipartFile
-     * @param filePath
+     * @param multipartFile 사용자에게 받은 파일
+     * @param filePath 파일이 저장될 Path
      */
     public static void uploadFile(MultipartFile multipartFile, Path filePath) {
         if (multipartFile.isEmpty()) {
@@ -34,7 +37,7 @@ public class FileUtil {
 
     /**
      * 파일을 물리적으로 제거한다.
-     * @param filePath
+     * @param filePath 파일의 Path
      */
     public static void deleteFile(Path filePath) {
         if (!Files.exists(filePath)) {
@@ -50,8 +53,8 @@ public class FileUtil {
 
     /**
      * 파일을 물리 디스크에서 가져온다.
-     * @param filePath
-     * @return
+     * @param filePath 파일의 Path
+     * @return 물리 파일 정보
      */
     public static Resource getFile(Path filePath) {
         try {

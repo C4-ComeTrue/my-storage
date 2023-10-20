@@ -19,49 +19,77 @@ public class FileService {
     private final FileRepository fileRepository;
     private final StoragePathService storagePathService;
 
-    public CreateFileRes uploadFile(MultipartFile file, String username){
+    /**
+     * 업로드 요청한 파일 저장
+     * @param file 사용자가 업로드한 파일
+     * @param username 사용자 이름
+     * @return 업로드된 파일 메타데이터
+     */
+    public CreateFileRes uploadFile(MultipartFile file, String username) {
+        // 특정 사용자의 동일한 파일명 중복 처리
+        if (fileRepository.findByFileNameAndUsername(file.getOriginalFilename(), username).isPresent()) {
+            throw ErrorCd.DUPLICATE_FILE.serviceException();
+        }
+
         String fileStorageName = UUID.randomUUID() + file.getOriginalFilename();
         Path filePath = storagePathService.createTotalPath(fileStorageName);
         FileUtil.uploadFile(file, filePath);
 
         FileMetaData fileMetaData = FileMetaData.builder()
-                .fileName(file.getOriginalFilename())
-                .fileStorageName(fileStorageName)
-                .size(file.getSize())
-                .mime(file.getContentType())
-                .owner(username)
-                .build();
+            .fileName(file.getOriginalFilename())
+            .fileStorageName(fileStorageName)
+            .size(file.getSize())
+            .mime(file.getContentType())
+            .username(username)
+            .build();
 
         // DB 저장
         fileRepository.save(fileMetaData);
         return new CreateFileRes(fileMetaData);
     }
 
+    /**
+     * 파일 삭제
+     * @param fileStorageName 파일 로컬 저장소 이름
+     * @param username 사용자 이름
+     */
     public void deleteFile(String fileStorageName, String username) {
-        FileMetaData fileMetaData = getFile(fileStorageName, username);
+        FileMetaData fileMetaData = getFileMetaData(fileStorageName, username);
         // 파일의 경로
         Path filePath = storagePathService.createTotalPath(fileMetaData.getFileStorageName());
-
-        FileUtil.deleteFile(filePath);
+        // 파일 DB 정보 삭제
         fileRepository.delete(fileMetaData);
+        // 파일 물리적 삭제
+        FileUtil.deleteFile(filePath);
     }
 
+    /**
+     * 파일 다운로드
+     * @param fileStorageName 파일 로컬 저장소 이름
+     * @param username 사용자 이름
+     * @return 물리적 파일 정보
+     */
     public Resource downloadFile(String fileStorageName, String username) {
-        FileMetaData fileMetaData = getFile(fileStorageName, username);
+        FileMetaData fileMetaData = getFileMetaData(fileStorageName, username);
         Path filePath = storagePathService.createTotalPath(fileMetaData.getFileStorageName());
-
+        // 실제 파일 반환
         return FileUtil.getFile(filePath);
     }
 
-    public FileMetaData getFile(String fileStorageName, String username){
-        FileMetaData fileMetaData = fileRepository.findByFileStorageName(fileStorageName);
+    /**
+     * 파일이 DB에 존재하는지 확인
+     * @param fileStorageName 파일 로컬 저장소 이름
+     * @param username 사용자 이름
+     * @return 파일 메타 데이터
+     */
+    public FileMetaData getFileMetaData(String fileStorageName, String username) {
+        FileMetaData fileMetaData = fileRepository.findByFileStorageName(fileStorageName)
+                .orElseThrow(() -> ErrorCd.FILE_NOT_EXIST
+                .serviceException("[getFileMetaData] file not exist - fileStorageName: {}", fileStorageName));
 
-        if (fileMetaData == null) {
-            throw ErrorCd.FILE_NOT_EXIST.serviceException("[getFile] file not exist - fileStorageName: {}", fileStorageName);
-        }
-
-        if (!fileMetaData.getOwner().equals(username)) {
-            throw ErrorCd.NO_PERMISSION.serviceException("[getFile] no permission - userName: {}", username);
+        if (!fileMetaData.getUsername().equals(username)) {
+            throw ErrorCd.NO_PERMISSION
+                .serviceException("[getFileMetaData] no permission - userName: {}", username);
         }
 
         return fileMetaData;
