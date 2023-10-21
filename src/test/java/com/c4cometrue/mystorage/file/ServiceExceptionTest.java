@@ -22,8 +22,22 @@ class ServiceExceptionTest {
 	@Test
 	@DisplayName("서비스 익셉션 테스트")
 	void serviceExceptionTest() {
-		ServiceException exception = new ServiceException(ErrorCode.CANNOT_FOUND_FILE);
+		ServiceException exception = new ServiceException(ErrorCode.CANNOT_FOUND_FILE.name(),
+			ErrorCode.CANNOT_FOUND_FILE.getMessage());
 
-		assertEquals(ErrorCode.CANNOT_FOUND_FILE, exception.getCode());
+		assertEquals(ErrorCode.CANNOT_FOUND_FILE.name(), exception.getErrCode());
+	}
+
+	@Test
+	@DisplayName("디버그 메시지 테스트")
+	void DebugMessageTest() {
+		Throwable cause = new RuntimeException();
+		ErrorCode errorCode = ErrorCode.UNAUTHORIZED_FILE_ACCESS;
+
+		ServiceException exception = errorCode.serviceException(debugMessageTemplate, fileId, userId);
+
+		assertEquals(errorCode.name(), exception.getErrCode());
+		assertEquals(errorCode.getMessage(), exception.getErrMessage());
+		assertEquals(debugMessage, exception.getDebugMessage());
 	}
 }

@@ -59,7 +59,7 @@ class FileServiceTest {
 			() -> fileService.uploadFile(mockMultipartFile, userId)
 		);
 
-		assertEquals(ErrorCode.FILE_COPY_ERROR, thrown.getCode());
+		assertEquals(ErrorCode.FILE_COPY_ERROR.name(), thrown.getErrCode());
 	}
 
 	@Test
@@ -71,7 +71,7 @@ class FileServiceTest {
 			ServiceException.class,
 			() -> fileService.downloadFile(fileId, userPath, userId)
 		);
-		assertEquals(ErrorCode.FILE_COPY_ERROR, thrown.getCode());
+		assertEquals(ErrorCode.FILE_COPY_ERROR.name(), thrown.getErrCode());
 	}
 
 	@Test
@@ -83,7 +83,7 @@ class FileServiceTest {
 			() -> fileService.deleteFile(fileId, userId)
 		);
 
-		assertEquals(ErrorCode.FILE_DELETE_ERROR, thrown.getCode());
+		assertEquals(ErrorCode.FILE_DELETE_ERROR.name(), thrown.getErrCode());
 	}
 
 	@Test

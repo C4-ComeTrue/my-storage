@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
-import com.c4cometrue.mystorage.exception.ServiceException;
 
 public class FileUtil {
 	private FileUtil() {
@@ -24,7 +23,7 @@ public class FileUtil {
 				os.write(buffer, 0, bytesRead);
 			}
 		} catch (IOException e) {
-			throw new ServiceException(ErrorCode.FILE_COPY_ERROR);
+			throw ErrorCode.FILE_COPY_ERROR.serviceException();
 		}
 	}
 
@@ -37,7 +36,7 @@ public class FileUtil {
 				os.write(buffer, 0, byteRead);
 			}
 		} catch (IOException e) {
-			throw new ServiceException(ErrorCode.FILE_COPY_ERROR);
+			throw ErrorCode.FILE_COPY_ERROR.serviceException("사용자 경로 : {}", userDesignatedPath);
 		}
 	}
 
@@ -45,7 +44,7 @@ public class FileUtil {
 		try {
 			Files.delete(path.toAbsolutePath());
 		} catch (IOException e) {
-			throw new ServiceException(ErrorCode.FILE_DELETE_ERROR);
+			throw ErrorCode.FILE_DELETE_ERROR.serviceException();
 		}
 	}
 }

@@ -19,7 +19,8 @@ public class FileDataAccessService implements FileReader, FileWriter {
 
 	public Metadata findBy(Long fileId, Long userId) {
 		return fileRepository.findByIdAndUploaderId(fileId, userId)
-			.orElseThrow(() -> new ServiceException(ErrorCode.UNAUTHORIZED_FILE_ACCESS));
+			.orElseThrow(() -> ErrorCode.UNAUTHORIZED_FILE_ACCESS.serviceException("fileId : {}, userId : {}", fileId,
+				userId));
 	}
 
 	public void persist(Metadata metadata, Long userId) {
@@ -29,13 +30,13 @@ public class FileDataAccessService implements FileReader, FileWriter {
 
 	public void existBy(Long fileId) {
 		if (!fileRepository.existsById(fileId)) {
-			throw new ServiceException(ErrorCode.CANNOT_FOUND_FILE);
+			throw ErrorCode.CANNOT_FOUND_FILE.serviceException("fileId : {}", fileId);
 		}
 	}
 
 	public void duplicateBy(String fileName, Long userId) {
 		if (fileRepository.checkDuplicateFileName(fileName, userId)) {
-			throw new ServiceException(ErrorCode.DUPLICATE_FILE_NAME);
+			throw ErrorCode.DUPLICATE_FILE_NAME.serviceException("fileName : {}", fileName);
 		}
 	}
 }

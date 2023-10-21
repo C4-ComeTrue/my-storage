@@ -14,4 +14,7 @@ public class TestConstants {
 	public static final MultipartFile mockMultipartFile = new MockMultipartFile("chungFile", "chung.txt", "text/plain",
 		"chung".getBytes());
 	public static final String uuidPattern = "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$";
+
+	public static final String debugMessageTemplate = "fileId : %s, userId : %s";
+	public static final String debugMessage = String.format(debugMessageTemplate, fileId, userId);
 }

@@ -20,4 +20,12 @@ public enum ErrorCode {
 
 	private final HttpStatus httpStatus;
 	private final String message;
+
+	public ServiceException serviceException() {
+		return new ServiceException(this.name(), message);
+	}
+
+	public ServiceException serviceException(String debugMessage, Object... debugMessageArgs) {
+		return new ServiceException(this.name(), message, String.format(debugMessage, debugMessageArgs));
+	}
 }
