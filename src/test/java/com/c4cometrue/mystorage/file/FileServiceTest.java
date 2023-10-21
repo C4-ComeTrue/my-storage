@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -33,6 +34,7 @@ import com.c4cometrue.mystorage.dto.FileDownloadRequest;
 import com.c4cometrue.mystorage.dto.FileUploadRequest;
 import com.c4cometrue.mystorage.exception.ErrorCode;
 import com.c4cometrue.mystorage.exception.ServiceException;
+import com.c4cometrue.mystorage.util.FileUtil;
 
 @DisplayName("파일 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -91,8 +93,7 @@ class FileServiceTest {
 		when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(mockMultipartFile.getBytes()));
 		when(mockFile.getOriginalFilename()).thenReturn(OriginalFileName);
 
-
-		doNothing().when(fileDataAccessService).persist(any(Metadata.class));
+		doNothing().when(fileDataAccessService).persist(any(Metadata.class), anyLong());
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
 			() -> fileService.uploadFile(mockFile, userId)
@@ -101,7 +102,7 @@ class FileServiceTest {
 
 	@Test
 	@DisplayName("감동의 업로드 성공 테스트")
-	void uploadFileTest22() throws IOException {
+	void uploadFileTest() throws IOException {
 		// given
 		var multipartFile = mock(MultipartFile.class);
 		var inputStream = mock(InputStream.class);
@@ -112,10 +113,10 @@ class FileServiceTest {
 		given(multipartFile.getOriginalFilename()).willReturn(OriginalFileName);
 		given(Files.newOutputStream(any())).willReturn(outStream);
 		given(inputStream.read(any()))
-				.willReturn(10)
-				.willReturn(20)
-				.willReturn(30)
-				.willReturn(-1);
+			.willReturn(10)
+			.willReturn(20)
+			.willReturn(30)
+			.willReturn(-1);
 
 		// when
 		fileService.uploadFile(multipartFile, userId);

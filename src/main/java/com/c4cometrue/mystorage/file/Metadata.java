@@ -2,9 +2,6 @@ package com.c4cometrue.mystorage.file;
 
 import java.util.UUID;
 
-import com.c4cometrue.mystorage.exception.ErrorCode;
-import com.c4cometrue.mystorage.exception.ServiceException;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -14,7 +14,9 @@ public enum ErrorCode {
 
 	FILE_COPY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 복사 중 오류가 발생했습니다."),
 
-	FILE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제 중 오류가 발생했습니다.");
+	FILE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제 중 오류가 발생했습니다."),
+
+	DUPLICATE_FILE_NAME(HttpStatus.BAD_REQUEST, "파일 업로드에 중복이 발생 했습니다");
 
 	private final HttpStatus httpStatus;
 	private final String message;

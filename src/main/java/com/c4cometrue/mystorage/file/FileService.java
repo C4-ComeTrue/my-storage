@@ -1,9 +1,5 @@
 package com.c4cometrue.mystorage.file;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -11,11 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.c4cometrue.mystorage.dto.FileDeleteRequest;
-import com.c4cometrue.mystorage.dto.FileDownloadRequest;
-import com.c4cometrue.mystorage.dto.FileUploadRequest;
-import com.c4cometrue.mystorage.exception.ErrorCode;
-import com.c4cometrue.mystorage.exception.ServiceException;
+import com.c4cometrue.mystorage.util.FileUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,26 +21,17 @@ public class FileService {
 	private String storagePath;
 
 	@Value("${file.buffer}")
-	private Integer bufferSize;
+	private int bufferSize;
 
 	@Transactional
 	public void uploadFile(MultipartFile file, Long userId) {
-
+		String originalFileName = file.getOriginalFilename();
 		String storedFileName = Metadata.storedName();
 		Path path = Paths.get(storagePath, storedFileName);
+		Metadata metadata = Metadata.of(originalFileName, storedFileName, path.toString(), userId);
 
-		Metadata metadata = Metadata.of(file.getOriginalFilename(), storedFileName, path.toString(), userId);
-		fileDataAccessService.persist(metadata);
-
-		try (InputStream is = file.getInputStream(); OutputStream os = Files.newOutputStream(path)) {
-			byte[] buffer = new byte[bufferSize];
-			int bytesRead;
-			while ((bytesRead = is.read(buffer)) != -1) {
-				os.write(buffer, 0, bytesRead);
-			}
-		} catch (IOException e) {
-			throw new ServiceException(ErrorCode.FILE_COPY_ERROR);
-		}
+		fileDataAccessService.persist(metadata, userId);
+		FileUtil.uploadFile(file, path, bufferSize);
 	}
 
 	public void downloadFile(Long fileId, String userPath, Long userId) {
@@ -56,27 +39,15 @@ public class FileService {
 		Path originalPath = Paths.get(metadata.getFilePath());
 		Path userDesignatedPath = Paths.get(userPath).resolve(metadata.getOriginalFileName()).normalize();
 
-		try (InputStream is = Files.newInputStream(originalPath); OutputStream os = Files.newOutputStream(
-			userDesignatedPath)) {
-			byte[] buffer = new byte[bufferSize];
-			int byteRead;
-			while ((byteRead = is.read(buffer)) != -1) {
-				os.write(buffer, 0, byteRead);
-			}
-		} catch (IOException e) {
-			throw new ServiceException(ErrorCode.FILE_COPY_ERROR);
-		}
+		FileUtil.download(originalPath, userDesignatedPath, bufferSize);
 	}
 
 	@Transactional
 	public void deleteFile(Long fileId, Long userId) {
-		fileDataAccessService.deleteBy(fileId);
 		Metadata metadata = fileDataAccessService.findBy(fileId, userId);
+		fileDataAccessService.deleteBy(fileId);
 		Path path = Paths.get(metadata.getFilePath());
-		try {
-			Files.delete(path.toAbsolutePath());
-		} catch (IOException e) {
-			throw new ServiceException(ErrorCode.FILE_DELETE_ERROR);
-		}
+
+		FileUtil.delete(path);
 	}
 }
