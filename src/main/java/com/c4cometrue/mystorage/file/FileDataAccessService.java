@@ -19,7 +19,7 @@ public class FileDataAccessService implements FileReader, FileWriter {
 
 	public Metadata findBy(Long fileId, Long userId) {
 		return fileRepository.findByIdAndUploaderId(fileId, userId)
-			.orElseThrow(() -> ErrorCode.UNAUTHORIZED_FILE_ACCESS.serviceException("fileId : {}, userId : {}", fileId,
+			.orElseThrow(() -> ErrorCode.CANNOT_FOUND_FILE.serviceException("fileId : {}, userId : {}", fileId,
 				userId));
 	}
 

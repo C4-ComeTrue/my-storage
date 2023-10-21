@@ -21,7 +21,7 @@ public class FileController {
 	private final FileService fileService;
 
 	@PostMapping
-	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ResponseStatus(HttpStatus.CREATED)
 	public void uploadFile(FileUploadRequest fileUploadRequest) {
 		fileService.uploadFile(fileUploadRequest.multipartFile(), fileUploadRequest.userId());
 	}

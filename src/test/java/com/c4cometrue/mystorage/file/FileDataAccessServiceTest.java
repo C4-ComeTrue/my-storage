@@ -26,32 +26,32 @@ class FileDataAccessServiceTest {
 	@Test
 	@DisplayName("파일 삭제 테스트")
 	void shouldDeleteByFileId() {
-		when(fileRepository.existsById(fileId)).thenReturn(true);
-		assertDoesNotThrow(() -> fileDataAccessService.deleteBy(fileId));
-		verify(fileRepository, times(1)).deleteById(fileId);
+		when(fileRepository.existsById(FILE_ID)).thenReturn(true);
+		assertDoesNotThrow(() -> fileDataAccessService.deleteBy(FILE_ID));
+		verify(fileRepository, times(1)).deleteById(FILE_ID);
 	}
 
 	@Test
 	@DisplayName("파일 조회 테스트")
 	void shouldFindByFileIdAndUserId() {
-		when(fileRepository.findByIdAndUploaderId(fileId, userId)).thenReturn(Optional.of(METADATA));
+		when(fileRepository.findByIdAndUploaderId(FILE_ID, USER_ID)).thenReturn(Optional.of(METADATA));
 
-		fileDataAccessService.findBy(fileId, userId);
+		fileDataAccessService.findBy(FILE_ID, USER_ID);
 
-		verify(fileRepository, times(1)).findByIdAndUploaderId(fileId, userId);
+		verify(fileRepository, times(1)).findByIdAndUploaderId(FILE_ID, USER_ID);
 	}
 
 	@Test
 	@DisplayName("파일 조회 테스트 : 실패")
 	void shouldThrowExceptionWhenFileNotFount() {
-		when(fileRepository.findByIdAndUploaderId(fileId, userId)).thenReturn(Optional.empty());
-		assertThrows(ServiceException.class, () -> fileDataAccessService.findBy(fileId, userId));
+		when(fileRepository.findByIdAndUploaderId(FILE_ID, USER_ID)).thenReturn(Optional.empty());
+		assertThrows(ServiceException.class, () -> fileDataAccessService.findBy(FILE_ID, USER_ID));
 	}
 
 	@Test
 	@DisplayName("파일 저장 테스트")
 	void shouldPersistFile() {
-		fileDataAccessService.persist(METADATA, userId);
+		fileDataAccessService.persist(METADATA, USER_ID);
 
 		verify(fileRepository, times(1)).save(METADATA);
 	}
@@ -59,28 +59,28 @@ class FileDataAccessServiceTest {
 	@Test
 	@DisplayName("존재하는 파일인지 테스트")
 	void shouldExistByFile() {
-		given(fileRepository.existsById(fileId)).willReturn(true);
-		assertDoesNotThrow(() -> fileDataAccessService.existBy(fileId));
+		given(fileRepository.existsById(FILE_ID)).willReturn(true);
+		assertDoesNotThrow(() -> fileDataAccessService.existBy(FILE_ID));
 	}
 
 	@Test
 	@DisplayName("존재하는 파일 테스트 : 실패")
 	void shouldThrowExceptionWhenFileNotExist() {
-		given(fileRepository.existsById(fileId)).willReturn(false);
-		assertThrows(ServiceException.class, () -> fileDataAccessService.existBy(fileId));
+		given(fileRepository.existsById(FILE_ID)).willReturn(false);
+		assertThrows(ServiceException.class, () -> fileDataAccessService.existBy(FILE_ID));
 	}
 
 	@Test
 	@DisplayName("중복 파일 검사")
 	void shouldNotDuplicateFile() {
-		given(fileRepository.checkDuplicateFileName(OriginalFileName, userId)).willReturn(false);
-		assertDoesNotThrow(() -> fileDataAccessService.duplicateBy(OriginalFileName, userId));
+		given(fileRepository.checkDuplicateFileName(ORIGINAL_FILE_NAME, USER_ID)).willReturn(false);
+		assertDoesNotThrow(() -> fileDataAccessService.duplicateBy(ORIGINAL_FILE_NAME, USER_ID));
 	}
 
 	@Test
 	@DisplayName("중복 파일 검사 : 실패")
 	void shouldThrowExceptionDuplicateFile() {
-		given(fileRepository.checkDuplicateFileName(OriginalFileName, userId)).willReturn(true);
-		assertThrows(ServiceException.class, () -> fileDataAccessService.duplicateBy(OriginalFileName, userId));
+		given(fileRepository.checkDuplicateFileName(ORIGINAL_FILE_NAME, USER_ID)).willReturn(true);
+		assertThrows(ServiceException.class, () -> fileDataAccessService.duplicateBy(ORIGINAL_FILE_NAME, USER_ID));
 	}
 }

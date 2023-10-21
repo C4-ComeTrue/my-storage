@@ -5,8 +5,9 @@ import org.springframework.http.HttpStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
+
 @Getter
+@AllArgsConstructor
 public enum ErrorCode {
 	UNAUTHORIZED_FILE_ACCESS(HttpStatus.FORBIDDEN, "비정상적인 요청입니다."),
 

@@ -30,14 +30,24 @@ class ServiceExceptionTest {
 
 	@Test
 	@DisplayName("디버그 메시지 테스트")
-	void DebugMessageTest() {
-		Throwable cause = new RuntimeException();
+	void debugMessageTest() {
 		ErrorCode errorCode = ErrorCode.UNAUTHORIZED_FILE_ACCESS;
 
-		ServiceException exception = errorCode.serviceException(debugMessageTemplate, fileId, userId);
+		ServiceException exception = errorCode.serviceException(DEBUG_MESSAGE_TEMPLATE, FILE_ID, USER_ID);
 
 		assertEquals(errorCode.name(), exception.getErrCode());
 		assertEquals(errorCode.getMessage(), exception.getErrMessage());
-		assertEquals(debugMessage, exception.getDebugMessage());
+		assertEquals(DEBUG_MESSAGE, exception.getDebugMessage());
+	}
+
+	@Test
+	@DisplayName("서비스 익셉션 생성자 테스트")
+	void testConstructor_withCause() {
+		ServiceException exception = new ServiceException(CAUSE, ERR_CODE, ERR_MESSAGE, DEBUG_MESSAGE);
+
+		assertSame(CAUSE, exception.getCause());
+		assertEquals(ERR_CODE, exception.getErrCode());
+		assertEquals(ERR_MESSAGE, exception.getErrMessage());
+		assertEquals(DEBUG_MESSAGE, exception.getDebugMessage());
 	}
 }

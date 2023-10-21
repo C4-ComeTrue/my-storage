@@ -13,8 +13,7 @@ public interface FileRepository extends JpaRepository<Metadata, Long> {
 		+ "ELSE FALSE END "
 		+ "FROM Metadata m "
 		+ "WHERE m.uploaderId = :uploaderId "
-		+ "AND m.originalFileName = :fileName "
-		+ "ORDER BY m.id DESC")
+		+ "AND m.originalFileName = :fileName ")
 	boolean checkDuplicateFileName(String fileName, Long uploaderId);
 
 }
