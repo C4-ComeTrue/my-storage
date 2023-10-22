@@ -10,6 +10,7 @@ import com.c4cometrue.mystorage.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,13 @@ import java.util.UUID;
 @Slf4j
 public class FileService {
 
+    private static String uploadDir;
     private final FileMetaDataRepository fileMetaDataRepository;
+
+    @Value("${file.upload-dir}")
+    public void setUploadDir(String value) {
+        uploadDir = value;
+    }
 
     @Transactional
     public FileUploadDto.Response fileUpload(MultipartFile file, long userId) {
@@ -37,10 +44,10 @@ public class FileService {
             throw new BusinessException(ErrorCode.DUPLICATE_FILE);
         }
 
-        val uploadFileName = getUploadFileName(originName);
-        FileUtil.uploadFile(file, uploadFileName);
+        val uploadFilePath = getFullUploadFilePath(originName);
+        FileUtil.uploadFile(file, uploadFilePath);
 
-        val fileMetaData = saveFileMetaData(file, userId, uploadFileName);
+        val fileMetaData = saveFileMetaData(file, userId, uploadFilePath);
         return new FileUploadDto.Response(fileMetaData);
     }
 
@@ -48,8 +55,8 @@ public class FileService {
         return fileMetaDataRepository.existsByFileNameAndUserId(fileName, userId);
     }
 
-    private String getUploadFileName(String originalFileName) {
-        return UUID.randomUUID() + originalFileName;
+    private String getFullUploadFilePath(String originalFileName) {
+        return uploadDir + UUID.randomUUID() + originalFileName;
     }
 
     private FileMetaData saveFileMetaData(MultipartFile file, long userId, String uploadFileName) {
