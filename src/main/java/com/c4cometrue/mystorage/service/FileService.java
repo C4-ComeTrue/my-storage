@@ -48,9 +48,9 @@ public class FileService {
         }
 
         val uploadFilePath = getFullUploadFilePath(originName);
-        fileUtil.uploadFile(file, uploadFilePath);
-
         val fileMetaData = saveFileMetaData(file, userId, uploadFilePath);
+
+        fileUtil.uploadFile(file, uploadFilePath);
         return new FileUploadDto.Response(fileMetaData);
     }
 
