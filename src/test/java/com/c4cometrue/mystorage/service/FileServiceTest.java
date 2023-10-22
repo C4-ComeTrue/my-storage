@@ -109,7 +109,7 @@ class FileServiceTest {
     }
 
     @Test
-    void 저장된_파일이_아니라면_실패한다() {
+    void 저장된_파일이_아니라면_다운로드에_실패한다() {
         var userId = 1L;
         var fileId = 1L;
 
@@ -120,7 +120,7 @@ class FileServiceTest {
     }
 
     @Test
-    void 본인이_업로드한_파일이_아니라면_실패한다() {
+    void 본인이_업로드한_파일이_아니라면_다운로드에_실패한다() {
         // given
         var userId = 2L;
         var fileId = 1L;
@@ -149,7 +149,7 @@ class FileServiceTest {
         var contentType = MediaType.IMAGE_JPEG.getType();
         var fileName = "name.jpg";
         var fileMetaData = FileMetaData.builder()
-                .userId(1L)
+                .userId(userId)
                 .fileName(fileName)
                 .uploadName(fileName)
                 .size(1000L)
@@ -173,4 +173,58 @@ class FileServiceTest {
                 .matches(res -> Arrays.equals(res.data(), byteArray));
     }
 
+    @Test
+    void 저장된_파일이_아니라면_삭제에_실패한다() {
+        var userId = 1L;
+        var fileId = 1L;
+
+        assertThatThrownBy(() -> {
+            fileService.fileDelete(userId, fileId);
+        }).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.FILE_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 본인이_업로드한_파일이_아니라면_삭제에_실패한다() {
+        // given
+        var userId = 2L;
+        var fileId = 1L;
+        var fileMetaData = FileMetaData.builder()
+                .userId(1L)
+                .fileName("name.jpg")
+                .uploadName("name.jp")
+                .size(1000L)
+                .type(MediaType.IMAGE_JPEG.getType())
+                .build();
+
+        given(fileMetaDataRepository.findById(anyLong())).willReturn(Optional.of(fileMetaData));
+
+        // when + then
+        assertThatThrownBy(() -> {
+            fileService.fileDelete(userId, fileId);
+        }).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.INVALID_FILE_ACCESS.getMessage());
+    }
+
+    @Test
+    void 파일_삭제에_성공한다() {
+        // given
+        var userId = 1L;
+        var fileId = 1L;
+        var fileMetaData = FileMetaData.builder()
+                .userId(userId)
+                .fileName("name.jpg")
+                .uploadName("name.jp")
+                .size(1000L)
+                .type(MediaType.IMAGE_JPEG.getType())
+                .build();
+
+        given(fileMetaDataRepository.findById(anyLong())).willReturn(Optional.of(fileMetaData));
+
+        // when
+        fileService.fileDelete(userId, fileId);
+
+        // then
+        fileUtilMockedStatic.verify(() -> FileUtil.deleteFile(anyString()), times(1));
+    }
 }

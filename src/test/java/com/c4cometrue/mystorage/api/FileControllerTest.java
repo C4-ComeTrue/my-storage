@@ -11,8 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(FileController.class)
@@ -102,5 +101,15 @@ class FileControllerTest {
                         content().contentType(contentType),
                         content().bytes(bytes)
                 );
+    }
+
+    @Test
+    void 파일을_삭제한다() throws Exception {
+        mockMvc.perform(
+                        delete("/v1/files")
+                                .queryParam("fileId", "1")
+                                .queryParam("userId", "1")
+                )
+                .andExpect(status().isOk());
     }
 }

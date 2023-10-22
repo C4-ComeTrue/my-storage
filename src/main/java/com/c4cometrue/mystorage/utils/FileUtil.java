@@ -2,7 +2,6 @@ package com.c4cometrue.mystorage.utils;
 
 import com.c4cometrue.mystorage.common.exception.BusinessException;
 import com.c4cometrue.mystorage.common.exception.ErrorCode;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -11,10 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Component
-@Slf4j
 public class FileUtil {
 
     private FileUtil() {}
@@ -26,7 +25,6 @@ public class FileUtil {
 
         try {
             file.transferTo(destinationPath);
-            log.info("file upload success : {}", fileUploadPath);
         } catch (IOException ex) {
             throw new BusinessException(ErrorCode.FILE_UPLOAD_FAILED, ex);
         }
@@ -40,10 +38,20 @@ public class FileUtil {
                 throw new BusinessException(ErrorCode.FILE_DOWNLOAD_FAILED);
             }
 
-            log.info("file download success : {}", fileUploadPath);
             return resource;
         } catch (MalformedURLException ex) {
             throw new BusinessException(ErrorCode.FILE_DOWNLOAD_FAILED, ex);
         }
     }
+
+    public static void deleteFile(String fileUploadPath) {
+        Path destinationPath = Path.of(fileUploadPath);
+
+        try {
+            Files.delete(destinationPath);
+        } catch (IOException ex) {
+            throw new BusinessException(ErrorCode.FILE_DELETE_FAILED, ex);
+        }
+    }
+
 }

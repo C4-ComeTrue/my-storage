@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,11 +24,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FileUtilTest {
 
+    String fileUploadPath = "C://test.jpg";
+
     @Test
     void 파일_업로드를_성공한다() throws IOException {
         // given
         var multipartFile = mock(MultipartFile.class);
-        var fileUploadPath = "C://test.jpg";
 
         // when
         FileUtil.uploadFile(multipartFile, fileUploadPath);
@@ -40,7 +42,6 @@ class FileUtilTest {
     void 파일_처리_과정에서_문제가_발생하면_업로드가_실패한다() throws IOException {
         // given
         var multipartFile = mock(MultipartFile.class);
-        var fileUploadPath = "C://test.jpg";
         doThrow(IOException.class).when(multipartFile).transferTo(any(Path.class));
 
         // when
@@ -55,7 +56,6 @@ class FileUtilTest {
     void 파일_다운로드를_성공한다() {
         // given
         var resource = mock(UrlResource.class);
-        var fileUploadPath = "C://test.jpg";
 
         ResourceLoader loader = mock(DefaultResourceLoader.class);
         given(loader.getResource(any())).willReturn(resource);
@@ -75,7 +75,6 @@ class FileUtilTest {
         // given
         var resource = mock(UrlResource.class);
         var classLoader = mock(URLClassLoader.class);
-        var fileUploadPath = "C://test.jpg";
 
         ResourceLoader loader = mock(DefaultResourceLoader.class);
         given(loader.getClassLoader()).willReturn(classLoader);
@@ -96,7 +95,6 @@ class FileUtilTest {
     void 파일_처리_과정에서_문제가_발생하면_다운로드가_실패한다() {
         // given
         var resource = mock(UrlResource.class);
-        var fileUploadPath = "C://test.jpg";
         ResourceLoader loader = mock(DefaultResourceLoader.class);
         given(loader.getResource(any())).willReturn(resource);
 
@@ -110,6 +108,29 @@ class FileUtilTest {
 
         // then
         assertEquals(ErrorCode.FILE_DOWNLOAD_FAILED, ex.getErrorCode());
+    }
+
+    @Test
+    void 파일_삭제에_성공한다() {
+        // given
+        var filesMockedStatic = mockStatic(Files.class);
+
+        // when
+        FileUtil.deleteFile(fileUploadPath);
+
+        // then
+        filesMockedStatic.verify(() -> Files.delete(any()), times(1));
+        filesMockedStatic.close();
+    }
+
+    @Test
+    void 파일_처리_과정에서_문제가_발생하면_삭제가_실패한다() {
+        // when
+        var ex = assertThrows(BusinessException.class,
+                () -> FileUtil.deleteFile(fileUploadPath));
+
+        // then
+        assertEquals(ErrorCode.FILE_DELETE_FAILED, ex.getErrorCode());
     }
 
 }

@@ -22,7 +22,7 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public FileUploadDto.Response upload(
             @RequestPart MultipartFile file,
             @NotNull(message = "유저 ID는 null이 될 수 없습니다.") @Valid long userId
@@ -39,6 +39,15 @@ public class FileController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(response.contentType()))
                 .body(response.data());
+    }
+
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void delete(
+            @NotNull(message = "유저 ID는 null이 될 수 없습니다.") @Valid long userId,
+            @NotNull(message = "파일 ID는 null이 될 수 없습니다.") @Valid long fileId
+    ) {
+        fileService.fileDelete(userId, fileId);
     }
 
 }

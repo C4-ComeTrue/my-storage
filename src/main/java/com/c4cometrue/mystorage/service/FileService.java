@@ -33,6 +33,12 @@ public class FileService {
         uploadDir = value;
     }
 
+    /**
+     * 파일 업로드
+     * @param file
+     * @param userId
+     * @return fileId, userId, uploadFilePath, fileSize
+     */
     @Transactional
     public FileUploadDto.Response fileUpload(MultipartFile file, long userId) {
         if (Objects.isNull(file) || file.isEmpty()) {
@@ -71,6 +77,12 @@ public class FileService {
         return fileMetaDataRepository.save(fileMetaData);
     }
 
+    /**
+     * 파일 다운로드
+     * @param userId
+     * @param fileId
+     * @return fileContentByteArray, FileContentType
+     */
     public FileDownloadDto.Response fileDownLoad(long userId, long fileId) {
         val fileMetaData = getFileMetaData(fileId);
 
@@ -90,6 +102,22 @@ public class FileService {
         }
     }
 
+    /**
+     * 파일 삭제
+     * @param fileId
+     * @param userId
+     */
+    @Transactional
+    public void fileDelete(long userId, long fileId) {
+        val fileMetaData = getFileMetaData(fileId);
+
+        if (hasFileAccess(userId, fileMetaData.getUserId())) {
+            throw new BusinessException(ErrorCode.INVALID_FILE_ACCESS);
+        }
+
+        FileUtil.deleteFile(fileMetaData.getUploadName());
+    }
+
     private FileMetaData getFileMetaData(long fileId) {
         return fileMetaDataRepository.findById(fileId).orElseThrow(
                 () -> new BusinessException(ErrorCode.FILE_NOT_FOUND));
@@ -98,10 +126,5 @@ public class FileService {
     private boolean hasFileAccess(long userId, long fileUserId) {
         return userId != fileUserId;
     }
-
-    /**
-     * 파일 삭제
-     * 파일이 존재하지 않으면 오류를 반환 + 물리적으로도 삭제
-     */
 
 }
