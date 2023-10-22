@@ -39,7 +39,6 @@ public class FileUtil {
         return resource;
     }
 
-
     public void deleteFile(String fileUploadPath) {
         Path destinationPath = Path.of(fileUploadPath);
 
@@ -49,4 +48,5 @@ public class FileUtil {
             throw new BusinessException(ErrorCode.FILE_DELETE_FAILED, ex);
         }
     }
+
 }
