@@ -1,7 +1,8 @@
 package com.c4cometrue.mystorage.exception;
 
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.Getter;
 
 @Getter
 public class ServiceException extends RuntimeException {
@@ -16,6 +17,7 @@ public class ServiceException extends RuntimeException {
         this.debugMessage = null;
     }
 
+    // debug 메세지 포함
     public ServiceException(String errCode, String errMessage, String debugMessage) {
         super(getDetailExceptionMessage(errCode, errMessage, debugMessage));
         this.errCode = errCode;
@@ -30,6 +32,7 @@ public class ServiceException extends RuntimeException {
         this.debugMessage = debugMessage;
     }
 
+    // RuntimeException에 필요한 message 생성
     private static String getDetailExceptionMessage(String errCode, String errMessage, String debugMessage) {
         var sb = new StringBuilder()
                 .append(errCode)
