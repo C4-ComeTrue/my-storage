@@ -29,9 +29,8 @@ class ServiceExceptionHandlerTest {
 		// Given
 		when(serviceException.getErrCode()).thenReturn(ERR_CODE);
 		when(serviceException.getErrMessage()).thenReturn(ERR_MESSAGE);
-		when(serviceException.getDebugMessage()).thenReturn(DEBUG_MESSAGE);
 
-		ErrorResponse expectedResponse = new ErrorResponse(ERR_CODE, ERR_MESSAGE, DEBUG_MESSAGE);
+		ErrorResponse expectedResponse = new ErrorResponse(ERR_CODE, ERR_MESSAGE);
 
 		// When
 		ResponseEntity<ErrorResponse> responseEntity = handler.handleServiceException(serviceException);

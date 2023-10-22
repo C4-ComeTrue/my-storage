@@ -3,7 +3,6 @@ package com.c4cometrue.mystorage.file;
 import org.springframework.stereotype.Service;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
-import com.c4cometrue.mystorage.exception.ServiceException;
 
 import lombok.RequiredArgsConstructor;
 
