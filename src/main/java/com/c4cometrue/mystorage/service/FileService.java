@@ -1,23 +1,27 @@
 package com.c4cometrue.mystorage.service;
 
+import java.nio.file.Path;
+import java.util.UUID;
+
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.c4cometrue.mystorage.dto.response.CreateFileRes;
 import com.c4cometrue.mystorage.entity.FileMetaData;
 import com.c4cometrue.mystorage.exception.ErrorCd;
 import com.c4cometrue.mystorage.repository.FileRepository;
 import com.c4cometrue.mystorage.util.FileUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.nio.file.Path;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class FileService {
     private final FileRepository fileRepository;
     private final StoragePathService storagePathService;
+    private final ResourceLoader resourceLoader;
+
 
     /**
      * 업로드 요청한 파일 저장
@@ -72,8 +76,12 @@ public class FileService {
     public Resource downloadFile(String fileStorageName, String username) {
         FileMetaData fileMetaData = getFileMetaData(fileStorageName, username);
         Path filePath = storagePathService.createTotalPath(fileMetaData.getFileStorageName());
-        // 실제 파일 반환
-        return FileUtil.getFile(filePath);
+        Resource file = resourceLoader.getResource(filePath.toString());
+        if (!file.exists()) {
+            throw ErrorCd.FILE_NOT_EXIST.serviceException(
+                "[downloadFile] file doesn't exist - fileStorageName {}", fileStorageName);
+        }
+        return file;
     }
 
     /**
