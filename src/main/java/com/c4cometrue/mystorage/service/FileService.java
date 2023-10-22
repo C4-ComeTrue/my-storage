@@ -1,46 +1,51 @@
 package com.c4cometrue.mystorage.service;
 
+import com.c4cometrue.mystorage.api.dto.FileDownloadDto;
 import com.c4cometrue.mystorage.api.dto.FileUploadDto;
 import com.c4cometrue.mystorage.common.exception.BusinessException;
 import com.c4cometrue.mystorage.common.exception.ErrorCode;
 import com.c4cometrue.mystorage.domain.FileMetaData;
-import com.c4cometrue.mystorage.repository.FileRepository;
+import com.c4cometrue.mystorage.repository.FileMetaDataRepository;
 import com.c4cometrue.mystorage.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class FileService {
 
-    private final FileRepository fileRepository;
+    private final FileMetaDataRepository fileMetaDataRepository;
 
     @Transactional
-    public FileUploadDto.Response fileUpload(MultipartFile file, Long userId) {
+    public FileUploadDto.Response fileUpload(MultipartFile file, long userId) {
         if (Objects.isNull(file) || file.isEmpty()) {
             throw new BusinessException(ErrorCode.FILE_EMPTY);
         }
 
-        var originName = file.getOriginalFilename();
+        val originName = file.getOriginalFilename();
         if (isDuplicateFile(originName, userId)) {
             throw new BusinessException(ErrorCode.DUPLICATE_FILE);
         }
 
-        var uploadFileName = getUploadFileName(originName);
+        val uploadFileName = getUploadFileName(originName);
         FileUtil.uploadFile(file, uploadFileName);
 
-        var fileMetaData = saveFileMetaData(file, userId, uploadFileName);
+        val fileMetaData = saveFileMetaData(file, userId, uploadFileName);
         return new FileUploadDto.Response(fileMetaData);
     }
 
     private boolean isDuplicateFile(String fileName, long userId) {
-        return fileRepository.existsByFileNameAndUserId(fileName, userId);
+        return fileMetaDataRepository.existsByFileNameAndUserId(fileName, userId);
     }
 
     private String getUploadFileName(String originalFileName) {
@@ -48,7 +53,7 @@ public class FileService {
     }
 
     private FileMetaData saveFileMetaData(MultipartFile file, long userId, String uploadFileName) {
-        var fileEntity = FileMetaData.builder()
+        val fileMetaData = FileMetaData.builder()
                 .userId(userId)
                 .fileName(file.getOriginalFilename())
                 .uploadName(uploadFileName)
@@ -56,15 +61,36 @@ public class FileService {
                 .type(file.getContentType())
                 .build();
 
-        return fileRepository.save(fileEntity);
+        return fileMetaDataRepository.save(fileMetaData);
     }
 
-    /**
-     * 파일 다운로드
-     * 본인이 만든 파일이 아니면 다운이 불가
-     * 파일이 다운로드 될 경로 정보도 함께 넘겨주기
-     */
+    public FileDownloadDto.Response fileDownLoad(long userId, long fileId) {
+        val fileMetaData = getFileMetaData(fileId);
 
+        if (hasFileAccess(userId, fileMetaData.getUserId())) {
+            throw new BusinessException(ErrorCode.INVALID_FILE_ACCESS);
+        }
+
+        val file = FileUtil.downloadFile(fileMetaData.getUploadName());
+        try {
+            return new FileDownloadDto.Response(
+                    file.getContentAsByteArray(),
+                    fileMetaData.getType()
+            );
+        } catch (IOException ex) {
+            throw new BusinessException(ErrorCode.FILE_DOWNLOAD_FAILED,
+                    String.format("failed copying byte arrays from file : %s", file.getFilename()));
+        }
+    }
+
+    private FileMetaData getFileMetaData(long fileId) {
+        return fileMetaDataRepository.findById(fileId).orElseThrow(
+                () -> new BusinessException(ErrorCode.FILE_NOT_FOUND));
+    }
+
+    private boolean hasFileAccess(long userId, long fileUserId) {
+        return userId != fileUserId;
+    }
 
     /**
      * 파일 삭제

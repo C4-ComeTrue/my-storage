@@ -3,7 +3,7 @@ package com.c4cometrue.mystorage.repository;
 import com.c4cometrue.mystorage.domain.FileMetaData;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface FileRepository extends JpaRepository<FileMetaData, Long> {
+public interface FileMetaDataRepository extends JpaRepository<FileMetaData, Long> {
 
     boolean existsByFileNameAndUserId(String fileName, long userId);
 
