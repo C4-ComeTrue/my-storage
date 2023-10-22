@@ -6,13 +6,10 @@ import com.c4cometrue.mystorage.domain.FileMetaData;
 import com.c4cometrue.mystorage.repository.FileMetaDataRepository;
 import com.c4cometrue.mystorage.utils.FileUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -30,23 +27,14 @@ import static org.mockito.BDDMockito.*;
 @ExtendWith(MockitoExtension.class)
 class FileServiceTest {
 
-    static MockedStatic<FileUtil> fileUtilMockedStatic;
-
     @Mock
     FileMetaDataRepository fileMetaDataRepository;
 
+    @Mock
+    FileUtil fileUtil;
+
     @InjectMocks
     FileService fileService;
-
-    @BeforeAll
-    static void setUp() {
-        fileUtilMockedStatic = mockStatic(FileUtil.class);
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        fileUtilMockedStatic.close();
-    }
 
     @Test
     void 파일이_없다면_실패한다() {
@@ -162,7 +150,7 @@ class FileServiceTest {
         lenient().when(resource.getContentAsByteArray()).thenReturn(byteArray);
 
         given(fileMetaDataRepository.findById(anyLong())).willReturn(Optional.of(fileMetaData));
-        given(FileUtil.downloadFile(anyString())).willReturn(resource);
+        given(fileUtil.downloadFile(anyString())).willReturn(resource);
 
         // when
         var response = fileService.fileDownLoad(userId, fileId);
@@ -172,6 +160,7 @@ class FileServiceTest {
                 .matches(res -> res.contentType().equals(contentType))
                 .matches(res -> Arrays.equals(res.data(), byteArray));
     }
+
 
     @Test
     void 저장된_파일이_아니라면_삭제에_실패한다() {
@@ -225,6 +214,6 @@ class FileServiceTest {
         fileService.fileDelete(userId, fileId);
 
         // then
-        fileUtilMockedStatic.verify(() -> FileUtil.deleteFile(anyString()), times(1));
+        verify(fileUtil, times(1)).deleteFile(anyString());
     }
 }

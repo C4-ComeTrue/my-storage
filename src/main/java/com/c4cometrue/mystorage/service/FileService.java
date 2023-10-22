@@ -25,13 +25,12 @@ import java.util.UUID;
 @Slf4j
 public class FileService {
 
-    private static String uploadDir;
     private final FileMetaDataRepository fileMetaDataRepository;
 
+    private final FileUtil fileUtil;
+
     @Value("${file.upload-dir}")
-    public void setUploadDir(String value) {
-        uploadDir = value;
-    }
+    private final String uploadDir;
 
     /**
      * 파일 업로드
@@ -51,7 +50,7 @@ public class FileService {
         }
 
         val uploadFilePath = getFullUploadFilePath(originName);
-        FileUtil.uploadFile(file, uploadFilePath);
+        fileUtil.uploadFile(file, uploadFilePath);
 
         val fileMetaData = saveFileMetaData(file, userId, uploadFilePath);
         return new FileUploadDto.Response(fileMetaData);
@@ -90,7 +89,7 @@ public class FileService {
             throw new BusinessException(ErrorCode.INVALID_FILE_ACCESS);
         }
 
-        val file = FileUtil.downloadFile(fileMetaData.getUploadName());
+        val file = fileUtil.downloadFile(fileMetaData.getUploadName());
         try {
             return new FileDownloadDto.Response(
                     file.getContentAsByteArray(),
@@ -115,7 +114,7 @@ public class FileService {
             throw new BusinessException(ErrorCode.INVALID_FILE_ACCESS);
         }
 
-        FileUtil.deleteFile(fileMetaData.getUploadName());
+        fileUtil.deleteFile(fileMetaData.getUploadName());
     }
 
     private FileMetaData getFileMetaData(long fileId) {
