@@ -53,7 +53,7 @@ class FileControllerTest {
                         .param("userId", "1")
                 )
                 .andExpectAll(
-                        status().isOk(),
+                        status().isCreated(),
                         jsonPath("$.fileId").value(fileId),
                         jsonPath("$.userId").value(userId),
                         jsonPath("$.uploadFileName").value(uploadFileName),

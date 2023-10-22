@@ -21,6 +21,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
 
 
@@ -130,6 +132,32 @@ class FileServiceTest {
     }
 
     @Test
+    void 파일을_읽어오다가_에러가_발생하면_실패한다() throws IOException {
+        // given
+        var userId = 1L;
+        var fileId = 1L;
+        var resource = mock(UrlResource.class);
+        var fileMetaData = FileMetaData.builder()
+                .userId(1L)
+                .fileName("name.jpg")
+                .uploadName("name.jp")
+                .size(1000L)
+                .type(MediaType.IMAGE_JPEG.getType())
+                .build();
+
+        given(fileMetaDataRepository.findById(anyLong())).willReturn(Optional.of(fileMetaData));
+        given(fileUtil.downloadFile(anyString())).willReturn(resource);
+        given(resource.getContentAsByteArray()).willThrow(IOException.class);
+
+        // when
+        var ex = assertThrows(BusinessException.class,
+                () -> fileService.fileDownLoad(userId, fileId));
+
+        // then
+        assertEquals(ErrorCode.FILE_DOWNLOAD_FAILED, ex.getErrorCode());
+    }
+
+    @Test
     void 파일을_다운로드에_성공한다() throws IOException {
         // given
         var userId = 1L;
@@ -160,7 +188,6 @@ class FileServiceTest {
                 .matches(res -> res.contentType().equals(contentType))
                 .matches(res -> Arrays.equals(res.data(), byteArray));
     }
-
 
     @Test
     void 저장된_파일이_아니라면_삭제에_실패한다() {

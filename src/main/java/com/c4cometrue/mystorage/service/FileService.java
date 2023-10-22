@@ -8,7 +8,6 @@ import com.c4cometrue.mystorage.domain.FileMetaData;
 import com.c4cometrue.mystorage.repository.FileMetaDataRepository;
 import com.c4cometrue.mystorage.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import java.util.UUID;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Slf4j
 public class FileService {
 
     private final FileMetaDataRepository fileMetaDataRepository;
@@ -30,7 +28,7 @@ public class FileService {
     private final FileUtil fileUtil;
 
     @Value("${file.upload-dir}")
-    private final String uploadDir;
+    private String uploadDir;
 
     /**
      * 파일 업로드
