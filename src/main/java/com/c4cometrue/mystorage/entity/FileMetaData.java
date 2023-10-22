@@ -17,19 +17,19 @@ public class FileMetaData {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int fileId;
 
-    @NotBlank
+    @NotBlank(message = "file name is blank")
     private String fileName;
 
-    @NotBlank
+    @NotBlank(message = "file storage name is blank")
     private String fileStorageName;
 
-    @NotNull
+    @NotNull(message = "file size can't be null")
     private long size;
 
-    @NotBlank
+    @NotBlank(message = "file content type is blank")
     private String mime;
 
-    @NotBlank
+    @NotBlank(message = "user name is blank")
     private String username;
 
     @Builder

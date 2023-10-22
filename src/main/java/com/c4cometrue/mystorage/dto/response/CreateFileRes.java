@@ -10,6 +10,10 @@ public record CreateFileRes(
 
 ) {
     public CreateFileRes(FileMetaData fileMetaData) {
-        this(fileMetaData.getFileStorageName(), fileMetaData.getSize(), fileMetaData.getMime(), fileMetaData.getUsername());
+        this(
+            fileMetaData.getFileStorageName(),
+            fileMetaData.getSize(),
+            fileMetaData.getMime(),
+            fileMetaData.getUsername());
     }
 }
