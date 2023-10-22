@@ -31,12 +31,20 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.h2database:h2'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 checkstyle {
     configFile = file("${rootDir}/naver-checkstyle.xml")
-    configProperties = ["suppressionFile" : "${rootDir}/naver-checkstyle-suppressions.xml"]
-    toolVersion ="8.24"
+    configProperties = ["suppressionFile": "${rootDir}/naver-checkstyle-suppressions.xml"]
+    toolVersion = "9.2"
 }
 
 tasks.named('test') {

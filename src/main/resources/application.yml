@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/c4
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: ab1010
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  servlet:
+    multipart:
+      max-file-size: 15GB
+      max-request-size: 15GB
+
+file:
+  storage-path: C:\\Users\\g2c10\\OneDrive\\C4\\myStorage
+  buffer: 10240
+
+
+
+
+
+
+
