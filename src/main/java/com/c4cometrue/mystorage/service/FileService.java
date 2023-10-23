@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FileService {
 
-	private static final String uploadDir = "/Users/kangsemi/Desktop/git/files/";
+	private static final String UPLOAD_DIR = "/Users/kangsemi/Desktop/git/files/";
 
 	private final FileMetaDataRepository fileMetaDataRepository;
 
@@ -61,7 +61,7 @@ public class FileService {
 
 	private String getFullUploadFilePath(String originalFileName) {
 		String uploadName = UUID.randomUUID() + originalFileName;
-		String fullUploadPAth = uploadDir + uploadName;
+		String fullUploadPAth = UPLOAD_DIR + uploadName;
 		validateFileUploadPath(fullUploadPAth);
 		return fullUploadPAth;
 	}
@@ -71,7 +71,7 @@ public class FileService {
 			File file = new File(path);
 			String canonicalDestPath = file.getCanonicalPath();
 
-			if (!canonicalDestPath.startsWith(uploadDir)) {
+			if (!canonicalDestPath.startsWith(UPLOAD_DIR)) {
 				throw new BusinessException(ErrorCode.INVALID_FILE_PATH);
 			}
 
