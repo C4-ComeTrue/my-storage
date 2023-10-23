@@ -9,10 +9,10 @@ public class FileUploadDto {
         long userId,
         String uploadFileName,
         long fileSize
-    ){
+    ) {
         public Response(FileMetaData fileMetaData) {
             this(fileMetaData.getId(), fileMetaData.getUserId(),
-                    fileMetaData.getUploadName(), fileMetaData.getSize());
+                fileMetaData.getUploadName(), fileMetaData.getSize());
         }
     }
 
