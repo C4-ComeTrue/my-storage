@@ -22,7 +22,7 @@ public class FileUtil {
 	private final ResourceLoader resourceLoader;
 
 	public void uploadFile(MultipartFile file, String fileUploadPath) {
-		Path destinationPath = Path.of(fileUploadPath);
+		Path destinationPath = Path.of(fileUploadPath).normalize();
 
 		try {
 			file.transferTo(destinationPath);
