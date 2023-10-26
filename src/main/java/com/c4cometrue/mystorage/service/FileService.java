@@ -29,7 +29,7 @@ public class FileService {
 
 	private final FileUtil fileUtil;
 
-	@Value("file.upload-dir")
+	@Value("${file.upload-dir}")
 	private String uploadDir;
 
 	/**
