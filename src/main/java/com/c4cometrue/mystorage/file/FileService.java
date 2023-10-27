@@ -15,7 +15,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class FileService {
-	private final FileDataAccessService fileDataAccessService;
+	private final FileReader fileReader;
+	private final FileWriter fileWriter;
 
 	@Value("${file.storage-path}")
 	private String storagePath;
@@ -30,12 +31,12 @@ public class FileService {
 		Path path = Paths.get(storagePath, storedFileName);
 		Metadata metadata = Metadata.of(originalFileName, storedFileName, path.toString(), userId);
 
-		fileDataAccessService.persist(metadata, userId);
+		fileWriter.persist(metadata, userId);
 		FileUtil.uploadFile(file, path, bufferSize);
 	}
 
 	public void downloadFile(Long fileId, String userPath, Long userId) {
-		Metadata metadata = fileDataAccessService.findBy(fileId, userId);
+		Metadata metadata = fileReader.findBy(fileId, userId);
 		Path originalPath = Paths.get(metadata.getFilePath());
 		Path userDesignatedPath = Paths.get(userPath).resolve(metadata.getOriginalFileName()).normalize();
 
@@ -44,8 +45,8 @@ public class FileService {
 
 	@Transactional
 	public void deleteFile(Long fileId, Long userId) {
-		Metadata metadata = fileDataAccessService.findBy(fileId, userId);
-		fileDataAccessService.deleteBy(fileId);
+		Metadata metadata = fileReader.findBy(fileId, userId);
+		fileWriter.deleteBy(fileId);
 		Path path = Paths.get(metadata.getFilePath());
 
 		FileUtil.delete(path);
