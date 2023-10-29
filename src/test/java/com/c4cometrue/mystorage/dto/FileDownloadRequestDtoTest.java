@@ -12,7 +12,7 @@ import static com.c4cometrue.mystorage.TestMockFile.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class FileDownloadRequestDtoTest {
+class FileDownloadRequestDtoTest {
 
     @Mock
     FileDownloadRequestDto fileDownloadRequestDto;
@@ -24,11 +24,8 @@ public class FileDownloadRequestDtoTest {
         FileDownloadRequestDto dto = fileDownloadRequestDto.create(mockFileName, mockUserName, mockDownRootPath);
         
         //then
-        assertEquals(dto.fileName(), mockFileName);
-        assertEquals(dto.userName(), mockUserName);
-        assertEquals(dto.downloadPath(), mockDownRootPath);
-
+        assertEquals(mockFileName, dto.fileName());
+        assertEquals(mockUserName, dto.userName());
+        assertEquals(mockDownRootPath, dto.downloadPath());
     }
-
-
 }

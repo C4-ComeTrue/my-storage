@@ -44,8 +44,8 @@ public class FilePathServiceTest {
         given(filePathService.createSavedPath(mockFileName)).willReturn(mockFilePath);
 //        var savedPath = mockRootPath + UUID.randomUUID() + "." + mockFileName;
 
-//        assertEquals(mockFilePath.substring(mockFilePath.lastIndexOf(".", -1)), mockFileName);
-//        assertEquals(filePathService.createSavedPath(mockFileName), mockFilePath);
+       assertEquals(mockFileName, mockFilePath.substring(mockFilePath.lastIndexOf(".", -1)));
+       assertEquals(mockFilePath, filePathService.createSavedPath(mockFileName));
     }
 
 }

@@ -4,11 +4,14 @@ import com.c4cometrue.mystorage.file.entity.FileMetaData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.c4cometrue.mystorage.TestMockFile.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class FileMetaDataTest {
+@ExtendWith(MockitoExtension.class)
+class FileMetaDataTest {
 
     @Test
     @DisplayName("FileMetatData Entity 생성")

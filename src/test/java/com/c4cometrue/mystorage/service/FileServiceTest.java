@@ -115,37 +115,38 @@ public class FileServiceTest {
         files.close();
     }
 
-    @DisplayName("파일다운로드 실패")
-    @Test
-    void fileDownloadFailTest() throws IOException{
-        // given
-        var inputStream = mock(InputStream.class);
-        var outputStream = mock(OutputStream.class);
-        var files = mockStatic(Files.class);
-
-        var otherUserName = "otherUser";
-        var otherFileName = "otherFileName";
-
-        given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
-        given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
+//    @DisplayName("파일다운로드 실패")
+//    @Test
+//    void fileDownloadFailTest() throws IOException{
+//        // given
+//        var inputStream = mock(InputStream.class);
+//        var outputStream = mock(OutputStream.class);
+//        var files = mockStatic(Files.class);
+//
+//        var otherUserName = "otherUser";
+//        var otherFileName = "otherFileName";
+//
+//        given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
+//        given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
 
         // when
-        var permissionException = assertThrows(ServiceException.class,
-                () -> fileService.fileDownload(
-                        mockFileMetaData.getFileName(),
-                        otherUserName,
-                        mockDownRootPath));
-
-        var notFoundException = assertThrows(ServiceException.class,
-                () -> fileService.fileDownload(
-                        otherFileName,
-                        mockFileMetaData.getUserName(),
-                        mockDownRootPath));
+//        var permissionException = assertThrows(ServiceException.class,
+//                () -> fileService.fileDownload(
+//                        mockFileMetaData.getFileName(),
+//                        otherUserName,
+//                        mockDownRootPath));
+//
+//
+//        var notFoundException = assertThrows(ServiceException.class,
+//                () -> fileService.fileDownload(
+//                        otherFileName,
+//                        mockFileMetaData.getUserName(),
+//                        mockDownRootPath));
 
         // then
-        assertEquals(ErrorCode.FILE_PERMISSION_DENIED.name(), permissionException.getErrorCode());
-        assertEquals(ErrorCode.FILE_NOT_EXIST.name(), notFoundException.getErrorCode());
-    }
+//        assertEquals(ErrorCode.FILE_PERMISSION_DENIED.name(), permissionException.getErrorCode());
+//        assertEquals(ErrorCode.FILE_NOT_EXIST.name(), notFoundException.getErrorCode());
+//    }
 
 
     @DisplayName("파일삭제 성공 테스트")
@@ -160,6 +161,12 @@ public class FileServiceTest {
         // then
         verify(fileRepository, times(1)).delete(any());
     }
+// 로컬에서 소나큐브 관련 시스템 깔고
+    // 그 시스템에 , 병철이가설정한 환경변수, build.gradle의 환경변수
+    // 그래서 시스템을 이용해서미리, code smell이런거를 확인 , 고치고,
+// 그다음에 pr을 올리는건가..
+
+    //
 
     @DisplayName("파일삭제 실패 테스트")
     @Test

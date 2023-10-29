@@ -1,14 +1,14 @@
 package com.c4cometrue.mystorage.exception;
 
 import org.apache.commons.lang3.StringUtils;
+
 import lombok.Getter;
 
 @Getter
-public class ServiceException extends RuntimeException{
-
-    private String errorCode;
-    private String errorMessage;
-    private String debugMessage;
+public class ServiceException extends RuntimeException {
+    private final String errorCode;
+    private final String errorMessage;
+    private final String debugMessage;
 
     public ServiceException(String errorCode, String errorMessage) {
         super(getDetailExceptionMessage(errorCode, errorMessage, null));
@@ -32,12 +32,12 @@ public class ServiceException extends RuntimeException{
     }
 
     private static String getDetailExceptionMessage(String errorCode, String errorMessage, String debugMessage) {
-        var sb = new StringBuffer()
+        var sb = new StringBuilder()
                 .append(errorCode)
                 .append(" : ")
                 .append(errorMessage);
 
-        if(StringUtils.isNotEmpty(debugMessage)) {
+        if (StringUtils.isNotEmpty(debugMessage)) {
             sb.append("-" + debugMessage);
         }
         return sb.toString();

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class FileUtilTest {
+class FileUtilTest {
 
     private static MockedStatic<Files> filesMockedStatic;
 

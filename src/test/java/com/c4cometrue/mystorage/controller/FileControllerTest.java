@@ -15,7 +15,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class FileControllerTest {
+class FileControllerTest {
     // controller에서 하는 역할
     // method요청받고, 그에 맞게 service레이어로 넘기기
     // 실제 파일에 메소드 수행 성공, 실패는 service에서 이뤄지므로, 여기서는 실패케이스를 고려하지 않아도됨.
