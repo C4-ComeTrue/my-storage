@@ -17,6 +17,7 @@ import com.c4cometrue.mystorage.exception.ErrorResponse;
 import com.c4cometrue.mystorage.exception.ServiceException;
 import com.c4cometrue.mystorage.exception.ServiceExceptionHandler;
 @ExtendWith(MockitoExtension.class)
+@DisplayName("에러 핸들러 테스트")
 class ServiceExceptionHandlerTest {
 	@InjectMocks
 	private ServiceExceptionHandler handler;

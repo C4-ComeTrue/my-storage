@@ -19,9 +19,9 @@ public class FolderDataAccessService implements FolderReader, FolderWriter {
 	}
 
 	// 적절한 예외 던져라
-	public FolderMetadata findBy(Long parentId) {
-		return folderRepository.findById(parentId).orElseThrow(
-			() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("parentId { }", parentId)
+	public FolderMetadata findBy(Long folderId) {
+		return folderRepository.findById(folderId).orElseThrow(
+			() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("folderId { }", folderId)
 		);
 	}
 
@@ -32,6 +32,12 @@ public class FolderDataAccessService implements FolderReader, FolderWriter {
 
 		if (!folderRepository.existsByParentIdAndUserId(parentId, userId)) {
 			throw ErrorCode.UNAUTHORIZED_FOLDER_ACCESS.serviceException();
+		}
+	}
+
+	public void validateFolderOwnershipBy(Long folderId, Long userId) {
+		if (!folderRepository.existsByIdAndUserId(folderId, userId)) {
+			throw ErrorCode.CANNOT_FOUND_FOLDER.serviceException();
 		}
 	}
 
@@ -58,5 +64,16 @@ public class FolderDataAccessService implements FolderReader, FolderWriter {
 		if (folderRepository.existsByParentIdAndUserIdAndOriginalFolderName(parentId, userId, userFolderName)) {
 			throw ErrorCode.DUPLICATE_FOLDER_NAME.serviceException();
 		}
+	}
+
+	public void changeFolderNameBy(String folderName, Long folderId, Long userId) {
+		validateFolderOwnershipBy(folderId, userId);
+		changeFolderNameBy(folderName, folderId);
+	}
+
+	public void changeFolderNameBy(String folderName, Long folderId) {
+		FolderMetadata folderMetadata = findBy(folderId);
+		folderMetadata.changeFolderName(folderName);
+		folderRepository.save(folderMetadata);
 	}
 }

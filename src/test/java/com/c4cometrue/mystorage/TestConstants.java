@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.c4cometrue.mystorage.dto.FolderNameChangeRequest;
 import com.c4cometrue.mystorage.file.Metadata;
 import com.c4cometrue.mystorage.folder.FolderMetadata;
 
@@ -35,4 +36,8 @@ public class TestConstants {
 	public static final String PARENT_PATH = FolderMetadata.storedName(USER_PATH);
 	public static final Path FOLDER_PATH = Paths.get(PARENT_PATH, STORED_FOLDER_NAME);
 	public static final FolderMetadata FOLDER_METADATA = FolderMetadata.builder().build();
+
+	public static final Long FOLDER_ID = 1L;
+
+	public static final FolderNameChangeRequest FOLDER_NAME_CHANGE_REQUEST = FolderNameChangeRequest.of(USER_ID, FOLDER_ID, USER_FOLDER_NAME);
 }

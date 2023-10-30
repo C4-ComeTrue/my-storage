@@ -122,4 +122,71 @@ class FolderDataAccessServiceTest {
 		verify(folderRepository, times(1)).save(any());
 	}
 
+	@Test
+	@DisplayName("폴더 찾기 테스트")
+	void findFolderTest() {
+		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.of(FOLDER_METADATA));
+
+		folderDataAccessService.findBy(FOLDER_ID);
+
+		verify(folderRepository, times(1)).findById(FOLDER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 찾기 테스트 : 실패")
+	void findFolderFailTest() {
+		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.empty());
+		assertThrows(ServiceException.class, () -> folderDataAccessService.findBy(FOLDER_ID));
+	}
+
+	@Test
+	@DisplayName("폴더 사용자 권한 테스트")
+	void validateFolderOwnershipTest() {
+		given(folderRepository.existsByIdAndUserId(FOLDER_ID, USER_ID)).willReturn(Boolean.TRUE);
+
+		folderDataAccessService.validateFolderOwnershipBy(FOLDER_ID, USER_ID);
+
+		verify(folderRepository, times(1)).existsByIdAndUserId(FOLDER_ID, USER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 사용자 권한 테스트 : 실패")
+	void validateFolderOwnershipFailTest() {
+		given(folderRepository.existsByIdAndUserId(FOLDER_ID, USER_ID)).willReturn(Boolean.FALSE);
+		assertThrows(ServiceException.class, () -> folderDataAccessService.validateFolderOwnershipBy(FOLDER_ID, USER_ID));
+	}
+
+	@Test
+	@DisplayName("폴더 이름 변경 테스트")
+	void changeFolderNameTest() {
+		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.of(FOLDER_METADATA));
+
+		folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID);
+
+		verify(folderRepository, times(1)).save(FOLDER_METADATA);
+	}
+
+	@Test
+	@DisplayName("폴더 이름 변경 테스트 : 실패")
+	void changeFolderNameFailTest() {
+		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.empty());
+
+		assertThrows(ServiceException.class, () -> folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID));
+	}
+
+	@Test
+	@DisplayName("폴더 이름 변경 테스트")
+	void changeFolderTest() {
+		given(folderRepository.existsByIdAndUserId(FOLDER_ID, USER_ID)).willReturn(Boolean.TRUE);
+		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.of(FOLDER_METADATA));
+
+		folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
+
+		verify(folderRepository, times(1)).existsByIdAndUserId(FOLDER_ID, USER_ID);
+		verify(folderRepository, times(1)).save(FOLDER_METADATA);
+	}
+
+
+
+
 }

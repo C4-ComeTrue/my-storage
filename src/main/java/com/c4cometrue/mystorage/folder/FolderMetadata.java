@@ -36,6 +36,9 @@ public class FolderMetadata {
 		return userFolderName + UUID.randomUUID();
 	}
 
+	public void changeFolderName(String userFolderName) {
+		this.originalFolderName = userFolderName;
+	}
 	@Builder
 	public FolderMetadata(String originalFolderName, String storedFolderName, Long parentId, String filePath,
 		Long userId) {

@@ -6,4 +6,6 @@ public interface FolderRepository extends JpaRepository<FolderMetadata, Long> {
 	boolean existsByParentIdAndUserId(Long parentId, Long userId);
 
 	boolean existsByParentIdAndUserIdAndOriginalFolderName(Long parentId, Long userId, String folderName);
+
+	boolean existsByIdAndUserId(Long folderId, Long userId);
 }

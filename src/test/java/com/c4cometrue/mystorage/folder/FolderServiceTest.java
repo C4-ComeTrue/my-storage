@@ -37,4 +37,12 @@ class FolderServiceTest {
 		verify(folderReader, times(1)).findPathBy(PARENT_ID);
 		verify(folderWriter, times(1)).persist(any(), any(), any(), any(), any());
 	}
+
+	@Test
+	@DisplayName("폴더 이름 변경 테스트")
+	void changeFolderNameTest() {
+		folderService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
+
+		verify(folderWriter, times(1)).changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
+	}
 }
