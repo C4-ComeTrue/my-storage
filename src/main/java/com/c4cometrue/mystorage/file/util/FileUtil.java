@@ -1,11 +1,11 @@
 package com.c4cometrue.mystorage.file.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +21,10 @@ public class FileUtil {
 			throw ErrorCode.FILE_BAD_REQUEST.serviceException(); // 파일이 비어있을 경우
 		}
 
+		Path savePath = Paths.get(savedPath);
+
 		try {
-			multipartFile.transferTo(new File(savedPath));
+			Files.copy(multipartFile.getInputStream(), savePath);
 		} catch (IOException e) {
 			throw ErrorCode.FILE_SERVER_ERROR.serviceException();
 		}
