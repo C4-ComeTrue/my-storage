@@ -134,6 +134,7 @@ public class FileServiceTest {
 
         assertEquals(ErrorCode.FILE_PERMISSION_DENIED.name(), permissionException.getErrorCode());
         assertEquals(ErrorCode.FILE_NOT_EXIST.name(), notFoundException.getErrorCode());
+        files.close();
     }
 
     @DisplayName("파일삭제 성공 테스트")
