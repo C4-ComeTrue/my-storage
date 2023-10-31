@@ -2,8 +2,12 @@ package com.c4cometrue.mystorage.file;
 
 import java.util.UUID;
 
+import com.c4cometrue.mystorage.MetadataType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,6 +35,10 @@ public class Metadata {
 	@Column(nullable = false)
 	private Long uploaderId;
 
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private MetadataType metadataType;
+
 	public static String storedName() {
 		return UUID.randomUUID().toString();
 	}
@@ -40,6 +48,7 @@ public class Metadata {
 		this.storedFileName = storedFileName;
 		this.filePath = filePath;
 		this.uploaderId = uploaderId;
+		this.metadataType = MetadataType.FILE;
 	}
 
 	public static Metadata of(String originalFileName, String storedFileName, String filePath, Long uploaderId) {

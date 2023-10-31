@@ -2,7 +2,12 @@ package com.c4cometrue.mystorage.folder;
 
 import java.util.UUID;
 
+import com.c4cometrue.mystorage.MetadataType;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,6 +37,10 @@ public class FolderMetadata {
 
 	private Long userId;
 
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private MetadataType metadataType;
+
 	public static String storedName(String userFolderName) {
 		return userFolderName + UUID.randomUUID();
 	}
@@ -47,5 +56,6 @@ public class FolderMetadata {
 		this.parentId = parentId;
 		this.filePath = filePath;
 		this.userId = userId;
+		this.metadataType = MetadataType.FOLDER;
 	}
 }
