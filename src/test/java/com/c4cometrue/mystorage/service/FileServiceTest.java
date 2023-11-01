@@ -45,7 +45,7 @@ class FileServiceTest {
 		assertThatThrownBy(() -> {
 			fileService.fileUpload(null, userId);
 		}).isInstanceOf(BusinessException.class)
-			.hasMessageContaining(ErrorCode.FILE_EMPTY.getMessage());
+			.hasMessageContaining(ErrorCode.FILE_EMPTY.getMsg());
 	}
 
 	@Test
@@ -62,7 +62,7 @@ class FileServiceTest {
 		assertThatThrownBy(() -> {
 			fileService.fileUpload(file, userId);
 		}).isInstanceOf(BusinessException.class)
-			.hasMessageContaining(ErrorCode.DUPLICATE_FILE.getMessage());
+			.hasMessageContaining(ErrorCode.DUPLICATE_FILE.getMsg());
 	}
 
 	@Test
@@ -104,7 +104,7 @@ class FileServiceTest {
 		assertThatThrownBy(() -> {
 			fileService.fileDownLoad(userId, fileId);
 		}).isInstanceOf(BusinessException.class)
-			.hasMessageContaining(ErrorCode.FILE_NOT_FOUND.getMessage());
+			.hasMessageContaining(ErrorCode.FILE_NOT_FOUND.getMsg());
 	}
 
 	@Test
@@ -126,7 +126,7 @@ class FileServiceTest {
 		assertThatThrownBy(() -> {
 			fileService.fileDownLoad(userId, fileId);
 		}).isInstanceOf(BusinessException.class)
-			.hasMessageContaining(ErrorCode.INVALID_FILE_ACCESS.getMessage());
+			.hasMessageContaining(ErrorCode.INVALID_FILE_ACCESS.getMsg());
 	}
 
 	@Test
@@ -195,7 +195,7 @@ class FileServiceTest {
 		assertThatThrownBy(() -> {
 			fileService.fileDelete(userId, fileId);
 		}).isInstanceOf(BusinessException.class)
-			.hasMessageContaining(ErrorCode.FILE_NOT_FOUND.getMessage());
+			.hasMessageContaining(ErrorCode.FILE_NOT_FOUND.getMsg());
 	}
 
 	@Test
@@ -217,7 +217,7 @@ class FileServiceTest {
 		assertThatThrownBy(() -> {
 			fileService.fileDelete(userId, fileId);
 		}).isInstanceOf(BusinessException.class)
-			.hasMessageContaining(ErrorCode.INVALID_FILE_ACCESS.getMessage());
+			.hasMessageContaining(ErrorCode.INVALID_FILE_ACCESS.getMsg());
 	}
 
 	@Test

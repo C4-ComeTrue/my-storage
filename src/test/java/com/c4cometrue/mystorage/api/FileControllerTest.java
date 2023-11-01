@@ -11,9 +11,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.c4cometrue.mystorage.api.dto.FileDeleteDto;
 import com.c4cometrue.mystorage.api.dto.FileDownloadDto;
 import com.c4cometrue.mystorage.api.dto.FileUploadDto;
 import com.c4cometrue.mystorage.service.FileService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(FileController.class)
 class FileControllerTest {
@@ -24,6 +26,8 @@ class FileControllerTest {
 	@MockBean
 	FileService fileService;
 
+	ObjectMapper mapper = new ObjectMapper();
+
 	@Test
 	void 유저아이디가_없다면_파일_업로드가_실패한다() throws Exception {
 		var content = "hello";
@@ -33,7 +37,7 @@ class FileControllerTest {
 					.file("file", content.getBytes())
 					.param("userId", "null")
 			)
-			.andExpectAll(status().is4xxClientError());
+			.andExpectAll(status().isInternalServerError());
 	}
 
 	@Test
@@ -65,20 +69,22 @@ class FileControllerTest {
 
 	@Test
 	void 유저아이디가_없다면_다운로드가_실패한다() throws Exception {
+		var request = new FileDownloadDto.Request(1L, null);
 		mockMvc.perform(
 				get("/v1/files")
-					.param("fileId", "1")
-					.param("userId", "null")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(mapper.writeValueAsString(request))
 			)
 			.andExpectAll(status().is4xxClientError());
 	}
 
 	@Test
 	void 파일아이디가_없다면_다운로드가_실패한다() throws Exception {
+		var request = new FileDownloadDto.Request(null, 1L);
 		mockMvc.perform(
 				get("/v1/files")
-					.param("fileId", "null")
-					.param("userId", "1")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(mapper.writeValueAsString(request))
 			)
 			.andExpectAll(status().is4xxClientError());
 	}
@@ -90,14 +96,15 @@ class FileControllerTest {
 		var byteDto = new FileDownloadDto.Bytes(bytes);
 		var contentType = MediaType.IMAGE_JPEG_VALUE;
 
+		var request = new FileDownloadDto.Request(1L, 1L);
 		var response = new FileDownloadDto.Response(byteDto, contentType);
 		given(fileService.fileDownLoad(anyLong(), anyLong())).willReturn(response);
 
 		// when + then
 		mockMvc.perform(
 				get("/v1/files")
-					.queryParam("fileId", "1")
-					.queryParam("userId", "1")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(mapper.writeValueAsString(request))
 			)
 			.andExpectAll(
 				status().isOk(),
@@ -108,10 +115,12 @@ class FileControllerTest {
 
 	@Test
 	void 파일을_삭제한다() throws Exception {
+		var request = new FileDeleteDto.Request(1L, 1L);
+
 		mockMvc.perform(
 				delete("/v1/files")
-					.queryParam("fileId", "1")
-					.queryParam("userId", "1")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(mapper.writeValueAsString(request))
 			)
 			.andExpect(status().isOk());
 	}

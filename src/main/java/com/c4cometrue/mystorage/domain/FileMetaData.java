@@ -42,5 +42,4 @@ public class FileMetaData extends BaseEntity {
 		this.size = size;
 		this.type = type;
 	}
-
 }

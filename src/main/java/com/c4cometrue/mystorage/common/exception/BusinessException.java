@@ -11,25 +11,25 @@ public class BusinessException extends RuntimeException {
 	private final String debugMessage;
 
 	public BusinessException(ErrorCode errorCode) {
-		super(errorCode.getMessage());
+		super(errorCode.getMsg());
 		this.errorCode = errorCode;
 		this.debugMessage = null;
 	}
 
 	public BusinessException(ErrorCode errorCode, Exception ex) {
-		super(errorCode.getMessage(), ex);
+		super(errorCode.getMsg(), ex);
 		this.errorCode = errorCode;
 		this.debugMessage = null;
 	}
 
 	public BusinessException(ErrorCode errorCode, String debugMessage) {
-		super(errorCode.getMessage());
+		super(errorCode.getMsg());
 		this.errorCode = errorCode;
 		this.debugMessage = debugMessage;
 	}
 
 	public BusinessException(ErrorCode errorCode, String debugMessage, Exception ex) {
-		super(errorCode.getMessage(), ex);
+		super(errorCode.getMsg(), ex);
 		this.errorCode = errorCode;
 		this.debugMessage = debugMessage;
 	}

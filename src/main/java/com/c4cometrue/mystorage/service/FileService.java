@@ -21,7 +21,7 @@ import com.c4cometrue.mystorage.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class FileService {
 
@@ -38,7 +38,6 @@ public class FileService {
 	 * @param userId
 	 * @return fileId, userId, uploadFilePath, fileSize
 	 */
-	@Transactional
 	public FileUploadDto.Response fileUpload(MultipartFile file, long userId) {
 		if (Objects.isNull(file) || file.isEmpty()) {
 			throw new BusinessException(ErrorCode.FILE_EMPTY);
@@ -54,6 +53,41 @@ public class FileService {
 
 		fileUtil.uploadFile(file, uploadFilePath);
 		return new FileUploadDto.Response(fileMetaData);
+	}
+
+	/**
+	 * 파일 다운로드
+	 * @param userId
+	 * @param fileId
+	 * @return fileContentByteArray, FileContentType
+	 */
+	@Transactional(readOnly = true)
+	public FileDownloadDto.Response fileDownLoad(long userId, long fileId) {
+		FileMetaData fileMetaData = getFileMetaData(fileId);
+		validateFileAccess(userId, fileMetaData.getUserId());
+
+		Resource file = fileUtil.downloadFile(fileMetaData.getUploadName());
+		try {
+			return new FileDownloadDto.Response(
+				new FileDownloadDto.Bytes(file.getContentAsByteArray()),
+				fileMetaData.getType()
+			);
+		} catch (IOException ex) {
+			throw new BusinessException(ErrorCode.FILE_DOWNLOAD_FAILED,
+				String.format("failed copying byte arrays from file : %s", file.getFilename()));
+		}
+	}
+
+	/**
+	 * 파일 삭제
+	 * @param fileId
+	 * @param userId
+	 */
+	public void fileDelete(long userId, long fileId) {
+		FileMetaData fileMetaData = getFileMetaData(fileId);
+		validateFileAccess(userId, fileMetaData.getUserId());
+		fileMetaDataRepository.delete(fileMetaData);
+		fileUtil.deleteFile(fileMetaData.getUploadName());
 	}
 
 	private boolean isDuplicateFile(String fileName, long userId) {
@@ -77,54 +111,15 @@ public class FileService {
 		return fileMetaDataRepository.save(fileMetaData);
 	}
 
-	/**
-	 * 파일 다운로드
-	 * @param userId
-	 * @param fileId
-	 * @return fileContentByteArray, FileContentType
-	 */
-	public FileDownloadDto.Response fileDownLoad(long userId, long fileId) {
-		FileMetaData fileMetaData = getFileMetaData(fileId);
-
-		if (hasFileAccess(userId, fileMetaData.getUserId())) {
-			throw new BusinessException(ErrorCode.INVALID_FILE_ACCESS);
-		}
-
-		Resource file = fileUtil.downloadFile(fileMetaData.getUploadName());
-		try {
-			return new FileDownloadDto.Response(
-				new FileDownloadDto.Bytes(file.getContentAsByteArray()),
-				fileMetaData.getType()
-			);
-		} catch (IOException ex) {
-			throw new BusinessException(ErrorCode.FILE_DOWNLOAD_FAILED,
-				String.format("failed copying byte arrays from file : %s", file.getFilename()));
-		}
-	}
-
-	/**
-	 * 파일 삭제
-	 * @param fileId
-	 * @param userId
-	 */
-	@Transactional
-	public void fileDelete(long userId, long fileId) {
-		FileMetaData fileMetaData = getFileMetaData(fileId);
-
-		if (hasFileAccess(userId, fileMetaData.getUserId())) {
-			throw new BusinessException(ErrorCode.INVALID_FILE_ACCESS);
-		}
-
-		fileUtil.deleteFile(fileMetaData.getUploadName());
-	}
-
 	private FileMetaData getFileMetaData(long fileId) {
 		return fileMetaDataRepository.findById(fileId).orElseThrow(
 			() -> new BusinessException(ErrorCode.FILE_NOT_FOUND));
 	}
 
-	private boolean hasFileAccess(long userId, long fileUserId) {
-		return userId != fileUserId;
+	private void validateFileAccess(long userId, long fileUserId) {
+		if (userId != fileUserId) {
+			throw new BusinessException(ErrorCode.INVALID_FILE_ACCESS);
+		}
 	}
 
 }
