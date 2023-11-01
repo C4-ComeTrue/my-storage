@@ -28,10 +28,4 @@ public class BusinessException extends RuntimeException {
 		this.debugMessage = debugMessage;
 	}
 
-	public BusinessException(ErrorCode errorCode, String debugMessage, Exception ex) {
-		super(errorCode.getMsg(), ex);
-		this.errorCode = errorCode;
-		this.debugMessage = debugMessage;
-	}
-
 }

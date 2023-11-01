@@ -1,7 +1,6 @@
 package com.c4cometrue.mystorage.common.exception.handler;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -37,7 +36,7 @@ public class CustomExceptionHandler {
 		log.error(ex.getMessage(), ex);
 		val errors = ex.getBindingResult().getFieldErrors().stream()
 			.map(ErrorResponse.ErrorDetail::from)
-			.collect(Collectors.toList());
+			.toList();
 
 		val errorResponse = new ErrorResponse(ErrorCode.BAD_REQUEST_ERROR.getMsg(), errors);
 		return ResponseEntity.badRequest().body(errorResponse);

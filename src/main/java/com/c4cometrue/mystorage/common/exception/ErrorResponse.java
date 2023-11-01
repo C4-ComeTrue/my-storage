@@ -27,8 +27,8 @@ public class ErrorResponse {
 		String detailMessage
 	) {
 
-		public static ErrorDetail from(FieldError e) {
-			return new ErrorDetail(e.getField(), e.getRejectedValue(), e.getDefaultMessage());
+		public static ErrorDetail from(FieldError ex) {
+			return new ErrorDetail(ex.getField(), ex.getRejectedValue(), ex.getDefaultMessage());
 		}
 	}
 }

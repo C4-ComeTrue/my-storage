@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class FileController {
 
 	private final FileService fileService;
-	
+
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public FileUploadDto.Response upload(
