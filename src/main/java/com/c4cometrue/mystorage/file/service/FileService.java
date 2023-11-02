@@ -36,14 +36,14 @@ public class FileService {
 
 		Long fileSize = multipartFile.getSize();
 		String fileMine = multipartFile.getContentType();
-		String savedPath = filePathService.createSavedPath(originFileName);
+		Path savedPath = Paths.get(filePathService.createSavedPath(originFileName));
 
 		FileUtil.fileUpload(multipartFile, savedPath);
 		FileMetaData fileMetaData = FileMetaData.builder()
 			.fileName(originFileName)
 			.userName(userName)
 			.fileSize(fileSize)
-			.savedPath(savedPath)
+			.savedPath(filePathService.createSavedPath(originFileName))
 			.fileMine(fileMine)
 			.build();
 

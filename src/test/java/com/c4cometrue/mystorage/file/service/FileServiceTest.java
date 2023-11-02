@@ -30,156 +30,153 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class FileServiceTest {
 
-    @InjectMocks
-    FileService fileService;
+	@InjectMocks
+	FileService fileService;
 
-    @Mock
-    FileRepository fileRepository;
+	@Mock
+	FileRepository fileRepository;
 
-    @Mock
-    FileUtil fileUtil;
+	@Mock
+	FileUtil fileUtil;
 
-    @Mock
-    FilePathService filePathService;
+	@Mock
+	FilePathService filePathService;
 
-    @Mock
-    ResourceLoader mockResourceLoader;
+	@Mock
+	ResourceLoader mockResourceLoader;
 
-    private static MockedStatic<FileUtil> fileUtilMockedStatic;
+	private static MockedStatic<FileUtil> fileUtilMockedStatic;
 
-    @BeforeAll // 매번 테스트 시작 전 초기화 작업
-    public static void init() {
-        fileUtilMockedStatic = mockStatic(FileUtil.class);
-    }
+	@BeforeAll // 매번 테스트 시작 전 초기화 작업
+	public static void init() {
+		fileUtilMockedStatic = mockStatic(FileUtil.class);
+	}
 
-    @AfterAll
-    public static void down() {
-        fileUtilMockedStatic.close();
-    }
+	@AfterAll
+	public static void down() {
+		fileUtilMockedStatic.close();
+	}
 
-    @DisplayName("파일업로드 성공 테스트")
-    @Test
-    void fileUploadSuccessTest() {
-        given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
-        given(mockMultipartFile.getSize()).willReturn(mockSize);
-        given(mockMultipartFile.getContentType()).willReturn(mockContentType);
+	@DisplayName("파일업로드 성공 테스트")
+	@Test
+	void fileUploadSuccessTest() {
+		given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
+		given(mockMultipartFile.getSize()).willReturn(mockSize);
+		given(mockMultipartFile.getContentType()).willReturn(mockContentType);
 
-        fileService.fileUpload(mockMultipartFile, mockUserName);
+		given(filePathService.createSavedPath(mockFileName))
+			.willReturn(mockFilePath);
 
-        assertThat(mockFileMetaData)
-                .matches(metadata -> mockFileMetaData.getUserName().equals(mockUserName))
-                .matches(metadata -> mockFileMetaData.getFileName().equals(mockFileName));
-    }
+		fileService.fileUpload(mockMultipartFile, mockUserName);
 
-    @DisplayName("파일업로드 실패 테스트")
-    @Test
-    void fileUploadFailTest() {
-        given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
-        given(fileRepository.findByFileNameAndUserName(mockFileName, mockUserName))
-                .willReturn(Optional.of(new FileMetaData()));
+		assertThat(mockFileMetaData)
+			.matches(metadata -> mockFileMetaData.getUserName().equals(mockUserName))
+			.matches(metadata -> mockFileMetaData.getFileName().equals(mockFileName));
+	}
 
-        ServiceException se = assertThrows(ServiceException.class,
-                () -> fileService.fileUpload(mockMultipartFile, mockUserName));
+	@DisplayName("파일업로드 실패 테스트")
+	@Test
+	void fileUploadFailTest() {
+		given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
+		given(fileRepository.findByFileNameAndUserName(mockFileName, mockUserName))
+			.willReturn(Optional.of(new FileMetaData()));
 
-        assertEquals(ErrorCode.FILE_IS_DUPLICATED.name(), se.getErrorCode());
-    }
+		ServiceException se = assertThrows(ServiceException.class,
+			() -> fileService.fileUpload(mockMultipartFile, mockUserName));
 
-    // @DisplayName("파일다운로드 성공")
-    // @Test
-    // void fileDownloadTest() throws IOException {
-    //     var inputStream = mock(InputStream.class);
-    //     var outputStream = mock(OutputStream.class);
-    //     var files = mockStatic(Files.class);
-    //
-    //     given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
-    //
-    //     given(inputStream.read(any()))
-    //             .willReturn(10)
-    //             .willReturn(20)
-    //             .willReturn(30)
-    //             .willReturn(-1);
-    //
-    //     given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
-    //
-    //     fileService.fileDownload(
-    //             mockFileMetaData.getFileName(),
-    //             mockFileMetaData.getUserName(),
-    //             mockDownRootPath);
-    //
-    //     then(outputStream).should(times(3))
-    //             .write(any(), eq(0), anyInt());
-    //
-    //     files.close();
-    // }
+		assertEquals(ErrorCode.FILE_IS_DUPLICATED.name(), se.getErrorCode());
+	}
 
-    @DisplayName("파일다운로드 실패")
-    @Test
-    void fileDownloadFailTest() throws IOException {
-        // given
-        var inputStream = mock(InputStream.class);
-        var outputStream = mock(OutputStream.class);
-        var files = mockStatic(Files.class);
+	// @DisplayName("파일다운로드 성공")
+	// @Test
+	// void fileDownloadTest() throws IOException {
+	//     var inputStream = mock(InputStream.class);
+	//     var outputStream = mock(OutputStream.class);
+	//     var files = mockStatic(Files.class);
+	//
+	//     given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
+	//
+	//     given(inputStream.read(any()))
+	//             .willReturn(10)
+	//             .willReturn(20)
+	//             .willReturn(30)
+	//             .willReturn(-1);
+	//
+	//     given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
+	//
+	//     fileService.fileDownload(
+	//             mockFileMetaData.getFileName(),
+	//             mockFileMetaData.getUserName(),
+	//             mockDownRootPath);
+	//
+	//     then(outputStream).should(times(3))
+	//             .write(any(), eq(0), anyInt());
+	//
+	//     files.close();
+	// }
 
-        var otherUserName = "otherUser";
-        var otherFileName = "otherFileName";
+	@DisplayName("파일다운로드 실패")
+	@Test
+	void fileDownloadFailTest() throws IOException {
+		// given
+		var inputStream = mock(InputStream.class);
+		var outputStream = mock(OutputStream.class);
+		var files = mockStatic(Files.class);
 
-        given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
-        given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
+		var otherUserName = "otherUser";
+		var otherFileName = "otherFileName";
 
-        var permissionException = assertThrows(ServiceException.class,
-                () -> fileService.fileDownload(mockFileName, otherUserName, mockDownRootPath));
+		given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
+		given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
 
-        var notFoundException = assertThrows(ServiceException.class,
-                () -> fileService.fileDownload(otherFileName, mockUserName, mockDownRootPath));
+		var permissionException = assertThrows(ServiceException.class,
+			() -> fileService.fileDownload(mockFileName, otherUserName, mockDownRootPath));
 
-        assertEquals(ErrorCode.FILE_PERMISSION_DENIED.name(), permissionException.getErrorCode());
-        assertEquals(ErrorCode.FILE_NOT_EXIST.name(), notFoundException.getErrorCode());
-        files.close();
-    }
+		var notFoundException = assertThrows(ServiceException.class,
+			() -> fileService.fileDownload(otherFileName, mockUserName, mockDownRootPath));
 
-    @DisplayName("파일삭제 성공 테스트")
-    @Test
-    void fileDeleteSuccessTest() {
-        // given
-        given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
+		assertEquals(ErrorCode.FILE_PERMISSION_DENIED.name(), permissionException.getErrorCode());
+		assertEquals(ErrorCode.FILE_NOT_EXIST.name(), notFoundException.getErrorCode());
+		files.close();
+	}
 
-        // when
-        fileService.fileDelete(mockFileMetaData.getFileName(), mockFileMetaData.getUserName());
+	@DisplayName("파일삭제 성공 테스트")
+	@Test
+	void fileDeleteSuccessTest() {
+		// given
+		given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
 
-        // then
-        verify(fileRepository, times(1)).delete(any());
-    }
-    // 로컬에서 소나큐브 관련 시스템 깔고
-    // 그 시스템에 , 병철이가설정한 환경변수, build.gradle의 환경변수
-    // 그래서 시스템을 이용해서미리, code smell이런거를 확인 , 고치고,
-    // 그다음에 pr을 올리는건가..
+		// when
+		fileService.fileDelete(mockFileMetaData.getFileName(), mockFileMetaData.getUserName());
 
-    //
+		// then
+		verify(fileRepository, times(1)).delete(any());
+	}
 
-    @DisplayName("파일삭제 실패 테스트")
-    @Test
-    void fileDeleteFailTest() {
-        // given
-        var otherUserName = "otherUserName";
-        var otherFileName = "otherFileName";
+	@DisplayName("파일삭제 실패 테스트")
+	@Test
+	void fileDeleteFailTest() {
+		// given
+		var otherUserName = "otherUserName";
+		var otherFileName = "otherFileName";
 
-        given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
+		given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
 
-        // when
-        var permissionException = assertThrows(ServiceException.class,
-                () -> fileService.fileDelete(
-                        mockFileName,
-                        otherUserName
-                ));
+		// when
+		var permissionException = assertThrows(ServiceException.class,
+			() -> fileService.fileDelete(
+				mockFileName,
+				otherUserName
+			));
 
-        var notFoundException = assertThrows(ServiceException.class,
-                () -> fileService.fileDelete(
-                        otherFileName,
-                        mockUserName
-                ));
+		var notFoundException = assertThrows(ServiceException.class,
+			() -> fileService.fileDelete(
+				otherFileName,
+				mockUserName
+			));
 
-        // then
-        assertEquals(ErrorCode.FILE_PERMISSION_DENIED.name(), permissionException.getErrorCode());
-        assertEquals(ErrorCode.FILE_NOT_EXIST.name(), notFoundException.getErrorCode());
-    }
+		// then
+		assertEquals(ErrorCode.FILE_PERMISSION_DENIED.name(), permissionException.getErrorCode());
+		assertEquals(ErrorCode.FILE_NOT_EXIST.name(), notFoundException.getErrorCode());
+	}
 }

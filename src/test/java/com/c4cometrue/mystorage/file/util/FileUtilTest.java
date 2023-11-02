@@ -1,4 +1,4 @@
-package com.c4cometrue.mystorage.util;
+package com.c4cometrue.mystorage.file.util;
 
 import static com.c4cometrue.mystorage.TestMockFile.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +41,7 @@ class FileUtilTest {
 		given(mockMultipartFile.isEmpty()).willReturn(true);
 
 		var emptyException = assertThrows(ServiceException.class,
-			() -> FileUtil.fileUpload(mockMultipartFile, mockFilePath));
+			() -> FileUtil.fileUpload(mockMultipartFile, mockUploadPath));
 
 		assertEquals(ErrorCode.FILE_BAD_REQUEST.name(), emptyException.getErrorCode());
 	}
@@ -55,7 +55,7 @@ class FileUtilTest {
 			.willThrow(IOException.class);
 
 		var exception = assertThrows(ServiceException.class,
-			() -> FileUtil.fileUpload(mockMultipartFile, mockFilePath));
+			() -> FileUtil.fileUpload(mockMultipartFile, mockUploadPath));
 
 		assertEquals(ErrorCode.FILE_SERVER_ERROR.name(), exception.getErrorCode());
 	}

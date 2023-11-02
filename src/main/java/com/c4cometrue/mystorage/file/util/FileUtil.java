@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,15 +15,13 @@ public class FileUtil {
 	private FileUtil() {
 	}
 
-	public static void fileUpload(MultipartFile multipartFile, String savedPath) {
+	public static void fileUpload(MultipartFile multipartFile, Path savedPath) {
 		if (multipartFile.isEmpty()) {
 			throw ErrorCode.FILE_BAD_REQUEST.serviceException(); // 파일이 비어있을 경우
 		}
 
-		Path savePath = Paths.get(savedPath);
-
 		try {
-			Files.copy(multipartFile.getInputStream(), savePath);
+			Files.copy(multipartFile.getInputStream(), savedPath);
 		} catch (IOException e) {
 			throw ErrorCode.FILE_SERVER_ERROR.serviceException();
 		}
