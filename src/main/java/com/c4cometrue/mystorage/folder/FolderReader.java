@@ -1,11 +1,9 @@
 package com.c4cometrue.mystorage.folder;
 
+import java.util.List;
+
 public interface FolderReader {
 	String findPathBy(Long parentId);
 
-	FolderMetadata findBy(Long parentId);
-
-	void verifyBy(Long parentId, Long userId);
-
-	void checkDuplicateBy(String userFolderName, Long parentId, Long userId);
+	List<FolderMetadata> findChildBy(Long parentId, Long userId);
 }

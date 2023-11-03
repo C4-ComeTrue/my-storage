@@ -2,6 +2,9 @@ package com.c4cometrue.mystorage.folder;
 
 import static com.c4cometrue.mystorage.TestConstants.*;
 import static org.mockito.BDDMockito.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,5 +47,15 @@ class FolderServiceTest {
 		folderService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
 
 		verify(folderWriter, times(1)).changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 조회 테스트")
+	void getFolder() {
+		given(folderReader.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FOLDER_METADATA));
+
+		folderService.findChildBy(PARENT_ID, USER_ID);
+
+		then(folderReader).should(times(1)).findChildBy(PARENT_ID, USER_ID);
 	}
 }

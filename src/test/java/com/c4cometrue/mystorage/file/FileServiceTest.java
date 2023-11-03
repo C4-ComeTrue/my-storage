@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +37,6 @@ class FileServiceTest {
 
 	@BeforeEach
 	void setup() {
-		ReflectionTestUtils.setField(fileService, "storagePath", "/path/to/storage");
 		ReflectionTestUtils.setField(fileService, "bufferSize", 1024);
 	}
 
@@ -45,7 +45,7 @@ class FileServiceTest {
 	void uploadFileFailTest() throws IOException {
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
-			() -> fileService.uploadFile(MOCK_MULTIPART_FILE, USER_ID)
+			() -> fileService.uploadFile(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID, PARENT_PATH)
 		);
 
 		assertEquals(ErrorCode.FILE_COPY_ERROR.name(), thrown.getErrCode());
@@ -54,7 +54,7 @@ class FileServiceTest {
 	@Test
 	@DisplayName("다운로드 실패 테스트")
 	void downloadFileFailTest() throws IOException {
-		when(fileDataAccessService.findBy(anyLong(), anyLong())).thenReturn(METADATA);
+		when(fileDataAccessService.findBy(anyLong(), anyLong())).thenReturn(FILE_METADATA);
 
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
@@ -66,7 +66,7 @@ class FileServiceTest {
 	@Test
 	@DisplayName("삭제 실패 테스트")
 	void deleteFileFailTest() throws IOException {
-		when(fileDataAccessService.findBy(FILE_ID, USER_ID)).thenReturn(METADATA);
+		when(fileDataAccessService.findBy(FILE_ID, USER_ID)).thenReturn(FILE_METADATA);
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
 			() -> fileService.deleteFile(FILE_ID, USER_ID)
@@ -82,10 +82,10 @@ class FileServiceTest {
 		when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(MOCK_MULTIPART_FILE.getBytes()));
 		when(mockFile.getOriginalFilename()).thenReturn(ORIGINAL_FILE_NAME);
 
-		doNothing().when(fileDataAccessService).persist(any(Metadata.class), anyLong());
+		doNothing().when(fileDataAccessService).persist(any(FileMetadata.class), anyLong(), anyLong());
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
-			() -> fileService.uploadFile(mockFile, USER_ID)
+			() -> fileService.uploadFile(mockFile, USER_ID, PARENT_ID, PARENT_PATH)
 		);
 	}
 
@@ -108,11 +108,21 @@ class FileServiceTest {
 			.willReturn(-1);
 
 		// when
-		fileService.uploadFile(multipartFile, USER_ID);
+		fileService.uploadFile(multipartFile, USER_ID, PARENT_ID, PARENT_PATH);
 
 		// then
 		then(outStream).should(times(3)).write(any(), eq(0), anyInt());
 
 		files.close();
+	}
+
+	@Test
+	@DisplayName("파일 조회 테스트")
+	void getFile() {
+		given(fileDataAccessService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FILE_METADATA));
+
+		fileService.findChildBy(PARENT_ID, USER_ID);
+
+		then(fileDataAccessService).should(times(1)).findChildBy(PARENT_ID, USER_ID);
 	}
 }

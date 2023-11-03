@@ -2,7 +2,7 @@ package com.c4cometrue.mystorage.folder;
 
 import java.util.UUID;
 
-import com.c4cometrue.mystorage.MetadataType;
+import com.c4cometrue.mystorage.meta.MetadataType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,21 +21,21 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Folder_Metadata", indexes = @Index(name = "index_parentId", columnList = "parentId"))
+@Table(name = "folder_metadata", indexes = @Index(name = "index_parentId", columnList = "parentId"))
 public class FolderMetadata {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	@Column(nullable = false)
 	private String originalFolderName;
-
+	@Column(nullable = false)
 	private String storedFolderName;
 
 	private Long parentId;
-
+	@Column(nullable = false)
 	private String filePath;
-
-	private Long userId;
+	@Column(nullable = false)
+	private Long uploaderId;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -48,14 +48,15 @@ public class FolderMetadata {
 	public void changeFolderName(String userFolderName) {
 		this.originalFolderName = userFolderName;
 	}
+
 	@Builder
 	public FolderMetadata(String originalFolderName, String storedFolderName, Long parentId, String filePath,
-		Long userId) {
+		Long uploaderId) {
 		this.originalFolderName = originalFolderName;
 		this.storedFolderName = storedFolderName;
 		this.parentId = parentId;
 		this.filePath = filePath;
-		this.userId = userId;
+		this.uploaderId = uploaderId;
 		this.metadataType = MetadataType.FOLDER;
 	}
 }

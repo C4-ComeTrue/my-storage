@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @DisplayName("폴더 엔티티 테스트")
 @ExtendWith(MockitoExtension.class)
-class FolderMetadataTest {
+class FolderFileMetadataTest {
 	@Test
 	@DisplayName("폴더 빌더 생성")
 	void testBuilderCreation() {
@@ -20,7 +20,7 @@ class FolderMetadataTest {
 			.storedFolderName(STORED_FOLDER_NAME)
 			.parentId(PARENT_ID)
 			.filePath(FOLDER_PATH.toString())
-			.userId(USER_ID)
+			.uploaderId(USER_ID)
 			.build();
 
 		// Then
@@ -28,6 +28,6 @@ class FolderMetadataTest {
 		assertEquals(STORED_FOLDER_NAME, folderMetadata.getStoredFolderName());
 		assertEquals(PARENT_ID, folderMetadata.getParentId());
 		assertEquals(FOLDER_PATH.toString(), folderMetadata.getFilePath());
-		assertEquals(USER_ID, folderMetadata.getUserId());
+		assertEquals(USER_ID, folderMetadata.getUploaderId());
 	}
 }

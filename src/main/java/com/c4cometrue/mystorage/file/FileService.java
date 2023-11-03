@@ -2,6 +2,7 @@ package com.c4cometrue.mystorage.file;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,37 +19,43 @@ public class FileService {
 	private final FileReader fileReader;
 	private final FileWriter fileWriter;
 
-	@Value("${file.storage-path}")
-	private String storagePath;
-
 	@Value("${file.buffer}")
 	private int bufferSize;
 
-	@Transactional
-	public void uploadFile(MultipartFile file, Long userId) {
+	public void uploadFile(MultipartFile file, Long userId, Long parentId, String basePath) {
 		String originalFileName = file.getOriginalFilename();
-		String storedFileName = Metadata.storedName();
-		Path path = Paths.get(storagePath, storedFileName);
-		Metadata metadata = Metadata.of(originalFileName, storedFileName, path.toString(), userId);
+		String storedFileName = FileMetadata.storedName();
+		Path path = Paths.get(basePath, storedFileName);
+		FileMetadata fileMetadata = FileMetadata.builder()
+			.originalFileName(originalFileName)
+			.storedFileName(storedFileName)
+			.filePath(path.toString())
+			.uploaderId(userId)
+			.parentId(parentId)
+			.build();
 
-		fileWriter.persist(metadata, userId);
+		fileWriter.persist(fileMetadata, userId, parentId);
 		FileUtil.uploadFile(file, path, bufferSize);
 	}
 
 	public void downloadFile(Long fileId, String userPath, Long userId) {
-		Metadata metadata = fileReader.findBy(fileId, userId);
-		Path originalPath = Paths.get(metadata.getFilePath());
-		Path userDesignatedPath = Paths.get(userPath).resolve(metadata.getOriginalFileName()).normalize();
+		FileMetadata fileMetadata = fileReader.findBy(fileId, userId);
+		Path originalPath = Paths.get(fileMetadata.getFilePath());
+		Path userDesignatedPath = Paths.get(userPath).resolve(fileMetadata.getOriginalFileName()).normalize();
 
 		FileUtil.download(originalPath, userDesignatedPath, bufferSize);
 	}
 
 	@Transactional
 	public void deleteFile(Long fileId, Long userId) {
-		Metadata metadata = fileReader.findBy(fileId, userId);
+		FileMetadata fileMetadata = fileReader.findBy(fileId, userId);
 		fileWriter.deleteBy(fileId);
-		Path path = Paths.get(metadata.getFilePath());
+		Path path = Paths.get(fileMetadata.getFilePath());
 
 		FileUtil.delete(path);
+	}
+
+	public List<FileMetadata> findChildBy(Long parentId, Long userId) {
+		return fileReader.findChildBy(parentId, userId);
 	}
 }

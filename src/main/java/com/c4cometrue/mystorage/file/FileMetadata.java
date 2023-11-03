@@ -2,7 +2,7 @@ package com.c4cometrue.mystorage.file;
 
 import java.util.UUID;
 
-import com.c4cometrue.mystorage.MetadataType;
+import com.c4cometrue.mystorage.meta.MetadataType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,14 +14,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Metadata", indexes = @Index(name = "index_uploaderId", columnList = "uploaderId"))
-public class Metadata {
+@Table(name = "file_metadata", indexes = @Index(name = "index_parentId", columnList = "parentId"))
+public class FileMetadata {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +35,7 @@ public class Metadata {
 	private String filePath;
 	@Column(nullable = false)
 	private Long uploaderId;
+	private Long parentId;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -43,15 +45,14 @@ public class Metadata {
 		return UUID.randomUUID().toString();
 	}
 
-	private Metadata(String originalFileName, String storedFileName, String filePath, Long uploaderId) {
+	@Builder
+	public FileMetadata(String originalFileName, String storedFileName, String filePath, Long uploaderId,
+		Long parentId) {
 		this.originalFileName = originalFileName;
 		this.storedFileName = storedFileName;
 		this.filePath = filePath;
 		this.uploaderId = uploaderId;
+		this.parentId = parentId;
 		this.metadataType = MetadataType.FILE;
-	}
-
-	public static Metadata of(String originalFileName, String storedFileName, String filePath, Long uploaderId) {
-		return new Metadata(originalFileName, storedFileName, filePath, uploaderId);
 	}
 }

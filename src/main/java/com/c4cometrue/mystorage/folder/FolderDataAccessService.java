@@ -1,5 +1,7 @@
 package com.c4cometrue.mystorage.folder;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,52 +20,33 @@ public class FolderDataAccessService implements FolderReader, FolderWriter {
 		return parentId == null ? storagePath : findBy(parentId).getFilePath();
 	}
 
-	// 적절한 예외 던져라
-	public FolderMetadata findBy(Long folderId) {
-		return folderRepository.findById(folderId).orElseThrow(
-			() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("folderId { }", folderId)
-		);
-	}
-
-	public void verifyBy(Long parentId, Long userId) {
-		if (parentId == null) {
-			return;
-		}
-
-		if (!folderRepository.existsByParentIdAndUserId(parentId, userId)) {
-			throw ErrorCode.UNAUTHORIZED_FOLDER_ACCESS.serviceException();
-		}
-	}
-
-	public void validateFolderOwnershipBy(Long folderId, Long userId) {
-		if (!folderRepository.existsByIdAndUserId(folderId, userId)) {
-			throw ErrorCode.CANNOT_FOUND_FOLDER.serviceException();
-		}
-	}
-
 	// 자신의 폴더나 null 밑에서만 폴더를 만들수 있어야 한다
-	public void persist(String userFolderName, String storedFolderName, String path, Long userId, Long parentId) {
+	public void persist(String userFolderName, String storedFolderName, String path, Long uploaderId, Long parentId) {
 		// 부모 폴더 주인이 가 유저와 같거나 부모 폴더 id 가 널이여야지 가능
-
-		verifyBy(parentId, userId);
+		validateFolderOwnershipBy(parentId, uploaderId);
 		// 중복된 폴더 이름 생성은 불가능
-		checkDuplicateBy(userFolderName, parentId, userId);
+		checkDuplicateBy(userFolderName, parentId, uploaderId);
 
 		FolderMetadata metadata = FolderMetadata.builder()
 			.originalFolderName(userFolderName)
 			.storedFolderName(storedFolderName)
 			.filePath(path)
 			.parentId(parentId)
-			.userId(userId)
+			.uploaderId(uploaderId)
 			.build();
 
 		folderRepository.save(metadata);
 	}
 
-	public void checkDuplicateBy(String userFolderName, Long parentId, Long userId) {
-		if (folderRepository.existsByParentIdAndUserIdAndOriginalFolderName(parentId, userId, userFolderName)) {
+	private void checkDuplicateBy(String userFolderName, Long parentId, Long userId) {
+		if (folderRepository.existsByParentIdAndUploaderIdAndOriginalFolderName(parentId, userId, userFolderName)) {
 			throw ErrorCode.DUPLICATE_FOLDER_NAME.serviceException();
 		}
+	}
+
+	public List<FolderMetadata> findChildBy(Long parentId, Long userId) {
+		validateFolderOwnershipBy(parentId, userId);
+		return folderRepository.findByParentIdAndUploaderId(parentId, userId);
 	}
 
 	public void changeFolderNameBy(String folderName, Long folderId, Long userId) {
@@ -71,9 +54,22 @@ public class FolderDataAccessService implements FolderReader, FolderWriter {
 		changeFolderNameBy(folderName, folderId);
 	}
 
-	public void changeFolderNameBy(String folderName, Long folderId) {
+	private void changeFolderNameBy(String folderName, Long folderId) {
 		FolderMetadata folderMetadata = findBy(folderId);
 		folderMetadata.changeFolderName(folderName);
 		folderRepository.save(folderMetadata);
+	}
+
+	private void validateFolderOwnershipBy(Long folderId, Long userId) {
+		if (folderId != null && !folderRepository.existsByIdAndUploaderId(folderId, userId)) {
+			throw ErrorCode.CANNOT_FOUND_FOLDER.serviceException();
+		}
+	}
+
+	// 적절한 예외 던져라
+	private FolderMetadata findBy(Long folderId) {
+		return folderRepository.findById(folderId).orElseThrow(
+			() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("folderId { }", folderId)
+		);
 	}
 }

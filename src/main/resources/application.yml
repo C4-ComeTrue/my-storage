@@ -10,6 +10,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+        show_sql: true
 
   servlet:
     multipart:
@@ -19,6 +20,12 @@ spring:
 file:
   storage-path: C:\\Users\\g2c10\\OneDrive\\C4\\myStorage
   buffer: 10240
+
+
+logging:
+   level:
+     org.springframework.web: DEBUG
+     org.springframework.web.servlet.DispatcherServlet: DEBUG
 
 
 

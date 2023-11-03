@@ -1,19 +1,26 @@
 package com.c4cometrue.mystorage.file;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface FileRepository extends JpaRepository<Metadata, Long> {
-	Optional<Metadata> findByIdAndUploaderId(Long id, Long uploaderId);
+public interface FileRepository extends JpaRepository<FileMetadata, Long> {
+	Optional<FileMetadata> findByIdAndUploaderId(Long id, Long uploaderId);
 
 	@Query("SELECT CASE WHEN COUNT(m) > 0 "
 		+ "THEN TRUE "
 		+ "ELSE FALSE END "
-		+ "FROM Metadata m "
-		+ "WHERE m.uploaderId = :uploaderId "
+		+ "FROM FileMetadata m "
+		+ "WHERE "
+		+ "(m.parentId = :parentId OR (m.parentId IS NULL AND :parentId IS NULL)) "
+		+ "AND m.uploaderId = :uploaderId "
 		+ "AND m.originalFileName = :fileName ")
-	boolean checkDuplicateFileName(String fileName, Long uploaderId);
+	boolean checkDuplicateFileName(Long parentId, Long uploaderId, String fileName);
+
+	List<FileMetadata> findByParentIdAndUploaderId(Long parentId, Long userId);
+
+	boolean existsByIdAndUploaderId(Long parentId, Long userId);
 
 }

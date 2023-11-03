@@ -1,9 +1,9 @@
 package com.c4cometrue.mystorage.file;
 
+import java.util.List;
+
 public interface FileReader {
-	Metadata findBy(Long fileId, Long userId);
+	FileMetadata findBy(Long fileId, Long userId);
 
-	void existBy(Long fileId);
-
-	void duplicateBy(String fileName, Long userId);
+	List<FileMetadata> findChildBy(Long parentId, Long userId);
 }

@@ -2,6 +2,7 @@ package com.c4cometrue.mystorage.folder;
 
 import static com.c4cometrue.mystorage.TestConstants.*;
 
+import static java.lang.Boolean.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -26,24 +27,6 @@ class FolderDataAccessServiceTest {
 	private FolderRepository folderRepository;
 
 	@Test
-	@DisplayName("폴더 메타 데이터 찾기")
-	void findBy() {
-		given(folderRepository.findById(PARENT_ID)).willReturn(Optional.of(FOLDER_METADATA));
-
-		folderDataAccessService.findBy(PARENT_ID);
-
-		verify(folderRepository, times(1)).findById(PARENT_ID);
-	}
-
-	@Test
-	@DisplayName("폴더 메타 데이터 찾기 : 실패")
-	void findByFail() {
-		given(folderRepository.findById(PARENT_ID)).willReturn(Optional.empty());
-
-		assertThrows(ServiceException.class, () -> folderDataAccessService.findBy(PARENT_ID));
-	}
-
-	@Test
 	@DisplayName("부모 폴더 기반 경로 찾기")
 	void findPathBy() {
 		given(folderRepository.findById(PARENT_ID)).willReturn(Optional.of(FOLDER_METADATA));
@@ -61,60 +44,11 @@ class FolderDataAccessServiceTest {
 	}
 
 	@Test
-	@DisplayName("유효성 검사 부모id, 유저id 를 가지는 파일 : 부모id 가 널")
-	void verifyParentIsNull() {
-		folderDataAccessService.verifyBy(null, PARENT_ID);
-
-		verify(folderRepository, times(0)).existsByParentIdAndUserId(null, PARENT_ID);
-	}
-
-	@Test
-	@DisplayName("유효성 검사 부모id, 유저id 를 가지는 파일")
-	void verifyBy() {
-		given(folderRepository.existsByParentIdAndUserId(PARENT_ID, USER_ID)).willReturn(Boolean.TRUE);
-
-		folderDataAccessService.verifyBy(PARENT_ID, USER_ID);
-
-		verify(folderRepository, times(1)).existsByParentIdAndUserId(PARENT_ID, USER_ID);
-
-	}
-
-	@Test
-	@DisplayName("유효성 검사 부모id, 유저id 를 가지는 파일 : 실패")
-	void verifyByFalse() {
-		given(folderRepository.existsByParentIdAndUserId(PARENT_ID, USER_ID)).willReturn(Boolean.FALSE);
-
-		assertThrows(ServiceException.class, () -> folderDataAccessService.verifyBy(PARENT_ID, USER_ID));
-	}
-
-	@Test
-	@DisplayName("폴더 중복 생성 검사")
-	void checkDuplicateBy() {
-		given(folderRepository.existsByParentIdAndUserIdAndOriginalFolderName(PARENT_ID, USER_ID,
-			USER_FOLDER_NAME)).willReturn(Boolean.FALSE);
-
-		folderDataAccessService.checkDuplicateBy(USER_FOLDER_NAME, PARENT_ID, USER_ID);
-
-		verify(folderRepository, times(1)).existsByParentIdAndUserIdAndOriginalFolderName(PARENT_ID, USER_ID,
-			USER_FOLDER_NAME);
-	}
-
-	@Test
-	@DisplayName("폴더 중복 생성 검사 : 실패")
-	void checkDuplicateFail() {
-		given(folderRepository.existsByParentIdAndUserIdAndOriginalFolderName(PARENT_ID, USER_ID,
-			USER_FOLDER_NAME)).willReturn(Boolean.TRUE);
-
-		assertThrows(ServiceException.class,
-			() -> folderDataAccessService.checkDuplicateBy(USER_FOLDER_NAME, PARENT_ID, USER_ID));
-	}
-
-	@Test
 	@DisplayName("폴더 메타데이터 저장")
 	void persist() {
-		given(folderRepository.existsByParentIdAndUserId(PARENT_ID, USER_ID)).willReturn(Boolean.TRUE);
-		given(folderRepository.existsByParentIdAndUserIdAndOriginalFolderName(PARENT_ID, USER_ID,
-			USER_FOLDER_NAME)).willReturn(Boolean.FALSE);
+		given(folderRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(TRUE);
+		given(folderRepository.existsByParentIdAndUploaderIdAndOriginalFolderName(PARENT_ID, USER_ID, USER_FOLDER_NAME))
+			.willReturn(FALSE);
 
 		folderDataAccessService.persist(USER_FOLDER_NAME, STORED_FOLDER_NAME, FOLDER_PATH.toString(), USER_ID,
 			PARENT_ID);
@@ -123,70 +57,61 @@ class FolderDataAccessServiceTest {
 	}
 
 	@Test
-	@DisplayName("폴더 찾기 테스트")
-	void findFolderTest() {
-		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.of(FOLDER_METADATA));
+	@DisplayName("폴더 메타데이터 저장 중복된 파일 : 실패")
+	void persistFail() {
+		given(folderRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(TRUE);
+		given(folderRepository.existsByParentIdAndUploaderIdAndOriginalFolderName(PARENT_ID, USER_ID, USER_FOLDER_NAME))
+			.willReturn(TRUE);
 
-		folderDataAccessService.findBy(FOLDER_ID);
-
-		verify(folderRepository, times(1)).findById(FOLDER_ID);
-	}
-
-	@Test
-	@DisplayName("폴더 찾기 테스트 : 실패")
-	void findFolderFailTest() {
-		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.empty());
-		assertThrows(ServiceException.class, () -> folderDataAccessService.findBy(FOLDER_ID));
-	}
-
-	@Test
-	@DisplayName("폴더 사용자 권한 테스트")
-	void validateFolderOwnershipTest() {
-		given(folderRepository.existsByIdAndUserId(FOLDER_ID, USER_ID)).willReturn(Boolean.TRUE);
-
-		folderDataAccessService.validateFolderOwnershipBy(FOLDER_ID, USER_ID);
-
-		verify(folderRepository, times(1)).existsByIdAndUserId(FOLDER_ID, USER_ID);
-	}
-
-	@Test
-	@DisplayName("폴더 사용자 권한 테스트 : 실패")
-	void validateFolderOwnershipFailTest() {
-		given(folderRepository.existsByIdAndUserId(FOLDER_ID, USER_ID)).willReturn(Boolean.FALSE);
-		assertThrows(ServiceException.class, () -> folderDataAccessService.validateFolderOwnershipBy(FOLDER_ID, USER_ID));
-	}
-
-	@Test
-	@DisplayName("폴더 이름 변경 테스트")
-	void changeFolderNameTest() {
-		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.of(FOLDER_METADATA));
-
-		folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID);
-
-		verify(folderRepository, times(1)).save(FOLDER_METADATA);
-	}
-
-	@Test
-	@DisplayName("폴더 이름 변경 테스트 : 실패")
-	void changeFolderNameFailTest() {
-		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.empty());
-
-		assertThrows(ServiceException.class, () -> folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID));
+		assertThrows(ServiceException.class,
+			() -> folderDataAccessService.persist(USER_FOLDER_NAME, STORED_FOLDER_NAME, USER_PATH, USER_ID,
+				PARENT_ID));
 	}
 
 	@Test
 	@DisplayName("폴더 이름 변경 테스트")
 	void changeFolderTest() {
-		given(folderRepository.existsByIdAndUserId(FOLDER_ID, USER_ID)).willReturn(Boolean.TRUE);
+		given(folderRepository.existsByIdAndUploaderId(FOLDER_ID, USER_ID)).willReturn(TRUE);
 		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.of(FOLDER_METADATA));
 
 		folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
 
-		verify(folderRepository, times(1)).existsByIdAndUserId(FOLDER_ID, USER_ID);
+		verify(folderRepository, times(1)).existsByIdAndUploaderId(FOLDER_ID, USER_ID);
 		verify(folderRepository, times(1)).save(FOLDER_METADATA);
 	}
 
+	@Test
+	@DisplayName("폴더 이름 변경 테스트 id 가 널")
+	void changeFolderParentIdIsNullTest() {
+		given(folderRepository.findById(null)).willReturn(Optional.of(FOLDER_METADATA));
 
+		folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, null, USER_ID);
 
+		verify(folderRepository, times(1)).save(FOLDER_METADATA);
+	}
 
+	@Test
+	@DisplayName("다른 유저 폴더명 변경 : 실패")
+	void changeOtherUserFolderTest() {
+		given(folderRepository.existsByIdAndUploaderId(FOLDER_ID, USER_ID)).willReturn(TRUE);
+
+		assertThrows(ServiceException.class,
+			() -> folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID));
+	}
+
+	@Test
+	@DisplayName("루트 폴더 조회 테스트")
+	void getChildFolder() {
+		folderDataAccessService.findChildBy(null, USER_ID);
+
+		then(folderRepository).should(times(1)).findByParentIdAndUploaderId(null, USER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 조회 테스트 : 실패")
+	void getChildFolderFail() {
+		given(folderRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(FALSE);
+
+		assertThrows(ServiceException.class, () -> folderDataAccessService.findChildBy(PARENT_ID, USER_ID));
+	}
 }

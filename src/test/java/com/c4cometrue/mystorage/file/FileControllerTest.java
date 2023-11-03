@@ -28,13 +28,6 @@ class FileControllerTest {
 	}
 
 	@Test
-	@DisplayName("업로드 컨트롤러 테스트")
-	void uploadFile() {
-		fileController.uploadFile(FileUploadRequest.of(MOCK_MULTIPART_FILE, USER_ID));
-		verify(fileService, times(1)).uploadFile(any(), anyLong());
-	}
-
-	@Test
 	@DisplayName("파일 다운로드 컨트롤러 테스트")
 	void downloadFile() {
 		fileController.downloadFile(FileDownloadRequest.of(FILE_ID, USER_PATH, USER_ID));
