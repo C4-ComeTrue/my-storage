@@ -1,10 +1,11 @@
 package com.c4cometrue.mystorage.file.util;
 
-import static com.c4cometrue.mystorage.TestMockFile.*;
+import static com.c4cometrue.mystorage.file.TestMockFile.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 
 import org.junit.jupiter.api.AfterAll;
@@ -17,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
 import com.c4cometrue.mystorage.exception.ServiceException;
-import com.c4cometrue.mystorage.file.util.FileUtil;
 
 @ExtendWith(MockitoExtension.class)
 class FileUtilTest {
@@ -32,6 +32,23 @@ class FileUtilTest {
 	@AfterAll
 	public static void tearDown() {
 		filesMockedStatic.close();
+	}
+
+	@Test
+	@DisplayName("파일 업로드 성공")
+	void fileUploadSuccessTest() throws IOException {
+		// given
+		var inputStream = mock(InputStream.class);
+
+		given(mockMultipartFile.isEmpty()).willReturn(false);
+		given(mockMultipartFile.getInputStream()).willReturn(inputStream);
+
+		// when
+		FileUtil.fileUpload(mockMultipartFile, mockUploadPath);
+
+		// then
+		filesMockedStatic.verify(() -> Files.copy(inputStream, mockUploadPath), times(1));
+
 	}
 
 	@Test

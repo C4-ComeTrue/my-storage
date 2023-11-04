@@ -1,15 +1,13 @@
 package com.c4cometrue.mystorage.file.dto;
 
-import com.c4cometrue.mystorage.file.dto.FileDownloadRequestDto;
+import static com.c4cometrue.mystorage.file.TestMockFile.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static com.c4cometrue.mystorage.TestMockFile.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class FileDownloadRequestDtoTest {

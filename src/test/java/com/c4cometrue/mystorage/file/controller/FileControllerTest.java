@@ -1,6 +1,5 @@
 package com.c4cometrue.mystorage.file.controller;
 
-import com.c4cometrue.mystorage.file.controller.FileController;
 import com.c4cometrue.mystorage.file.dto.FileDeleteRequestDto;
 import com.c4cometrue.mystorage.file.dto.FileDownloadRequestDto;
 import com.c4cometrue.mystorage.file.service.FileService;
@@ -12,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static com.c4cometrue.mystorage.TestMockFile.*;
+import static com.c4cometrue.mystorage.file.TestMockFile.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 

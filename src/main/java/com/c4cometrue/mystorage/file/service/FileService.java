@@ -2,6 +2,7 @@ package com.c4cometrue.mystorage.file.service;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,18 +33,20 @@ public class FileService {
 	@Transactional
 	public void fileUpload(MultipartFile multipartFile, String userName) {
 		String originFileName = multipartFile.getOriginalFilename(); // 파일 원본이름
-		checkFileDuplicated(originFileName, userName);
+		checkFileDuplicated(originFileName, userName); // 중복검사
 
 		Long fileSize = multipartFile.getSize();
 		String fileMine = multipartFile.getContentType();
-		Path savedPath = Paths.get(filePathService.createSavedPath(originFileName));
+		String filePath = UUID.randomUUID() + originFileName;
+
+		Path savedPath = filePathService.createSavedPath(filePath);
 
 		FileUtil.fileUpload(multipartFile, savedPath);
 		FileMetaData fileMetaData = FileMetaData.builder()
 			.fileName(originFileName)
 			.userName(userName)
 			.fileSize(fileSize)
-			.savedPath(filePathService.createSavedPath(originFileName))
+			.savedPath(filePath)
 			.fileMine(fileMine)
 			.build();
 

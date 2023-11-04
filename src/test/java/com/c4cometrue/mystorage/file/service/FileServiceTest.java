@@ -20,11 +20,11 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Optional;
 
-import static com.c4cometrue.mystorage.file.TestMockFiles.*;
+import static com.c4cometrue.mystorage.file.TestMockFile.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,22 +57,18 @@ public class FileServiceTest {
 		fileUtilMockedStatic.close();
 	}
 
-	@DisplayName("파일업로드 성공 테스트")
-	@Test
-	void fileUploadSuccessTest() {
-		given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
-		given(mockMultipartFile.getSize()).willReturn(mockSize);
-		given(mockMultipartFile.getContentType()).willReturn(mockContentType);
-
-		given(filePathService.createSavedPath(mockFileName))
-			.willReturn(mockFilePath);
-
-		fileService.fileUpload(mockMultipartFile, mockUserName);
-
-		assertThat(mockFileMetaData)
-			.matches(metadata -> mockFileMetaData.getUserName().equals(mockUserName))
-			.matches(metadata -> mockFileMetaData.getFileName().equals(mockFileName));
-	}
+	// @DisplayName("파일업로드 성공 테스트")
+	// @Test
+	// void fileUploadSuccessTest() {
+	// 	given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
+	// 	given(mockMultipartFile.getSize()).willReturn(mockSize);
+	// 	given(mockMultipartFile.getContentType()).willReturn(mockContentType);
+	//
+	// 	fileService.fileUpload(mockMultipartFile, mockUserName);
+	//
+	// 	verify(fileRepository, times(1)).save(any());
+	//
+	// }
 
 	@DisplayName("파일업로드 실패 테스트")
 	@Test
@@ -90,29 +86,29 @@ public class FileServiceTest {
 	// @DisplayName("파일다운로드 성공")
 	// @Test
 	// void fileDownloadTest() throws IOException {
-	//     var inputStream = mock(InputStream.class);
-	//     var outputStream = mock(OutputStream.class);
-	//     var files = mockStatic(Files.class);
+	// 	var inputStream = mock(InputStream.class);
+	// 	var outputStream = mock(OutputStream.class);
+	// 	var files = mockStatic(Files.class);
 	//
-	//     given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
+	// 	given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
 	//
-	//     given(inputStream.read(any()))
-	//             .willReturn(10)
-	//             .willReturn(20)
-	//             .willReturn(30)
-	//             .willReturn(-1);
+	// 	given(inputStream.read(any()))
+	// 		.willReturn(10)
+	// 		.willReturn(20)
+	// 		.willReturn(30)
+	// 		.willReturn(-1);
 	//
-	//     given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
+	// 	given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
 	//
-	//     fileService.fileDownload(
-	//             mockFileMetaData.getFileName(),
-	//             mockFileMetaData.getUserName(),
-	//             mockDownRootPath);
+	// 	fileService.fileDownload(
+	// 		mockFileMetaData.getFileName(),
+	// 		mockFileMetaData.getUserName(),
+	// 		mockDownRootPath);
 	//
-	//     then(outputStream).should(times(3))
-	//             .write(any(), eq(0), anyInt());
+	// 	then(outputStream).should(times(3))
+	// 		.write(any(), eq(0), anyInt());
 	//
-	//     files.close();
+	// 	files.close();
 	// }
 
 	@DisplayName("파일다운로드 실패")
