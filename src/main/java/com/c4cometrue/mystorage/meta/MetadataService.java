@@ -12,7 +12,6 @@ import com.c4cometrue.mystorage.file.FileService;
 import com.c4cometrue.mystorage.folder.FolderMetadata;
 import com.c4cometrue.mystorage.folder.FolderService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,7 +20,6 @@ public class MetadataService {
 	private final FolderService folderService;
 	private final FileService fileService;
 
-	@Transactional
 	public void uploadFile(MultipartFile file, Long userId, Long parentId) {
 		String basePath = folderService.findPathBy(parentId);
 		fileService.uploadFile(file, userId, parentId, basePath);

@@ -6,13 +6,14 @@ import org.springframework.stereotype.Service;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class FileDataAccessService implements FileReader, FileWriter {
 	private final FileRepository fileRepository;
-
+	@Transactional
 	public void deleteBy(Long fileId) {
 		existBy(fileId);
 		fileRepository.deleteById(fileId);
@@ -30,6 +31,7 @@ public class FileDataAccessService implements FileReader, FileWriter {
 				userId));
 	}
 
+	@Transactional
 	public void persist(FileMetadata fileMetadata, Long userId, Long parentId) {
 		validateFileOwnershipBy(parentId, userId);
 		duplicateBy(fileMetadata.getOriginalFileName(), userId, parentId);

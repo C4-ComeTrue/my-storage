@@ -82,7 +82,6 @@ class FileServiceTest {
 		when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(MOCK_MULTIPART_FILE.getBytes()));
 		when(mockFile.getOriginalFilename()).thenReturn(ORIGINAL_FILE_NAME);
 
-		doNothing().when(fileDataAccessService).persist(any(FileMetadata.class), anyLong(), anyLong());
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
 			() -> fileService.uploadFile(mockFile, USER_ID, PARENT_ID, PARENT_PATH)

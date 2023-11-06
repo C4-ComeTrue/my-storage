@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.util.FileUtil;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,8 +33,8 @@ public class FileService {
 			.parentId(parentId)
 			.build();
 
-		fileWriter.persist(fileMetadata, userId, parentId);
 		FileUtil.uploadFile(file, path, bufferSize);
+		fileWriter.persist(fileMetadata, userId, parentId);
 	}
 
 	public void downloadFile(Long fileId, String userPath, Long userId) {
@@ -46,13 +45,13 @@ public class FileService {
 		FileUtil.download(originalPath, userDesignatedPath, bufferSize);
 	}
 
-	@Transactional
 	public void deleteFile(Long fileId, Long userId) {
 		FileMetadata fileMetadata = fileReader.findBy(fileId, userId);
-		fileWriter.deleteBy(fileId);
 		Path path = Paths.get(fileMetadata.getFilePath());
 
 		FileUtil.delete(path);
+
+		fileWriter.deleteBy(fileId);
 	}
 
 	public List<FileMetadata> findChildBy(Long parentId, Long userId) {
