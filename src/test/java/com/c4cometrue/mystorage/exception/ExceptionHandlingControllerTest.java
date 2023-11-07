@@ -1,9 +1,12 @@
 package com.c4cometrue.mystorage.exception;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
 
+import java.util.Objects;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,8 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import jakarta.validation.ConstraintViolationException;
-import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import jakarta.validation.ValidationException;
 
 @ExtendWith(MockitoExtension.class)
 class ExceptionHandlingControllerTest {
@@ -20,6 +22,7 @@ class ExceptionHandlingControllerTest {
     ExceptionHandlingController exceptionHandlingController;
 
     @Test
+    @DisplayName("서비스 exception ResponseEntity 응답값 확인")
     void serviceException() {
         // given
         var mockException = mock(ServiceException.class);
@@ -35,6 +38,7 @@ class ExceptionHandlingControllerTest {
     }
 
     @Test
+    @DisplayName("로그 디버깅 메세지")
     void logDebugMessage() {
         // given
         var mockException = mock(ServiceException.class);
@@ -48,13 +52,14 @@ class ExceptionHandlingControllerTest {
 
         // then
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("File not exist", response.getBody().message());
+        assertEquals("File not exist", Objects.requireNonNull(response.getBody()).message());
     }
 
     @Test
-    void validExceptionConstraintViolation() {
+    @DisplayName("Javax 유효성 검증 테스트")
+    void validationExceptionTest() {
         // given
-        var mockException = mock(ConstraintViolationException.class);
+        var mockException = mock(ValidationException.class);
 
         // when
         var response = exceptionHandlingController.handleValidException(mockException);
@@ -64,14 +69,15 @@ class ExceptionHandlingControllerTest {
     }
 
     @Test
-    void validExceptionMissingServletRequestPart() {
+    @DisplayName("그 외 모든 예외 테스트")
+    void handleExceptionTest() {
         // given
-        var mockException = mock(MissingServletRequestPartException.class);
+        var mockException = mock(Exception.class);
 
         // when
-        var response = exceptionHandlingController.handleValidException(mockException);
+        var response = exceptionHandlingController.handleException(mockException);
 
         //then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 }
