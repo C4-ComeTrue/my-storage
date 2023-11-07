@@ -17,14 +17,17 @@ class FileMetaDataTest {
             .fileStorageName(mockFileStorageName)
             .size(100L)
             .mime("text/plain")
-            .username("userName")
+            .userName("userName")
+            .folderId(123)
             .build();
 
         assertThat(fileMetaData)
+            .matches(metadata -> metadata.getFileId() == 0)
             .matches(metadata -> StringUtils.equals(metadata.getFileName(), mockFileName))
             .matches(metadata -> StringUtils.equals(metadata.getFileStorageName(), mockFileStorageName))
             .matches(metadata -> metadata.getSize() == mockSize)
             .matches(metadata -> StringUtils.equals(metadata.getMime(), mockContentType))
-            .matches(metadata -> StringUtils.equals(metadata.getUsername(), mockUserName));
+            .matches(metadata -> StringUtils.equals(metadata.getUserName(), mockUserName))
+            .matches(metadata -> metadata.getFolderId() == 123);
     }
 }

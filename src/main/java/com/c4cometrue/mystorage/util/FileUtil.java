@@ -64,7 +64,6 @@ public class FileUtil {
 		try {
 			Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			e.printStackTrace();
 			throw ErrorCd.INTERNAL_SERVER_ERROR.serviceException();
 		}
 	}
