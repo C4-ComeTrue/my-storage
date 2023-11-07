@@ -41,7 +41,6 @@ public class FileService {
 
 		Path savedPath = filePathService.createSavedPath(filePath);
 
-		FileUtil.fileUpload(multipartFile, savedPath);
 		FileMetaData fileMetaData = FileMetaData.builder()
 			.fileName(originFileName)
 			.userName(userName)
@@ -51,6 +50,7 @@ public class FileService {
 			.build();
 
 		fileRepository.save(fileMetaData);
+		FileUtil.fileUpload(multipartFile, savedPath);
 	}
 
 	public void checkFileDuplicated(String fileName, String userName) {
@@ -69,6 +69,7 @@ public class FileService {
 
 		FileMetaData savedFileMetaData = getFileMetaDataEntity(fileName, userName);
 
+		// dir + uuid + filename
 		Path savedPath = Paths.get(savedFileMetaData.getSavedPath());
 		Path downloadPath = Paths.get(downPath).resolve(fileName).normalize();
 

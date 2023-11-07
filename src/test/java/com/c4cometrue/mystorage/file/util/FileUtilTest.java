@@ -4,8 +4,10 @@ import static com.c4cometrue.mystorage.file.TestMockFile.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 
 import org.junit.jupiter.api.AfterAll;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
 import com.c4cometrue.mystorage.exception.ServiceException;
@@ -48,11 +51,10 @@ class FileUtilTest {
 
 		// then
 		filesMockedStatic.verify(() -> Files.copy(inputStream, mockUploadPath), times(1));
-
 	}
 
 	@Test
-	@DisplayName("파일 업로드 실패")
+	@DisplayName("파일 업로드 실패: 빈 파일")
 	void fileUploadFailEmptyTest() {
 
 		given(mockMultipartFile.isEmpty()).willReturn(true);
@@ -64,7 +66,7 @@ class FileUtilTest {
 	}
 
 	@Test
-	@DisplayName("파일 업로드 도중 실패")
+	@DisplayName("파일 업로드 실패 : 업로드 진행 중 실패")
 	void fileUploadFailIOTest() throws IOException {
 
 		given(mockMultipartFile.isEmpty()).willReturn(false);
@@ -78,11 +80,36 @@ class FileUtilTest {
 	}
 
 	@Test
+	@DisplayName("파일 다운로드 실패 : 다운로드할 ")
+	void fileDownloadFailTest() throws IOException {
+		InputStream is = mock(InputStream.class);
+		OutputStream os = mock(OutputStream.class);
+
+		given(Files.newInputStream(mockUploadPath)).willThrow(new IOException());
+		given(Files.newOutputStream(mockDownloadPath)).willThrow(new IOException());
+
+		var exception = assertThrows(ServiceException.class,
+			() -> FileUtil.fileDownload(mockUploadPath, mockDownloadPath, mockReadCnt, mockBuffer));
+
+		assertEquals(ErrorCode.FILE_SERVER_ERROR.name(), exception.getErrorCode());
+	}
+
+	@Test
 	@DisplayName("파일 삭제 실패: 파일이 없는 경우")
 	void fileDeleteFailEmptyTest() {
 		given(Files.exists(mockDeletePath)).willReturn(false);
 
 		var exception = assertThrows(ServiceException.class, () -> FileUtil.fileDelete(mockDeletePath));
 		assertEquals(ErrorCode.FILE_NOT_EXIST.name(), exception.getErrorCode());
+	}
+
+	@Test
+	@DisplayName("파일 삭제 실패 : 삭제 진행 중 실패")
+	void fileDeleteFailProcessTest() {
+		given(Files.exists(mockDeletePath)).willReturn(true);
+
+		FileUtil.fileDelete(mockDeletePath);
+
+		filesMockedStatic.verify(() -> Files.delete(mockDeletePath), times(1));
 	}
 }
