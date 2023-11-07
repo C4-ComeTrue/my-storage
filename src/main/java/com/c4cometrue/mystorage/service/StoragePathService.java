@@ -8,13 +8,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StoragePathService {
-    private final Path storagePath;
+	private final Path storagePath;
 
-    public StoragePathService(@Value("${storage.dir}") String root) {
-        this.storagePath = Paths.get(root);
-    }
+	public StoragePathService(@Value("${storage.dir}") String root) {
+		this.storagePath = Paths.get(root);
+	}
 
-    public Path createTotalPath(String fileStorageName) {
-        return storagePath.resolve(fileStorageName);
-    }
+	public Path createBasicFolderPath(String folderPath) {
+		return storagePath.resolve(folderPath);
+	}
+
+	public Path createFolderPath(String parentFolderPath, String folderPath) {
+		return Path.of(parentFolderPath).resolve(folderPath);
+	}
 }
