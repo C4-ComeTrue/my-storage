@@ -69,7 +69,6 @@ public class FileService {
 
 		FileMetaData savedFileMetaData = getFileMetaDataEntity(fileName, userName);
 
-		// dir + uuid + filename
 		Path savedPath = Paths.get(savedFileMetaData.getSavedPath());
 		Path downloadPath = Paths.get(downPath).resolve(fileName).normalize();
 
@@ -100,7 +99,6 @@ public class FileService {
 
 	public FileMetaData getFileMetaDataEntity(String fileName, String userName) {
 
-		// FileMetaDataEntity 찾아올 때, 두 가지 에러가 발생할 수 있다고 생각해서 분리
 		FileMetaData savedFileMetaData = fileRepository.findByFileName(fileName)
 			.orElseThrow(ErrorCode.FILE_NOT_EXIST::serviceException);
 

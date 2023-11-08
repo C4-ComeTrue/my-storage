@@ -19,11 +19,11 @@ class FileDownloadRequestDtoTest {
 	@Test
 	void creatTest() {
 		// given
-		FileDownloadRequestDto dto = fileDownloadRequestDto.create(mockFileName, mockUserName, mockDownRootPath);
+		FileDownloadRequestDto dto = fileDownloadRequestDto.create(MOCK_FILE_NAME, MOCK_USER_NAME, MOCK_DOWN_ROOT_PATH);
 
 		//then
-		assertEquals(mockFileName, dto.fileName());
-		assertEquals(mockUserName, dto.userName());
-		assertEquals(mockDownRootPath, dto.downloadPath());
+		assertEquals(MOCK_FILE_NAME, dto.fileName());
+		assertEquals(MOCK_USER_NAME, dto.userName());
+		assertEquals(MOCK_DOWN_ROOT_PATH, dto.downloadPath());
 	}
 }

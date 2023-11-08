@@ -17,19 +17,19 @@ class FileMetaDataTest {
 	void fileMetaDataBuilderTest() {
 		// given : builder메소드로 metadataentity생성하기
 		FileMetaData fileMetaData = FileMetaData.builder()
-			.fileName(mockFileName)
-			.userName(mockUserName)
-			.fileSize(mockSize)
-			.fileMine(mockContentType)
-			.savedPath(mockFilePath)
+			.fileName(MOCK_FILE_NAME)
+			.userName(MOCK_USER_NAME)
+			.fileSize(MOCK_SIZE)
+			.fileMine(MOCK_CONTENT_TYPE)
+			.savedPath(MOCK_FILE_PATH)
 			.build();
 
 		// then : assertThat - matches로 검증
 		assertThat(fileMetaData)
-			.matches((data) -> StringUtils.equals(data.getFileName(), mockFileName))
-			.matches((data) -> StringUtils.equals(data.getUserName(), mockUserName))
-			.matches((data) -> data.getFileSize() == mockSize)
-			.matches((data) -> StringUtils.equals(data.getFileMine(), mockContentType))
-			.matches((data) -> StringUtils.equals(data.getSavedPath(), mockFilePath));
+			.matches((data) -> StringUtils.equals(data.getFileName(), MOCK_FILE_NAME))
+			.matches((data) -> StringUtils.equals(data.getUserName(), MOCK_USER_NAME))
+			.matches((data) -> data.getFileSize() == MOCK_SIZE)
+			.matches((data) -> StringUtils.equals(data.getFileMine(), MOCK_CONTENT_TYPE))
+			.matches((data) -> StringUtils.equals(data.getSavedPath(), MOCK_FILE_PATH));
 	}
 }

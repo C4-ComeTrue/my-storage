@@ -1,38 +1,32 @@
 package com.c4cometrue.mystorage.file.service;
 
-import com.c4cometrue.mystorage.exception.ErrorCode;
-import com.c4cometrue.mystorage.exception.ServiceException;
-import com.c4cometrue.mystorage.file.entity.FileMetaData;
-import com.c4cometrue.mystorage.file.repository.FileRepository;
-import com.c4cometrue.mystorage.file.util.FileUtil;
-
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.internal.util.StringUtil;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.web.multipart.MultipartFile;
+import static com.c4cometrue.mystorage.file.TestMockFile.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Optional;
 
-import static com.c4cometrue.mystorage.file.TestMockFile.*;
-import static com.c4cometrue.mystorage.file.util.FileUtil.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import jakarta.annotation.Resource;
+import com.c4cometrue.mystorage.exception.ErrorCode;
+import com.c4cometrue.mystorage.exception.ServiceException;
+import com.c4cometrue.mystorage.file.entity.FileMetaData;
+import com.c4cometrue.mystorage.file.repository.FileRepository;
+import com.c4cometrue.mystorage.file.util.FileUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class FileServiceTest {
@@ -49,9 +43,6 @@ public class FileServiceTest {
 	@Mock
 	FilePathService filePathService;
 
-	@Mock
-	ResourceLoader mockResourceLoader;
-
 	private static MockedStatic<FileUtil> fileUtilMockedStatic;
 
 	@BeforeAll // 매번 테스트 시작 전 초기화 작업
@@ -67,12 +58,12 @@ public class FileServiceTest {
 	@DisplayName("파일업로드 실패 테스트")
 	@Test
 	void fileUploadFailTest() {
-		given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
-		given(fileRepository.findByFileNameAndUserName(mockFileName, mockUserName))
+		given(MOCK_MULTIPLE_FILE.getOriginalFilename()).willReturn(MOCK_FILE_NAME);
+		given(fileRepository.findByFileNameAndUserName(MOCK_FILE_NAME, MOCK_USER_NAME))
 			.willReturn(Optional.of(new FileMetaData()));
 
 		ServiceException se = assertThrows(ServiceException.class,
-			() -> fileService.fileUpload(mockMultipartFile, mockUserName));
+			() -> fileService.fileUpload(MOCK_MULTIPLE_FILE, MOCK_USER_NAME));
 
 		assertEquals(ErrorCode.FILE_IS_DUPLICATED.name(), se.getErrorCode());
 	}
@@ -81,42 +72,40 @@ public class FileServiceTest {
 	@Test
 	void fileUploadSuccessTest() {
 
-		given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
-		given(mockMultipartFile.getSize()).willReturn(mockSize);
-		given(mockMultipartFile.getContentType()).willReturn(mockContentType);
+		given(MOCK_MULTIPLE_FILE.getOriginalFilename()).willReturn(MOCK_FILE_NAME);
+		given(MOCK_MULTIPLE_FILE.getSize()).willReturn(MOCK_SIZE);
+		given(MOCK_MULTIPLE_FILE.getContentType()).willReturn(MOCK_CONTENT_TYPE);
 
 		// when
-		fileService.fileUpload(mockMultipartFile, mockUserName);
+		fileService.fileUpload(MOCK_MULTIPLE_FILE, MOCK_USER_NAME);
 
 		// then
-		assertThat(mockFileMetaData)
-			.matches(metadata -> StringUtils.equals(metadata.getFileName(), mockFileName))
-			.matches(metadata -> metadata.getFileSize() == mockSize)
-			.matches(metadata -> StringUtils.equals(metadata.getFileMine(), mockContentType)
+		assertThat(MOCK_FILE_META_DATA)
+			.matches(metadata -> StringUtils.equals(metadata.getFileName(), MOCK_FILE_NAME))
+			.matches(metadata -> metadata.getFileSize() == MOCK_SIZE)
+			.matches(metadata -> StringUtils.equals(metadata.getFileMine(), MOCK_CONTENT_TYPE)
 			);
-
 	}
 
 	@DisplayName("파일다운로드 실패")
 	@Test
 	void fileDownloadFailTest() throws IOException {
-
 		// given
-		var inputStream = mock(InputStream.class);
+		// var inputStream = mock(InputStream.class);
 		var outputStream = mock(OutputStream.class);
 		var files = mockStatic(Files.class);
 
 		var otherUserName = "otherUser";
 		var otherFileName = "otherFileName";
 
-		given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
-		given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
+		given(fileRepository.findByFileName(MOCK_FILE_NAME)).willReturn(Optional.of(MOCK_FILE_META_DATA));
+		given(Files.newOutputStream(MOCK_DOWNLOAD_PATH)).willReturn(outputStream);
 
 		var permissionException = assertThrows(ServiceException.class,
-			() -> fileService.fileDownload(mockFileName, otherUserName, mockDownRootPath));
+			() -> fileService.fileDownload(MOCK_FILE_NAME, otherUserName, MOCK_DOWN_ROOT_PATH));
 
 		var notFoundException = assertThrows(ServiceException.class,
-			() -> fileService.fileDownload(otherFileName, mockUserName, mockDownRootPath));
+			() -> fileService.fileDownload(otherFileName, MOCK_USER_NAME, MOCK_DOWN_ROOT_PATH));
 
 		assertEquals(ErrorCode.FILE_PERMISSION_DENIED.name(), permissionException.getErrorCode());
 		assertEquals(ErrorCode.FILE_NOT_EXIST.name(), notFoundException.getErrorCode());
@@ -131,11 +120,11 @@ public class FileServiceTest {
 		var outputStream = mock(OutputStream.class);
 		var files = mockStatic(Files.class);
 
-		given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
-		given(Files.newInputStream(mockUploadPath)).willReturn(inputStream);
-		given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
+		given(fileRepository.findByFileName(MOCK_FILE_NAME)).willReturn(Optional.of(MOCK_FILE_META_DATA));
+		given(Files.newInputStream(MOCK_UPLOAD_PATH)).willReturn(inputStream);
+		given(Files.newOutputStream(MOCK_DOWNLOAD_PATH)).willReturn(outputStream);
 
-		fileService.fileDownload(mockFileName, mockUserName, mockDownRootPath);
+		fileService.fileDownload(MOCK_FILE_NAME, MOCK_USER_NAME, MOCK_DOWN_ROOT_PATH);
 
 		verify(fileRepository, times(1)).findByFileName(any());
 
@@ -146,10 +135,10 @@ public class FileServiceTest {
 	@Test
 	void fileDeleteSuccessTest() {
 		// given
-		given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
+		given(fileRepository.findByFileName(MOCK_FILE_NAME)).willReturn(Optional.of(MOCK_FILE_META_DATA));
 
 		// when
-		fileService.fileDelete(mockFileMetaData.getFileName(), mockFileMetaData.getUserName());
+		fileService.fileDelete(MOCK_FILE_META_DATA.getFileName(), MOCK_FILE_META_DATA.getUserName());
 
 		// then
 		verify(fileRepository, times(1)).delete(any());
@@ -162,19 +151,19 @@ public class FileServiceTest {
 		var otherUserName = "otherUserName";
 		var otherFileName = "otherFileName";
 
-		given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
+		given(fileRepository.findByFileName(MOCK_FILE_NAME)).willReturn(Optional.of(MOCK_FILE_META_DATA));
 
 		// when
 		var permissionException = assertThrows(ServiceException.class,
 			() -> fileService.fileDelete(
-				mockFileName,
+				MOCK_FILE_NAME,
 				otherUserName
 			));
 
 		var notFoundException = assertThrows(ServiceException.class,
 			() -> fileService.fileDelete(
 				otherFileName,
-				mockUserName
+				MOCK_USER_NAME
 			));
 
 		// then

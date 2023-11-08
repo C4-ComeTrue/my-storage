@@ -19,11 +19,11 @@ class FileDeleteRequestDtoTest {
 	@Test
 	void createTest() {
 		// 생성
-		FileDeleteRequestDto dto = fileDeleteRequestDto.create(mockFileName, mockUserName);
+		FileDeleteRequestDto dto = fileDeleteRequestDto.create(MOCK_FILE_NAME, MOCK_USER_NAME);
 
 		// matches
-		assertEquals(mockFileName, dto.fileName());
-		assertEquals(mockUserName, dto.userName());
+		assertEquals(MOCK_FILE_NAME, dto.fileName());
+		assertEquals(MOCK_USER_NAME, dto.userName());
 	}
 
 }

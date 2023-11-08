@@ -15,7 +15,6 @@ import ch.qos.logback.classic.Logger;
 
 @RestControllerAdvice
 public class ServiceExceptionController {
-
 	private final Logger logger = (Logger)LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 	@ExceptionHandler(value = {ServiceException.class})
@@ -27,7 +26,6 @@ public class ServiceExceptionController {
 			exception.getErrorMessage(),
 			ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
 		);
-
 		var httpStatus = ErrorCode.valueOf(exception.getErrorCode()).getHttpStatus();
 
 		return new ResponseEntity<>(errorResponse, httpStatus);

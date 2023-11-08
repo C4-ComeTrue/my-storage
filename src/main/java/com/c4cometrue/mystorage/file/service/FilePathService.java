@@ -15,7 +15,6 @@ public class FilePathService {
 	}
 
 	public Path createSavedPath(String fileName) {
-
 		return dirPath.resolve(fileName);
 	}
 }

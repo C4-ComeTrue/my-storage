@@ -43,24 +43,24 @@ class FileUtilTest {
 		// given
 		var inputStream = mock(InputStream.class);
 
-		given(mockMultipartFile.isEmpty()).willReturn(false);
-		given(mockMultipartFile.getInputStream()).willReturn(inputStream);
+		given(MOCK_MULTIPLE_FILE.isEmpty()).willReturn(false);
+		given(MOCK_MULTIPLE_FILE.getInputStream()).willReturn(inputStream);
 
 		// when
-		FileUtil.fileUpload(mockMultipartFile, mockUploadPath);
+		FileUtil.fileUpload(MOCK_MULTIPLE_FILE, MOCK_UPLOAD_PATH);
 
 		// then
-		filesMockedStatic.verify(() -> Files.copy(inputStream, mockUploadPath), times(1));
+		filesMockedStatic.verify(() -> Files.copy(inputStream, MOCK_UPLOAD_PATH), times(1));
 	}
 
 	@Test
 	@DisplayName("파일 업로드 실패: 빈 파일")
 	void fileUploadFailEmptyTest() {
 
-		given(mockMultipartFile.isEmpty()).willReturn(true);
+		given(MOCK_MULTIPLE_FILE.isEmpty()).willReturn(true);
 
 		var emptyException = assertThrows(ServiceException.class,
-			() -> FileUtil.fileUpload(mockMultipartFile, mockUploadPath));
+			() -> FileUtil.fileUpload(MOCK_MULTIPLE_FILE, MOCK_UPLOAD_PATH));
 
 		assertEquals(ErrorCode.FILE_BAD_REQUEST.name(), emptyException.getErrorCode());
 	}
@@ -69,12 +69,12 @@ class FileUtilTest {
 	@DisplayName("파일 업로드 실패 : 업로드 진행 중 실패")
 	void fileUploadFailIOTest() throws IOException {
 
-		given(mockMultipartFile.isEmpty()).willReturn(false);
-		given(Files.copy(mockMultipartFile.getInputStream(), mockUploadPath))
+		given(MOCK_MULTIPLE_FILE.isEmpty()).willReturn(false);
+		given(Files.copy(MOCK_MULTIPLE_FILE.getInputStream(), MOCK_UPLOAD_PATH))
 			.willThrow(IOException.class);
 
 		var exception = assertThrows(ServiceException.class,
-			() -> FileUtil.fileUpload(mockMultipartFile, mockUploadPath));
+			() -> FileUtil.fileUpload(MOCK_MULTIPLE_FILE, MOCK_UPLOAD_PATH));
 
 		assertEquals(ErrorCode.FILE_SERVER_ERROR.name(), exception.getErrorCode());
 	}
@@ -85,11 +85,11 @@ class FileUtilTest {
 		InputStream is = mock(InputStream.class);
 		OutputStream os = mock(OutputStream.class);
 
-		given(Files.newInputStream(mockUploadPath)).willThrow(new IOException());
-		given(Files.newOutputStream(mockDownloadPath)).willThrow(new IOException());
+		given(Files.newInputStream(MOCK_UPLOAD_PATH)).willThrow(new IOException());
+		given(Files.newOutputStream(MOCK_DOWNLOAD_PATH)).willThrow(new IOException());
 
 		var exception = assertThrows(ServiceException.class,
-			() -> FileUtil.fileDownload(mockUploadPath, mockDownloadPath, mockReadCnt, mockBuffer));
+			() -> FileUtil.fileDownload(MOCK_UPLOAD_PATH, MOCK_DOWNLOAD_PATH, MOCK_READ_CNT, MOCK_BUFFER));
 
 		assertEquals(ErrorCode.FILE_SERVER_ERROR.name(), exception.getErrorCode());
 	}
@@ -97,19 +97,19 @@ class FileUtilTest {
 	@Test
 	@DisplayName("파일 삭제 실패: 파일이 없는 경우")
 	void fileDeleteFailEmptyTest() {
-		given(Files.exists(mockDeletePath)).willReturn(false);
+		given(Files.exists(MOCK_DELETE_PATH)).willReturn(false);
 
-		var exception = assertThrows(ServiceException.class, () -> FileUtil.fileDelete(mockDeletePath));
+		var exception = assertThrows(ServiceException.class, () -> FileUtil.fileDelete(MOCK_DELETE_PATH));
 		assertEquals(ErrorCode.FILE_NOT_EXIST.name(), exception.getErrorCode());
 	}
 
 	@Test
 	@DisplayName("파일 삭제 실패 : 삭제 진행 중 실패")
 	void fileDeleteFailProcessTest() {
-		given(Files.exists(mockDeletePath)).willReturn(true);
+		given(Files.exists(MOCK_DELETE_PATH)).willReturn(true);
 
-		FileUtil.fileDelete(mockDeletePath);
+		FileUtil.fileDelete(MOCK_DELETE_PATH);
 
-		filesMockedStatic.verify(() -> Files.delete(mockDeletePath), times(1));
+		filesMockedStatic.verify(() -> Files.delete(MOCK_DELETE_PATH), times(1));
 	}
 }

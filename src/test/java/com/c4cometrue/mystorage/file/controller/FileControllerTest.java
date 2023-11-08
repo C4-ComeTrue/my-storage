@@ -31,26 +31,26 @@ class FileControllerTest {
 	@Test
 	@DisplayName("파일 업로드 테스트")
 	void fileUpload() {
-		fileController.fileUpload(mockMultipartFile, mockUserName);
+		fileController.fileUpload(MOCK_MULTIPLE_FILE, MOCK_USER_NAME);
 
 		verify(fileService, times(1))
-			.fileUpload(mockMultipartFile, mockUserName);
+			.fileUpload(MOCK_MULTIPLE_FILE, MOCK_USER_NAME);
 	}
 
 	@Test
 	@DisplayName("파일 다운로드 테스트")
 	void fileDownload() {
-		fileController.fileDownload(FileDownloadRequestDto.create(mockFileName, mockUserName, mockFilePath));
+		fileController.fileDownload(FileDownloadRequestDto.create(MOCK_FILE_NAME, MOCK_USER_NAME, MOCK_FILE_PATH));
 
 		verify(fileService, times(1))
-			.fileDownload(mockFileName, mockUserName, mockFilePath);
+			.fileDownload(MOCK_FILE_NAME, MOCK_USER_NAME, MOCK_FILE_PATH);
 	}
 
 	@Test
 	@DisplayName("파일 삭제 테스트")
 	void fileDelete() {
-		fileController.fileDelete(FileDeleteRequestDto.create(mockFileName, mockUserName));
+		fileController.fileDelete(FileDeleteRequestDto.create(MOCK_FILE_NAME, MOCK_USER_NAME));
 
-		verify(fileService, times(1)).fileDelete(mockFileName, mockUserName);
+		verify(fileService, times(1)).fileDelete(MOCK_FILE_NAME, MOCK_USER_NAME);
 	}
 }
