@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import static com.c4cometrue.mystorage.file.TestMockFile.*;
@@ -30,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
+
+import jakarta.annotation.Resource;
 
 @ExtendWith(MockitoExtension.class)
 public class FileServiceTest {
@@ -92,7 +95,6 @@ public class FileServiceTest {
 			.matches(metadata -> StringUtils.equals(metadata.getFileMine(), mockContentType)
 			);
 
-		// verify(fileUtil, times(1)).fileUpload(mockMultipartFile, mockUploadPath);
 	}
 
 	@DisplayName("파일다운로드 실패")
@@ -118,6 +120,25 @@ public class FileServiceTest {
 
 		assertEquals(ErrorCode.FILE_PERMISSION_DENIED.name(), permissionException.getErrorCode());
 		assertEquals(ErrorCode.FILE_NOT_EXIST.name(), notFoundException.getErrorCode());
+		files.close();
+	}
+
+	@DisplayName("파일 다운로드 성공")
+	@Test
+	void fileDownloadSuccessTest() throws IOException {
+		// given
+		var inputStream = mock(InputStream.class);
+		var outputStream = mock(OutputStream.class);
+		var files = mockStatic(Files.class);
+
+		given(fileRepository.findByFileName(mockFileName)).willReturn(Optional.of(mockFileMetaData));
+		given(Files.newInputStream(mockUploadPath)).willReturn(inputStream);
+		given(Files.newOutputStream(mockDownloadPath)).willReturn(outputStream);
+
+		fileService.fileDownload(mockFileName, mockUserName, mockDownRootPath);
+
+		verify(fileRepository, times(1)).findByFileName(any());
+
 		files.close();
 	}
 
