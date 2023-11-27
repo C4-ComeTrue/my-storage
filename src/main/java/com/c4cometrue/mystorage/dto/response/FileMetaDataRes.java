@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * DTO for {@link com.c4cometrue.mystorage.entity.FileMetaData}
+ * @see com.c4cometrue.mystorage.entity.FileMetaData
  */
 public record FileMetaDataRes(@NotBlank(message = "file name is blank") String fileStorageName,
 							  @NotNull(message = "size is null") long size,

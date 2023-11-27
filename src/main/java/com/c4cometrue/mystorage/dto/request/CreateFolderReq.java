@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * DTO for {@link com.c4cometrue.mystorage.entity.FolderMetaData}
+ * @see com.c4cometrue.mystorage.entity.FolderMetaData
  */
 public record CreateFolderReq(
 	@NotBlank(message = "folder name is blank") String folderName,
