@@ -31,12 +31,21 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // MySQL
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // mockito
+//    testImplementation 'org.springframework.mock'
 }
 
 checkstyle {
     configFile = file("${rootDir}/naver-checkstyle.xml")
     configProperties = ["suppressionFile" : "${rootDir}/naver-checkstyle-suppressions.xml"]
-    toolVersion ="8.24"
+    toolVersion ="9.2"
 }
 
 tasks.named('test') {
