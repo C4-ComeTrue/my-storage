@@ -24,7 +24,12 @@ public enum ErrorCode {
 	FILE_DOWNLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 다운로드에 실패했습니다."),
 
 	// file-delete
-	FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패했습니다.");
+	FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패했습니다."),
+
+	// folder-create
+	FOLDER_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "폴더 생성에 실패했습니다."),
+	DUPLICATE_FOLDER(HttpStatus.BAD_REQUEST, "이미 존재하는 이름의 폴더입니다."),
+	INVALID_FOLDER(HttpStatus.BAD_REQUEST, "유효하지 않은 폴더입니다.");
 
 	private final HttpStatus httpStatus;
 

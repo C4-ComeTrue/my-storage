@@ -31,9 +31,9 @@ public class FileController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public FileUploadDto.Response upload(
-		@RequestPart MultipartFile file, long userId
+		@RequestPart MultipartFile file, long userId, long folderId
 	) {
-		return fileService.fileUpload(file, userId);
+		return fileService.fileUpload(file, userId, folderId);
 	}
 
 	@GetMapping

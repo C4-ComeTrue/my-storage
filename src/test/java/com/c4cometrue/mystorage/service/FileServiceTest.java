@@ -112,7 +112,7 @@ class FileServiceTest {
 		// given
 		var userId = 2L;
 		var fileId = 1L;
-		var fileMetaData = FileMetaData.builder()
+		var fileMetaData = FileMetaData.fileBuilder()
 			.userId(1L)
 			.fileName("name.jpg")
 			.uploadName("name.jp")
@@ -135,7 +135,7 @@ class FileServiceTest {
 		var userId = 1L;
 		var fileId = 1L;
 		var resource = mock(UrlResource.class);
-		var fileMetaData = FileMetaData.builder()
+		var fileMetaData = FileMetaData.fileBuilder()
 			.userId(1L)
 			.fileName("name.jpg")
 			.uploadName("name.jp")
@@ -162,7 +162,7 @@ class FileServiceTest {
 		var fileId = 1L;
 		var contentType = MediaType.IMAGE_JPEG.getType();
 		var fileName = "name.jpg";
-		var fileMetaData = FileMetaData.builder()
+		var fileMetaData = FileMetaData.fileBuilder()
 			.userId(userId)
 			.fileName(fileName)
 			.uploadName(fileName)
@@ -203,7 +203,7 @@ class FileServiceTest {
 		// given
 		var userId = 2L;
 		var fileId = 1L;
-		var fileMetaData = FileMetaData.builder()
+		var fileMetaData = FileMetaData.fileBuilder()
 			.userId(1L)
 			.fileName("name.jpg")
 			.uploadName("name.jp")
@@ -225,7 +225,7 @@ class FileServiceTest {
 		// given
 		var userId = 1L;
 		var fileId = 1L;
-		var fileMetaData = FileMetaData.builder()
+		var fileMetaData = FileMetaData.fileBuilder()
 			.userId(userId)
 			.fileName("name.jpg")
 			.uploadName("name.jp")
