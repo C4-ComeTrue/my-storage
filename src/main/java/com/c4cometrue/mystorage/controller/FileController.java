@@ -31,22 +31,36 @@ import lombok.RequiredArgsConstructor;
 public class FileController {
     private final FileService fileService;
 
+    /**
+     * 파일 업로드 요청
+     * @param req (파일, 사용자 이름, 폴더 기본키)
+     * @return {@link com.c4cometrue.mystorage.dto.response.FileMetaDataRes}
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public FileMetaDataRes uploadFile(@Valid UploadFileReq uploadFileReq
+    public FileMetaDataRes uploadFile(@Valid UploadFileReq req
     ) {
-        return fileService.uploadFile(uploadFileReq);
+        return fileService.uploadFile(req.file(), req.userName(), req.folderId());
     }
 
+    /**
+     * 파일 삭제 요청
+     * @param req (파일 저장소 이름, 사용자 이름, 폴더 기본키)
+     */
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteFile(@Valid FileReq fileReq) {
-        fileService.deleteFile(fileReq);
+    public void deleteFile(@Valid FileReq req) {
+        fileService.deleteFile(req.fileStorageName(), req.userName(), req.folderId());
     }
 
+    /**
+     * 파일 다운로드 요청
+     * @param req (파일 저장소 이름, 사용자 이름, 폴더 기본키)
+     * @return 파일(Resource)
+     */
     @GetMapping
-    public ResponseEntity<Resource> downloadFile(@Valid FileReq fileReq) {
-        FileDownloadRes file = fileService.downloadFile(fileReq);
+    public ResponseEntity<Resource> downloadFile(@Valid FileReq req) {
+        FileDownloadRes file = fileService.downloadFile(req.fileStorageName(), req.userName(), req.folderId());
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(file.mime()))
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.fileName() + "\"")

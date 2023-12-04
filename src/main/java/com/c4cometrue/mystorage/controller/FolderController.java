@@ -28,21 +28,36 @@ public class FolderController {
 
 	private final FolderService folderService;
 
-	@GetMapping()
+	/**
+	 * 폴더의 개략적인 정보 요청
+	 * @param req (폴더 기본키, 폴더 이름, 사용자 이름, 부모 폴더 기본키)
+	 * @return {@link com.c4cometrue.mystorage.dto.response.FolderOverviewRes}
+	 */
+	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public FolderOverviewRes getFolderData(@Valid GetFolderReq getFolderReq) {
-		return folderService.getFolderData(getFolderReq);
+	public FolderOverviewRes getFolderData(@Valid GetFolderReq req) {
+		return folderService.getFolderData(req.folderId(), req.userName());
 	}
 
-	@PostMapping()
+	/**
+	 * 폴더 생성 요청이 성공하면 해당 폴더 pk를 포함한 정보 반환
+	 * @param req (폴더 이름, 사용자 이름, 부모 폴더 기본키)
+	 * @return {@link com.c4cometrue.mystorage.dto.response.CreateFolderRes}
+	 */
+	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public CreateFolderRes createFolder(@RequestBody @Valid CreateFolderReq createFolderReq) {
-		return folderService.createFolder(createFolderReq);
+	public CreateFolderRes createFolder(@RequestBody @Valid CreateFolderReq req) {
+		return folderService.createFolder(req.parentFolderId(), req.userName(), req.folderName());
 	}
 
+	/**
+	 * 폴더 이름 수정 요청
+	 * @param updateFolderNameReq (이전 폴더 이름, 사용자 이름, 새로운 폴더 이름, 부모 폴더 기본키)
+	 */
 	@PatchMapping("/name")
 	@ResponseStatus(HttpStatus.OK)
 	public void updateFolderName(@RequestBody @Valid UpdateFolderNameReq updateFolderNameReq) {
-		folderService.updateFolderName(updateFolderNameReq);
+		folderService.updateFolderName(updateFolderNameReq.folderId(), updateFolderNameReq.parentFolderId(),
+			updateFolderNameReq.userName(),	updateFolderNameReq.newFolderName());
 	}
 }

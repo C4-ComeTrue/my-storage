@@ -25,6 +25,6 @@ public class UserController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public SignUpRes signUp(@Valid @RequestBody SignUpReq signUpReq) {
-		return userService.signUp(signUpReq);
+		return userService.signUp(signUpReq.userName());
 	}
 }
