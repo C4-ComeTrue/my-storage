@@ -8,8 +8,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.c4cometrue.mystorage.dto.request.FileReq;
-import com.c4cometrue.mystorage.dto.request.UploadFileReq;
 import com.c4cometrue.mystorage.dto.response.FileDownloadRes;
 import com.c4cometrue.mystorage.dto.response.FileMetaDataRes;
 import com.c4cometrue.mystorage.entity.FileMetaData;
@@ -27,96 +25,114 @@ public class FileService {
 	private final FileRepository fileRepository;
 	private final ResourceLoader resourceLoader;
 	private final FolderRepository folderRepository;
+	private final StoragePathService storagePathService;
 
 	/**
 	 * 파일 업로드
-	 * @param uploadFileReq 파일(MultiPartFile)과 사용자 이름, 폴더 아이디 포함
+	 * @param file     업로드할 파일
+	 * @param userName 사용자 이름
+	 * @param folderId 파일이 업로드 될 폴더 기본키
 	 * @return 파일의 메타 데이터
 	 */
 	@Transactional
-	public FileMetaDataRes uploadFile(UploadFileReq uploadFileReq) {
-		// 폴더 존재 확인
-		Path folderPath = getFolderPath(uploadFileReq.folderId());
-		MultipartFile file = uploadFileReq.file();
+	public FileMetaDataRes uploadFile(MultipartFile file, String userName, long folderId) {
+		// 폴더 확인
+		checkFolder(folderId);
 		// 특정 사용자의 동일한 파일명 중복 처리
-		if (fileRepository.findByFileNameAndUserNameAndFolderId(
-			file.getOriginalFilename(), uploadFileReq.userName(), uploadFileReq.folderId()).isPresent()) {
-			throw ErrorCd.DUPLICATE_FILE.serviceException();
-		}
+		checkDuplicate(folderId, userName, file.getOriginalFilename());
+		// 파일 저장소 이름
 		String fileStorageName = UUID.randomUUID() + file.getOriginalFilename();
 
-		// 물리적 저장
-		Path filePath = folderPath.resolve(fileStorageName);
-		FileUtil.uploadFile(file, filePath);
-
-
+		// DB 저장 -> 롤백 가능
 		FileMetaData fileMetaData = FileMetaData.builder()
 			.fileName(file.getOriginalFilename())
 			.fileStorageName(fileStorageName)
 			.size(file.getSize())
 			.mime(file.getContentType())
-			.userName(uploadFileReq.userName())
-			.folderId(uploadFileReq.folderId())
+			.userName(userName)
+			.folderId(folderId)
 			.build();
-		// DB 저장
 		fileRepository.save(fileMetaData);
+
+		// 물리적 저장 -> 롤백 불가능
+		Path filePath = getFilePath(userName, fileStorageName);
+		FileUtil.uploadFile(file, filePath);
+
 		return new FileMetaDataRes(fileMetaData);
 	}
 
 	/**
 	 * 파일 삭제
-	 * @param fileReq 파일 저장소 이름, 사용자 이름, 폴더 아이디
+	 * @param fileStorageName 파일 저장소 이름
+	 * @param userName 사용자 이름
+	 * @param folderId 파일이 존재하는 폴더 기본키
 	 */
 	@Transactional
-	public void deleteFile(FileReq fileReq) {
+	public void deleteFile(String fileStorageName, String userName, long folderId) {
 		// 폴더 존재 확인
-		Path folderPath = getFolderPath(fileReq.folderId());
+		checkFolder(folderId);
 		// 파일 데이터 조회
-		FileMetaData fileMetaData = getFileMetaData(fileReq.fileStorageName(), fileReq.userName());
-		// 파일 물리적 경로
-		Path filePath = folderPath.resolve(fileMetaData.getFileStorageName());
+		FileMetaData fileMetaData = getFileMetaData(fileStorageName, userName);
 		// 파일 DB 정보 삭제
 		fileRepository.delete(fileMetaData);
 		// 파일 물리적 삭제
+		Path filePath = getFilePath(userName, fileStorageName);
 		FileUtil.deleteFile(filePath);
 	}
 
 	/**
 	 * 파일 다운로드
-	 * @param fileReq 파일 저장소 이름 / 사용자 이름 / 폴더 아이디
+	 * @param fileStorageName 파일 저장소 이름
+	 * @param userName 사용자 이름
+	 * @param folderId 삭제할 파일이 존재하는 폴더 기본키
 	 * @return 파일 Resource 데이터 및 메타 데이터
 	 */
-	public FileDownloadRes downloadFile(FileReq fileReq) {
+	public FileDownloadRes downloadFile(String fileStorageName, String userName, long folderId) {
 		// 폴더 존재 확인
-		Path folderPath = getFolderPath(fileReq.folderId());
+		checkFolder(folderId);
 		// 파일 메타 데이터 조회
-		FileMetaData fileMetaData = getFileMetaData(fileReq.fileStorageName(), fileReq.userName());
+		FileMetaData fileMetaData = getFileMetaData(fileStorageName, userName);
 		// 파일 물리적 경로
-		Path filePath = folderPath.resolve(fileMetaData.getFileStorageName());
-		// 파일 데이터 로드
-		Resource file = resourceLoader.getResource("file:" + filePath.toString());
-		if (!file.exists()) {
-			throw ErrorCd.FILE_NOT_EXIST.serviceException(
-				"[downloadFile] file doesn't exist - fileStorageName {}", fileMetaData.getFileId());
-		}
-		return new FileDownloadRes(file, fileMetaData.getFileName(), fileMetaData.getMime());
+		Path filePath = getFilePath(userName, fileStorageName);
+		return new FileDownloadRes(getFileResource(filePath), fileMetaData.getFileName(), fileMetaData.getMime());
 	}
 
 	/**
-	 * 폴더의 Path 가져오기
-	 * @param folderId 폴더 PK
+	 * 폴더가 DB에 존재하는지 확인한다.
+	 * @param folderId 폴더 기본키
+	 */
+	private void checkFolder(long folderId) {
+		if (folderRepository.findByFolderId(folderId).isEmpty()) {
+			throw ErrorCd.FOLDER_NOT_EXIST.serviceException();
+		}
+	}
+
+	/**
+	 * 파일이 중복인지 확인한다.
+	 * @param folderId 파일이 존재할 폴더 기본키
+	 * @param userName 사용자 이름
+	 * @param fileName 파일 이름
+	 */
+	private void checkDuplicate(long folderId, String userName, String fileName) {
+		if (fileRepository.findByFolderIdAndUserNameAndFileName(
+			folderId, userName, fileName).isPresent()) {
+			throw ErrorCd.DUPLICATE_FILE.serviceException();
+		}
+	}
+
+	/**
+	 * 파일의 Path(root/사용자 이름/파일 저장소 이름)를 생성한다.
+	 * @param userName        사용자 이름
+	 * @param fileStorageName 파일 저장소 이름
 	 * @return 폴더 Path
 	 */
-	private Path getFolderPath(long folderId) {
-		String folderPath = folderRepository.findFolderPathByFolderId(folderId).orElseThrow(
-			() -> ErrorCd.FOLDER_NOT_EXIST.serviceException("folder doesn't exist!")
-		);
-		return Path.of(folderPath);
+	private Path getFilePath(String userName, String fileStorageName) {
+		return storagePathService.createPathByUser(userName).resolve(fileStorageName);
 	}
 
 	/**
 	 * 파일이 DB에 존재하는지 확인
-	 * @param fileStorageName 파일 로컬 저장소 이름
+	 * @param fileStorageName 파일 저장소 이름
 	 * @param username 사용자 이름
 	 * @return 파일 메타 데이터
 	 */
@@ -132,4 +148,19 @@ public class FileService {
 
 		return fileMetaData;
 	}
+
+	/**
+	 * 파일 자체를 반환한다.
+	 * @param filePath 파일이 존재하는 경로
+	 * @return 파일 자체(Resource)
+	 */
+	private Resource getFileResource(Path filePath) {
+		Resource file = resourceLoader.getResource("file:" + filePath.toString());
+		if (!file.exists()) {
+			throw ErrorCd.FILE_NOT_EXIST.serviceException(
+				"[downloadFile] file doesn't exist - filePath {}", filePath.toString());
+		}
+		return file;
+	}
+
 }

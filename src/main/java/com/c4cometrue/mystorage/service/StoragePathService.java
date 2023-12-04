@@ -14,11 +14,12 @@ public class StoragePathService {
 		this.storagePath = Paths.get(root);
 	}
 
-	public Path createBasicFolderPath(String folderPath) {
-		return storagePath.resolve(folderPath);
-	}
-
-	public Path createFolderPath(String parentFolderPath, String folderPath) {
-		return Path.of(parentFolderPath).resolve(folderPath);
+	/**
+	 * 루트 경로에서 주어진 폴더 이름에 해당하는 경로를 만든다.
+	 * @param userName 사용자 이름
+	 * @return 해당 폴더 절대 경로
+	 */
+	public Path createPathByUser(String userName) {
+		return storagePath.resolve(userName);
 	}
 }
