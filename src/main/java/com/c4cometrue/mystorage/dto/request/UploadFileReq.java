@@ -8,6 +8,6 @@ import jakarta.validation.constraints.NotNull;
 public record UploadFileReq(
 	@NotNull(message = "file doesn't exist") MultipartFile file,
 	@NotBlank(message = "user name is blank") String userName,
-	@NotNull(message = "folder id is null") Long folderId
+	@NotNull(message = "folder id is null") long folderId
 ) {
 }

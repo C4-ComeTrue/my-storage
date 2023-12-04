@@ -7,7 +7,8 @@ import jakarta.validation.constraints.NotNull;
  * @see com.c4cometrue.mystorage.entity.FolderMetaData
  */
 public record CreateFolderReq(
-	@NotBlank(message = "folder name is blank") String folderName,
+	@NotNull(message = "parent folder can't be null") long parentFolderId,
 	@NotBlank(message = "user name is blank") String userName,
-	@NotNull(message = "parent folder can't be null") long parentFolderId) {
+	@NotBlank(message = "folder name is blank") String folderName
+) {
 }

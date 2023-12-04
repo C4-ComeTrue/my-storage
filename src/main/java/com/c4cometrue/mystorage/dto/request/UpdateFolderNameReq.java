@@ -7,9 +7,9 @@ import jakarta.validation.constraints.NotNull;
  * @see com.c4cometrue.mystorage.entity.FolderMetaData
  */
 public record UpdateFolderNameReq(
-	@NotBlank(message = "folder name is blank") String folderName,
+	@NotNull long folderId,
+	@NotNull long parentFolderId,
 	@NotBlank(message = "user name is blank") String userName,
-	@NotBlank(message = "new folder name is blank") String newFolderName,
-	@NotNull long parentFolderId
+	@NotBlank(message = "new folder name is blank") String newFolderName
 ) {
 }
