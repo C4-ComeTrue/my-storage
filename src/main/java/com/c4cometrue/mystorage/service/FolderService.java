@@ -56,8 +56,9 @@ public class FolderService {
 	 * @param userName 요청한 사용자 이름
 	 */
 	private void checkOwner(String ownerName, String userName) {
-		if (!ownerName.equals(userName))
+		if (!ownerName.equals(userName)) {
 			throw ErrorCd.NO_PERMISSION.serviceException();
+		}
 	}
 
 	/**
