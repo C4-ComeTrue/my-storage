@@ -5,7 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,12 +13,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class UserData {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long userId;
+	private Long userId;
 
 	@NotBlank(message = "user name is blank")
 	private String userName;
 
-	@Builder
 	public UserData(String userName) {
 		this.userName = userName;
 	}

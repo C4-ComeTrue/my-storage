@@ -16,38 +16,30 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 @Table(indexes = {
-	@Index(name = "idx_parentId", columnList = "parentFolderId")
+	@Index(name = "idx_folderName_parentId_userName", columnList = "folderName,parentFolderId,userName")
 })
 public class FolderMetaData {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long folderId;
+	private Long folderId;
 
 	@NotBlank(message = "folder name is blank")
 	private String folderName;
-
-	@NotBlank(message = "folder path is blank")
-	private String folderPath;
 
 	@NotBlank(message = "user name is blank")
 	private String userName;
 
 	@NotNull(message = "parent folder can't be null")
-	private long parentFolderId;
+	private Long parentFolderId;
 
 	@Builder
-	public FolderMetaData(String folderName, String folderPath, String userName, long parentFolderId) {
+	public FolderMetaData(String folderName, String userName, long parentFolderId) {
 		this.folderName = folderName;
-		this.folderPath = folderPath;
 		this.userName = userName;
 		this.parentFolderId = parentFolderId;
 	}
 
 	public void setFolderName(String folderName) {
 		this.folderName = folderName;
-	}
-
-	public void setFolderPath(String folderPath) {
-		this.folderPath = folderPath;
 	}
 }

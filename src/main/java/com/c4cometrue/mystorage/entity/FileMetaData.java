@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -16,12 +17,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 @Table(indexes = {
-	@Index(name = "idx_folderId", columnList = "folderId")
+	@Index(name = "idx_folderId_userName_fileName", columnList = "folderId,userName,fileName")
 })
 public class FileMetaData {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long fileId;
+	private Long fileId;
 
 	@NotBlank(message = "file name is blank")
 	private String fileName;
@@ -29,7 +30,7 @@ public class FileMetaData {
 	@NotBlank(message = "file storage name is blank")
 	private String fileStorageName;
 
-	@NotNull(message = "file size can't be null")
+	@Min(value = 1, message = "file size can't be null")
 	private long size;
 
 	@NotBlank(message = "file content type is blank")
@@ -39,7 +40,7 @@ public class FileMetaData {
 	private String userName;
 
 	@NotNull(message = "folder id is blank")
-	private long folderId;
+	private Long folderId;
 
 	@Builder
 	public FileMetaData(String fileName, String fileStorageName, long size, String mime, String userName,
