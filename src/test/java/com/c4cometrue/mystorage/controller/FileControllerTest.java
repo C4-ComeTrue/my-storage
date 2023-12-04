@@ -27,38 +27,39 @@ class FileControllerTest {
 	@DisplayName("파일 업로드")
 	void uploadFile() {
 		// then
-		var uploadFileReq = new UploadFileReq(mockMultipartFile, mockUserName, 1L);
-		fileController.uploadFile(uploadFileReq);
+		var req = new UploadFileReq(MOCK_MULTIPART_FILE, MOCK_USER_NAME, 1L);
+		fileController.uploadFile(req);
 
 		// 테스트 결과 검증
-		verify(fileService, times(1)).uploadFile(uploadFileReq);
+		verify(fileService, times(1)).uploadFile(req.file(), req.userName(),
+			req.folderId());
 	}
 
 	@Test
 	@DisplayName("파일 삭제")
 	void deleteFile() {
 		// given
-		var mockFileReq = new FileReq(mockFileStorageName, mockUserName, 1L);
+		var req = new FileReq(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L);
 
 		// when
-		fileController.deleteFile(mockFileReq);
+		fileController.deleteFile(req);
 
 		// then
-		verify(fileService, times(1)).deleteFile(mockFileReq);
+		verify(fileService, times(1)).deleteFile(req.fileStorageName(), req.userName(), req.folderId());
 	}
 
 	@Test
 	@DisplayName("파일 다운로드")
 	void downloadFile() {
 		// given
-		var mockFileReq = new FileReq(mockFileStorageName, mockUserName, 1L);
-		given(fileService.downloadFile(mockFileReq)).willReturn(
-			new FileDownloadRes(mock(Resource.class), mockFileName, mockContentType));
+		var req = new FileReq(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L);
+		given(fileService.downloadFile(req.fileStorageName(), req.userName(), req.folderId())).willReturn(
+			new FileDownloadRes(mock(Resource.class), MOCK_FILE_NAME, MOCK_CONTENT_TYPE));
 
 		// when
-		fileController.downloadFile(mockFileReq);
+		fileController.downloadFile(req);
 
 		// then
-		verify(fileService, times(1)).downloadFile(mockFileReq);
+		verify(fileService, times(1)).downloadFile(req.fileStorageName(), req.userName(), req.folderId());
 	}
 }

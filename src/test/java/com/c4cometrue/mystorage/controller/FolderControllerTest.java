@@ -26,13 +26,13 @@ class FolderControllerTest {
 	@DisplayName("폴더 조회")
 	void getFolderData() {
 		// given
-		var mockGetFolderReq = new GetFolderReq(1L, "my_folder", mockUserName, 0L);
+		var req = new GetFolderReq(1L, MOCK_USER_NAME);
 
 		// when
-		folderController.getFolderData(mockGetFolderReq);
+		folderController.getFolderData(req);
 
 		// then
-		verify(folderService, times(1)).getFolderData(mockGetFolderReq);
+		verify(folderService, times(1)).getFolderData(req.folderId(), req.userName());
 
 	}
 
@@ -40,26 +40,27 @@ class FolderControllerTest {
 	@DisplayName("폴더 생성")
 	void createFolder() {
 		// given
-		var mockCreateFolderReq = new CreateFolderReq("my_folder", mockUserName, 0L);
+		var req = new CreateFolderReq(0L, MOCK_USER_NAME, "my_folder");
 
 		// when
-		folderController.createFolder(mockCreateFolderReq);
+		folderController.createFolder(req);
 
 		// then
-		verify(folderService, times(1)).createFolder(mockCreateFolderReq);
+		verify(folderService, times(1)).createFolder(req.parentFolderId(), req.userName(), req.folderName());
 	}
 
 	@Test
 	@DisplayName("폴더 이름 수정")
 	void updateFolderName() {
 		// given
-		var mockUpdateFolderNameReq = new UpdateFolderNameReq("my_folder", mockUserName, "new_folder", 0L);
+		var req = new UpdateFolderNameReq(1L, 0L, MOCK_USER_NAME, "new_folder");
 
 		// when
-		folderController.updateFolderName(mockUpdateFolderNameReq);
+		folderController.updateFolderName(req);
 
 		// then
-		verify(folderService, times(1)).updateFolderName(mockUpdateFolderNameReq);
+		verify(folderService, times(1)).updateFolderName(req.folderId(), req.parentFolderId(), req.userName(),
+			req.newFolderName());
 	}
 
 }

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
-class UserTest {
+class UserDataTest {
 
 	@Test
 	void builderTest() {
@@ -13,13 +13,10 @@ class UserTest {
 		var userName = "userName";
 
 		// when
-		var userMetaData = UserData.builder()
-			.userName(userName)
-			.build();
+		var userMetaData = new UserData(userName);
 
 		// then
 		assertThat(userMetaData)
-			.matches(metadata -> metadata.getUserId() == 0)
 			.matches(metadata -> StringUtils.equals(metadata.getUserName(), userName));
 	}
 

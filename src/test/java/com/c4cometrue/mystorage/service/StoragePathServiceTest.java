@@ -1,9 +1,9 @@
 package com.c4cometrue.mystorage.service;
 
 import static com.c4cometrue.mystorage.TestParameter.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,32 +17,17 @@ class StoragePathServiceTest {
 
     @BeforeEach
     void setUp() {
-        storagePathService = new StoragePathService(mockRootPath);
+        storagePathService = new StoragePathService(MOCK_ROOT_PATH);
     }
 
 
     @Test
-    @DisplayName("폴더 기본 경로 생성")
+    @DisplayName("사용자별 기본 폴더 생성")
     void createBasicFolderPath() {
         // when
-        var path = storagePathService.createBasicFolderPath(mockUserName);
+        var path = storagePathService.createPathByUser(MOCK_USER_NAME);
 
         // then
-        assertEquals(Path.of(mockRootPath).resolve(mockUserName), path);
-    }
-
-    @Test
-    @DisplayName("폴더 경로 생성")
-    void createFolderPath() {
-        // given
-        var mockFolderName = "my_folder";
-        var parentFolderPath = Path.of(mockRootPath).resolve(mockUserName);
-        var mockFolderPath = parentFolderPath.resolve(mockFolderName);
-
-        // when
-        var folderPath = storagePathService.createFolderPath(parentFolderPath.toString(), mockFolderName);
-
-        // then
-        assertEquals(mockFolderPath, folderPath);
+        assertEquals(Paths.get(MOCK_ROOT_PATH, MOCK_USER_NAME), path);
     }
 }

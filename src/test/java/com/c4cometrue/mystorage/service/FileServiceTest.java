@@ -1,13 +1,11 @@
 package com.c4cometrue.mystorage.service;
 
 import static com.c4cometrue.mystorage.TestParameter.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +24,7 @@ import org.springframework.core.io.ResourceLoader;
 import com.c4cometrue.mystorage.dto.request.FileReq;
 import com.c4cometrue.mystorage.dto.request.UploadFileReq;
 import com.c4cometrue.mystorage.entity.FileMetaData;
+import com.c4cometrue.mystorage.entity.FolderMetaData;
 import com.c4cometrue.mystorage.exception.ErrorCd;
 import com.c4cometrue.mystorage.exception.ServiceException;
 import com.c4cometrue.mystorage.repository.FileRepository;
@@ -42,6 +41,8 @@ public class FileServiceTest {
 	FolderRepository folderRepository;
 	@Mock
 	ResourceLoader mockResourceLoader;
+	@Mock
+	StoragePathService storagePathService;
 
 	private static MockedStatic<FileUtil> fileUtilMockedStatic;
 
@@ -59,39 +60,53 @@ public class FileServiceTest {
 	@DisplayName("파일 업로드 성공")
 	void uploadFile() {
 		// given
-		given(folderRepository.findFolderPathByFolderId(1L)).willReturn(
-			Optional.of(mockRootPath + "/" + mockUserName));
-		given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
-		given(mockMultipartFile.getSize()).willReturn(mockSize);
-		given(mockMultipartFile.getContentType()).willReturn(mockContentType);
-		var uploadFileReq = new UploadFileReq(mockMultipartFile, mockUserName, 1L);
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(1L)
+			.build();
+
+		given(folderRepository.findByFolderId(1L)).willReturn(Optional.of(mockFolderMetaData));
+		given(storagePathService.createPathByUser(MOCK_USER_NAME)).willReturn(
+			Paths.get(MOCK_ROOT_PATH, MOCK_USER_NAME));
+
+		given(MOCK_MULTIPART_FILE.getOriginalFilename()).willReturn(MOCK_FILE_NAME);
+		given(MOCK_MULTIPART_FILE.getSize()).willReturn(MOCK_SIZE);
+		given(MOCK_MULTIPART_FILE.getContentType()).willReturn(MOCK_CONTENT_TYPE);
+
+		var req = new UploadFileReq(MOCK_MULTIPART_FILE, MOCK_USER_NAME, 1L);
 
 		// when
-		var createFileRes = fileService.uploadFile(uploadFileReq);
+		var createFileRes = fileService.uploadFile(req.file(), req.userName(), req.folderId());
 
 		// then
 		assertThat(createFileRes)
 			.matches(metadata -> StringUtils.equals(
-				StringUtils.substring(metadata.fileStorageName(), 36), mockFileName))
-			.matches(metadata -> metadata.size() == mockSize)
-			.matches(metadata -> StringUtils.equals(metadata.mime(), mockContentType))
-			.matches(metadata -> StringUtils.equals(metadata.userName(), mockUserName));
+				StringUtils.substring(metadata.fileStorageName(), 36), MOCK_FILE_NAME))
+			.matches(metadata -> metadata.size() == MOCK_SIZE)
+			.matches(metadata -> StringUtils.equals(metadata.mime(), MOCK_CONTENT_TYPE))
+			.matches(metadata -> StringUtils.equals(metadata.userName(), MOCK_USER_NAME));
 	}
 
 	@Test
 	@DisplayName("파일 업로드 실패 - 중복 파일명")
 	void uploadFileFailDuplicateName() {
 		// given
-		given(folderRepository.findFolderPathByFolderId(1L)).willReturn(
-			Optional.of(mockRootPath + "/" + mockUserName));
-		given(mockMultipartFile.getOriginalFilename()).willReturn(mockFileName);
-		given(fileRepository.findByFileNameAndUserNameAndFolderId(mockFileName, mockUserName, 1L))
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(1L)
+			.build();
+
+		given(folderRepository.findByFolderId(1L)).willReturn(Optional.of(mockFolderMetaData));
+		given(MOCK_MULTIPART_FILE.getOriginalFilename()).willReturn(MOCK_FILE_NAME);
+		given(fileRepository.findByFolderIdAndUserNameAndFileName(1L, MOCK_USER_NAME, MOCK_FILE_NAME))
 			.willReturn(Optional.of(new FileMetaData()));
-		var uploadFileReq = new UploadFileReq(mockMultipartFile, mockUserName, 1L);
+		var req = new UploadFileReq(MOCK_MULTIPART_FILE, MOCK_USER_NAME, 1L);
 
 		// when
 		var exception = assertThrows(ServiceException.class,
-			() -> fileService.uploadFile(uploadFileReq));
+			() -> fileService.uploadFile(MOCK_MULTIPART_FILE, MOCK_USER_NAME, 1L));
 
 		// then
 		assertEquals(ErrorCd.DUPLICATE_FILE.name(), exception.getErrCode());
@@ -102,24 +117,24 @@ public class FileServiceTest {
 	void getFileMetaData() {
 		// given
 		var mockFileMetaData = FileMetaData.builder()
-			.fileName(mockFileName)
-			.fileStorageName(mockFileStorageName)
-			.userName(mockUserName)
-			.size(mockSize)
-			.mime(mockContentType)
+			.fileName(MOCK_FILE_NAME)
+			.fileStorageName(MOCK_FILE_STORAGE_NAME)
+			.userName(MOCK_USER_NAME)
+			.size(MOCK_SIZE)
+			.mime(MOCK_CONTENT_TYPE)
 			.folderId(1L)
 			.build();
-		given(fileRepository.findByFileStorageName(mockFileStorageName)).willReturn(Optional.of(mockFileMetaData));
+		given(fileRepository.findByFileStorageName(MOCK_FILE_STORAGE_NAME)).willReturn(Optional.of(mockFileMetaData));
 
 		// when
-		var fileMetadata = fileService.getFileMetaData(mockFileStorageName, mockUserName);
+		var fileMetadata = fileService.getFileMetaData(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME);
 
 		// then
 		assertThat(fileMetadata)
-			.matches(metadata -> StringUtils.equals(metadata.getFileName(), mockFileName))
-			.matches(metadata -> metadata.getSize() == mockSize)
-			.matches(metadata -> StringUtils.equals(metadata.getMime(), mockContentType))
-			.matches(metadata -> StringUtils.equals(metadata.getUserName(), mockUserName));
+			.matches(metadata -> StringUtils.equals(metadata.getFileName(), MOCK_FILE_NAME))
+			.matches(metadata -> metadata.getSize() == MOCK_SIZE)
+			.matches(metadata -> StringUtils.equals(metadata.getMime(), MOCK_CONTENT_TYPE))
+			.matches(metadata -> StringUtils.equals(metadata.getUserName(), MOCK_USER_NAME));
 	}
 
 	@Test
@@ -131,7 +146,7 @@ public class FileServiceTest {
 
 		// when
 		var exception = assertThrows(ServiceException.class,
-			() -> fileService.getFileMetaData(wrongFileStorageName, mockUserName));
+			() -> fileService.getFileMetaData(wrongFileStorageName, MOCK_USER_NAME));
 
 		// then
 		assertEquals(ErrorCd.FILE_NOT_EXIST.name(), exception.getErrCode());
@@ -142,18 +157,18 @@ public class FileServiceTest {
 	void getFileMetaDataFailNotOwner() {
 		// given
 		var mockFileMetaData = FileMetaData.builder()
-			.fileName(mockFileName)
-			.fileStorageName(mockFileStorageName)
-			.userName(mockUserName)
-			.size(mockSize)
-			.mime(mockContentType)
+			.fileName(MOCK_FILE_NAME)
+			.fileStorageName(MOCK_FILE_STORAGE_NAME)
+			.userName(MOCK_USER_NAME)
+			.size(MOCK_SIZE)
+			.mime(MOCK_CONTENT_TYPE)
 			.folderId(1L)
 			.build();
-		given(fileRepository.findByFileStorageName(mockFileStorageName)).willReturn(Optional.of(mockFileMetaData));
+		given(fileRepository.findByFileStorageName(MOCK_FILE_STORAGE_NAME)).willReturn(Optional.of(mockFileMetaData));
 
 		// when
 		var exception = assertThrows(ServiceException.class,
-			() -> fileService.getFileMetaData(mockFileStorageName, "anonymous"));
+			() -> fileService.getFileMetaData(MOCK_FILE_STORAGE_NAME, "anonymous"));
 
 		// then
 		assertEquals(ErrorCd.NO_PERMISSION.name(), exception.getErrCode());
@@ -163,25 +178,31 @@ public class FileServiceTest {
 	@DisplayName("파일 삭제")
 	void deleteFile() {
 		// given
-		var mockFileReq = new FileReq(mockFileStorageName, mockUserName, 1L);
-		var folderPath = Path.of(mockRootPath).resolve(mockUserName);
+		var req = new FileReq(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L);
 		var mockFileMetaData = FileMetaData.builder()
-			.fileName(mockFileName)
-			.fileStorageName(mockFileStorageName)
-			.userName(mockUserName)
-			.size(mockSize)
-			.mime(mockContentType)
+			.fileName(MOCK_FILE_NAME)
+			.fileStorageName(MOCK_FILE_STORAGE_NAME)
+			.userName(MOCK_USER_NAME)
+			.size(MOCK_SIZE)
+			.mime(MOCK_CONTENT_TYPE)
 			.folderId(1L)
 			.build();
-		given(folderRepository.findFolderPathByFolderId(1L)).willReturn(
-			Optional.of(folderPath.toString()));
-		given(fileRepository.findByFileStorageName(mockFileStorageName)).willReturn(Optional.of(mockFileMetaData));
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(1L)
+			.build();
+
+		given(folderRepository.findByFolderId(1L)).willReturn(Optional.of(mockFolderMetaData));
+		given(storagePathService.createPathByUser(MOCK_USER_NAME)).willReturn(
+			Paths.get(MOCK_ROOT_PATH, MOCK_USER_NAME));
+		given(fileRepository.findByFileStorageName(MOCK_FILE_STORAGE_NAME)).willReturn(Optional.of(mockFileMetaData));
 
 		// when
-		fileService.deleteFile(mockFileReq);
+		fileService.deleteFile(req.fileStorageName(), req.userName(), req.folderId());
 
 		// then
-		verify(folderRepository, times(1)).findFolderPathByFolderId(1L);
+		verify(folderRepository, times(1)).findByFolderId(1L);
 		verify(fileRepository, times(1)).findByFileStorageName(any());
 		verify(fileRepository, times(1)).delete(any());
 	}
@@ -190,29 +211,35 @@ public class FileServiceTest {
 	@DisplayName("파일 다운로드")
 	void downloadFile() {
 		// given
-		var mockFileReq = new FileReq(mockFileStorageName, mockUserName, 1L);
+		var req = new FileReq(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L);
 		var mockResource = mock(Resource.class);
-		var folderPath = Path.of(mockRootPath).resolve(mockUserName);
 		var mockFileMetaData = FileMetaData.builder()
-			.fileName(mockFileName)
-			.fileStorageName(mockFileStorageName)
-			.userName(mockUserName)
-			.size(mockSize)
-			.mime(mockContentType)
+			.fileName(MOCK_FILE_NAME)
+			.fileStorageName(MOCK_FILE_STORAGE_NAME)
+			.userName(MOCK_USER_NAME)
+			.size(MOCK_SIZE)
+			.mime(MOCK_CONTENT_TYPE)
 			.folderId(1L)
 			.build();
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(1L)
+			.build();
 
-		given(fileRepository.findByFileStorageName(mockFileStorageName)).willReturn(Optional.of(mockFileMetaData));
-		given(folderRepository.findFolderPathByFolderId(1L)).willReturn(
-			Optional.of(folderPath.toString()));
+		given(fileRepository.findByFileStorageName(MOCK_FILE_STORAGE_NAME)).willReturn(Optional.of(mockFileMetaData));
+		given(folderRepository.findByFolderId(1L)).willReturn(Optional.of(mockFolderMetaData));
 		given(mockResourceLoader.getResource(any())).willReturn(mockResource);
+		given(storagePathService.createPathByUser(MOCK_USER_NAME)).willReturn(
+			Paths.get(MOCK_ROOT_PATH, MOCK_USER_NAME));
+
 		given(mockResource.exists()).willReturn(true);
 
 		// when
-		fileService.downloadFile(mockFileReq);
+		fileService.downloadFile(req.fileStorageName(), req.userName(), req.folderId());
 
 		// then
-		verify(folderRepository, times(1)).findFolderPathByFolderId(1L);
+		verify(folderRepository, times(1)).findByFolderId(1L);
 		verify(fileRepository, times(1)).findByFileStorageName(any());
 	}
 
@@ -220,30 +247,37 @@ public class FileServiceTest {
 	@DisplayName("파일 다운로드 실패")
 	void downloadFileFail() {
 		// given
-		var mockFileReq = new FileReq(mockFileStorageName, mockUserName, 1L);
+		var req = new FileReq(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L);
 		var mockResource = mock(Resource.class);
-		var folderPath = Path.of(mockRootPath).resolve(mockUserName);
 		var mockFileMetaData = FileMetaData.builder()
-			.fileName(mockFileName)
-			.fileStorageName(mockFileStorageName)
-			.userName(mockUserName)
-			.size(mockSize)
-			.mime(mockContentType)
+			.fileName(MOCK_FILE_NAME)
+			.fileStorageName(MOCK_FILE_STORAGE_NAME)
+			.userName(MOCK_USER_NAME)
+			.size(MOCK_SIZE)
+			.mime(MOCK_CONTENT_TYPE)
 			.folderId(1L)
 			.build();
 
-		given(fileRepository.findByFileStorageName(mockFileStorageName)).willReturn(Optional.of(mockFileMetaData));
-		given(folderRepository.findFolderPathByFolderId(1L)).willReturn(
-			Optional.of(folderPath.toString()));
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(0L)
+			.build();
+
+		given(fileRepository.findByFileStorageName(MOCK_FILE_STORAGE_NAME)).willReturn(Optional.of(mockFileMetaData));
+		given(folderRepository.findByFolderId(1L)).willReturn(Optional.of(mockFolderMetaData));
 		given(mockResourceLoader.getResource(any())).willReturn(mockResource);
-		given(mockResource.exists()).willReturn(false);  // 물리적 파일을 찾지 못함
+		given(storagePathService.createPathByUser(MOCK_USER_NAME)).willReturn(
+			Paths.get(MOCK_ROOT_PATH, MOCK_USER_NAME));
+		// 물리적 파일을 찾지 못함
+		given(mockResource.exists()).willReturn(false);
 
 		// when
 		var exception = assertThrows(ServiceException.class,
-			() -> fileService.downloadFile(mockFileReq));
+			() -> fileService.downloadFile(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L));
 
 		// then
-		verify(folderRepository, times(1)).findFolderPathByFolderId(1L);
+		verify(folderRepository, times(1)).findByFolderId(1L);
 		verify(fileRepository, times(1)).findByFileStorageName(any());
 		assertEquals(ErrorCd.FILE_NOT_EXIST.name(), exception.getErrCode());
 	}
@@ -252,12 +286,12 @@ public class FileServiceTest {
 	@DisplayName("파일이 있어야할 폴더가 없다")
 	void folderNotExist() {
 		// given
-		var mockFileReq = new FileReq(mockFileStorageName, mockUserName, 1L);
-		given(folderRepository.findFolderPathByFolderId(1L)).willReturn(Optional.empty());
+		var req = new FileReq(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L);
+		given(folderRepository.findByFolderId(1L)).willReturn(Optional.empty());
 
 		// when
 		var exception = assertThrows(ServiceException.class,
-			() -> fileService.downloadFile(mockFileReq));
+			() -> fileService.downloadFile(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L));
 
 		// then
 		assertEquals(ErrorCd.FOLDER_NOT_EXIST.name(), exception.getErrCode());

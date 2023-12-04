@@ -14,20 +14,20 @@ class FileMetaDataTest {
         // given
         var fileMetaData = FileMetaData.builder()
             .fileName("file.txt")
-            .fileStorageName(mockFileStorageName)
+            .fileStorageName(MOCK_FILE_STORAGE_NAME)
             .size(100L)
             .mime("text/plain")
             .userName("userName")
             .folderId(123)
             .build();
 
+        // then
         assertThat(fileMetaData)
-            .matches(metadata -> metadata.getFileId() == 0)
-            .matches(metadata -> StringUtils.equals(metadata.getFileName(), mockFileName))
-            .matches(metadata -> StringUtils.equals(metadata.getFileStorageName(), mockFileStorageName))
-            .matches(metadata -> metadata.getSize() == mockSize)
-            .matches(metadata -> StringUtils.equals(metadata.getMime(), mockContentType))
-            .matches(metadata -> StringUtils.equals(metadata.getUserName(), mockUserName))
+            .matches(metadata -> StringUtils.equals(metadata.getFileName(), MOCK_FILE_NAME))
+            .matches(metadata -> StringUtils.equals(metadata.getFileStorageName(), MOCK_FILE_STORAGE_NAME))
+            .matches(metadata -> metadata.getSize() == MOCK_SIZE)
+            .matches(metadata -> StringUtils.equals(metadata.getMime(), MOCK_CONTENT_TYPE))
+            .matches(metadata -> StringUtils.equals(metadata.getUserName(), MOCK_USER_NAME))
             .matches(metadata -> metadata.getFolderId() == 123);
     }
 }

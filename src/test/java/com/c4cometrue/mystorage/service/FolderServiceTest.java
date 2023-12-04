@@ -5,19 +5,15 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-import java.nio.file.Path;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -30,7 +26,6 @@ import com.c4cometrue.mystorage.exception.ErrorCd;
 import com.c4cometrue.mystorage.exception.ServiceException;
 import com.c4cometrue.mystorage.repository.FileRepository;
 import com.c4cometrue.mystorage.repository.FolderRepository;
-import com.c4cometrue.mystorage.util.FileUtil;
 
 @ExtendWith(MockitoExtension.class)
 class FolderServiceTest {
@@ -41,19 +36,6 @@ class FolderServiceTest {
 	FolderRepository folderRepository;
 	@Mock
 	FileRepository fileRepository;
-	@Mock
-	StoragePathService storagePathService;
-	private static MockedStatic<FileUtil> fileUtilMockedStatic;
-
-	@BeforeAll
-	public static void setup() {
-		fileUtilMockedStatic = mockStatic(FileUtil.class);
-	}
-
-	@AfterAll
-	public static void tearDown() {
-		fileUtilMockedStatic.close();
-	}
 
 	@Test
 	@DisplayName("폴더 정보 조회 성공")
@@ -61,70 +43,86 @@ class FolderServiceTest {
 		// given
 		// 1. 폴더 정보
 		var folderName = "my_folder";
-		var getFolderReq = new GetFolderReq(2L, folderName, mockUserName, 1L);
-		var mockFolderPath = Path.of(mockRootPath).resolve(mockUserName).resolve(folderName);
+		var req = new GetFolderReq(2L, MOCK_USER_NAME);
 		var mockFolderMetaData = FolderMetaData.builder()
 			.folderName(folderName)
-			.folderPath(mockFolderPath.toString())
-			.userName(mockUserName)
+			.userName(MOCK_USER_NAME)
 			.parentFolderId(1L)
 			.build();
 
-		given(folderRepository.findByFolderId(1L)).willReturn(Optional.of(mock(FolderMetaData.class))); // 부모 폴더
-		given(folderRepository.findByUserNameAndFolderNameAndParentFolderId(getFolderReq.userName(),
-			getFolderReq.folderName(), getFolderReq.parentFolderId()))
-			.willReturn(Optional.of(mockFolderMetaData)); // 조회하려는 폴더 존재
+		// 조회하려는 폴더 존재
+		given(folderRepository.findByFolderId(req.folderId())).willReturn(Optional.of(mockFolderMetaData));
 		ReflectionTestUtils.setField(mockFolderMetaData, "folderId", 2L); // 폴더 pk 임의로 2로 설정
 
 		// 2. 해당 폴더에 하위 파일 1개, 하위 폴더 1개 있다고 가정
-		var fileList = new LinkedList<FileMetaData>();
+		var fileList = new ArrayList<FileMetaData>();
 		fileList.add(FileMetaData.builder()
-			.fileName(mockFileName)
-			.fileStorageName(mockFileStorageName)
-			.userName(mockUserName)
-			.size(mockSize)
-			.mime(mockContentType)
+			.fileName(MOCK_FILE_NAME)
+			.fileStorageName(MOCK_FILE_STORAGE_NAME)
+			.userName(MOCK_USER_NAME)
+			.size(MOCK_SIZE)
+			.mime(MOCK_CONTENT_TYPE)
 			.folderId(2L)
 			.build());
 
-		var folderList = new LinkedList<FolderMetaData>();
-		folderList.add(FolderMetaData.builder()
+		var folderList = new ArrayList<FolderMetaData>();
+		var subFolder = FolderMetaData.builder()
 			.folderName("childFolder")
-			.folderPath(mockFolderPath.resolve("childFolder").toString())
-			.userName(mockUserName)
+			.userName(MOCK_USER_NAME)
 			.parentFolderId(2L)
-			.build());
+			.build();
+		ReflectionTestUtils.setField(subFolder, "folderId", 3L);
+		folderList.add(subFolder);
 
 		given(fileRepository.findAllByFolderId(2L)).willReturn(Optional.of(fileList));
 		given(folderRepository.findAllByParentFolderId(2L)).willReturn(Optional.of(folderList));
 
 		// when
-		var folderOverviewRes = folderService.getFolderData(getFolderReq);
+		var folderOverviewRes = folderService.getFolderData(req.folderId(), req.userName());
 
 		// then
 		assertThat(folderOverviewRes)
 			.matches(res -> StringUtils.equals(res.folderName(), folderName))
-			.matches(res -> StringUtils.equals(res.userName(), mockUserName))
+			.matches(res -> StringUtils.equals(res.userName(), MOCK_USER_NAME))
 			.matches(res -> StringUtils.equals(res.folderList().get(0).folderName(), "childFolder"))
-			.matches(res -> StringUtils.equals(res.fileList().get(0).fileStorageName(), mockFileStorageName));
+			.matches(res -> StringUtils.equals(res.fileList().get(0).fileStorageName(), MOCK_FILE_STORAGE_NAME));
 	}
 
 	@Test
-	@DisplayName("폴더 정보 조회 실패 - 부모 폴더가 없음")
-	void getFolderDataFail() {
+	@DisplayName("폴더 정보 조회 실패 - 폴더가 없음")
+	void getFolderDataFailNoFolder() {
 		// given
-		var folderName = "my_folder";
-		var getFolderReq = new GetFolderReq(2L, folderName, mockUserName, 1L);
 		given(folderRepository.findByFolderId(1L)).willReturn(Optional.empty());
 
 		// when
-		var exception = assertThrows(ServiceException.class, () -> folderService.getFolderData(getFolderReq));
+		var exception = assertThrows(ServiceException.class,
+			() -> folderService.getFolderData(1L, MOCK_USER_NAME));
 
 		// then
 		assertEquals(exception.getErrCode(), ErrorCd.FOLDER_NOT_EXIST.name());
 		verify(folderRepository, times(1)).findByFolderId(1L);
-		verify(folderRepository, times(0)).findByUserNameAndFolderNameAndParentFolderId(mockUserName, folderName,
-			1L); // 조회하려던 폴더는 보려고 시도도 못 함
+	}
+
+	@Test
+	@DisplayName("폴더 정보 조회 실패 - 권한이 없음")
+	void getFolderDataFailNotOwner() {
+		// given
+		var folderName = "my_folder";
+		var mockFolder = FolderMetaData.builder()
+			.folderName(folderName)
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(0L)
+			.build();
+
+		given(folderRepository.findByFolderId(1L)).willReturn(Optional.of(mockFolder));
+
+		// when
+		var exception = assertThrows(ServiceException.class,
+			() -> folderService.getFolderData(1L, "Anonymous"));
+
+		// then
+		assertEquals(exception.getErrCode(), ErrorCd.NO_PERMISSION.name());
+		verify(folderRepository, times(1)).findByFolderId(1L);
 	}
 
 	@Test
@@ -132,44 +130,48 @@ class FolderServiceTest {
 	void createFolder() {
 		// 폴더 데이터 정보 생성
 		var folderName = "my_folder";
-		var createFolderReq = new CreateFolderReq(folderName, mockUserName, 1L);
-		var parentFolderData = FolderMetaData.builder().folderName(mockUserName).userName(mockUserName).folderPath(
-			Path.of(mockRootPath).resolve(mockUserName).toString()).parentFolderId(0L).build();
+		var req = new CreateFolderReq(1L, MOCK_USER_NAME, folderName);
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName(folderName)
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(10L)
+			.build();
 
-		given(folderRepository.findByFolderId(createFolderReq.parentFolderId())).willReturn(
-			Optional.of(parentFolderData)); // 부모 폴더 존재
-		given(folderRepository.findByUserNameAndFolderNameAndParentFolderId(createFolderReq.userName(),
-			createFolderReq.folderName(), createFolderReq.parentFolderId()))
-			.willReturn(Optional.empty()); // 중복 폴더 없음
-		given(storagePathService.createFolderPath(parentFolderData.getFolderPath(), folderName)).willReturn(
-			Path.of(parentFolderData.getFolderPath()).resolve(folderName));
+		// 중복 폴더 없음
+		given(folderRepository.findByFolderNameAndParentFolderIdAndUserName(req.folderName(), req.parentFolderId(),
+			req.userName()))
+			.willReturn(Optional.empty());
+
+		// 기본키 설정
+		ReflectionTestUtils.setField(mockFolderMetaData, "folderId", 2L); // 폴더 pk 임의로 2로 설정
+		given(folderRepository.save(any(FolderMetaData.class))).willReturn(mockFolderMetaData);
 
 		// when
-		var createFolderRes = folderService.createFolder(createFolderReq);
+		var createFolderRes = folderService.createFolder(req.parentFolderId(), req.userName(), req.folderName());
 
 		// then
 		assertThat(createFolderRes)
 			.matches(res -> StringUtils.equals(res.folderName(), folderName))
-			.matches(res -> StringUtils.equals(res.userName(), mockUserName));
+			.matches(res -> StringUtils.equals(res.userName(), MOCK_USER_NAME));
 	}
 
 	@Test
 	@DisplayName("폴더 생성 실패 - 동일한 위치, 유저, 이름으로 폴더 존재")
 	void createFolderFail() {
 		var folderName = "my_folder";
-		var createFolderReq = new CreateFolderReq(folderName, mockUserName, 1L);
-		given(folderRepository.findByFolderId(createFolderReq.parentFolderId())).willReturn(
-			Optional.of(mock(FolderMetaData.class))); // 부모 폴더 존재
-		given(folderRepository.findByUserNameAndFolderNameAndParentFolderId(createFolderReq.userName(),
-			createFolderReq.folderName(), createFolderReq.parentFolderId()))
-			.willReturn(Optional.of(mock(FolderMetaData.class)));
+		var req = new CreateFolderReq(1L, MOCK_USER_NAME, folderName);
+
+		// 중복 폴더 존재
+		given(folderRepository.findByFolderNameAndParentFolderIdAndUserName(
+			req.folderName(), req.parentFolderId(), req.userName())).willReturn(
+			Optional.of(mock(FolderMetaData.class)));
 
 		// when
-		var exception = assertThrows(ServiceException.class, () -> folderService.createFolder(createFolderReq));
+		var exception = assertThrows(ServiceException.class,
+			() -> folderService.createFolder(1L, MOCK_USER_NAME, folderName));
 
 		// then
-		verify(folderRepository, times(1)).findByFolderId(1L);
-		verify(folderRepository, times(1)).findByUserNameAndFolderNameAndParentFolderId(mockUserName, folderName, 1L);
+		verify(folderRepository, times(1)).findByFolderNameAndParentFolderIdAndUserName(folderName, 1L, MOCK_USER_NAME);
 		assertEquals(exception.getErrCode(), ErrorCd.DUPLICATE_FOLDER.name());
 	}
 
@@ -178,60 +180,29 @@ class FolderServiceTest {
 	void updateFolderName() {
 		// given
 		var mockNewFolderName = "random_folder";
-		var updateFolderReq = new UpdateFolderNameReq("my_folder", mockUserName, mockNewFolderName, 1L);
-
-		var parentFolderPath = Path.of(mockRootPath).resolve(mockUserName);
-		var parentFolderData = FolderMetaData.builder().folderName(mockUserName).userName(mockUserName).folderPath(
-			parentFolderPath.toString()).parentFolderId(0L).build();
-
-		var folderPath = parentFolderPath.resolve("my_folder");
+		var req = new UpdateFolderNameReq(2L, 1L, MOCK_USER_NAME, mockNewFolderName);
 		var mockFolderMetaData = FolderMetaData.builder()
 			.folderName("my_folder")
-			.folderPath(folderPath.toString())
-			.userName(mockUserName)
+			.userName(MOCK_USER_NAME)
 			.parentFolderId(1L)
 			.build();
 
-		ReflectionTestUtils.setField(parentFolderData, "folderId", 1L);
 		ReflectionTestUtils.setField(mockFolderMetaData, "folderId", 2L);
 
-		given(folderRepository.findByFolderId(1L)).willReturn(Optional.of(parentFolderData)); // 부모 폴더 존재
-		given(folderRepository.findByUserNameAndFolderNameAndParentFolderId(updateFolderReq.userName(),
-			updateFolderReq.folderName(), updateFolderReq.parentFolderId()))
-			.willReturn(Optional.of(mockFolderMetaData)); // 기존 폴더 존재
+		// 기존 폴더 존재
+		given(folderRepository.findByFolderId(req.folderId())).willReturn(Optional.of(mockFolderMetaData));
 
-		given(folderRepository.findByUserNameAndFolderNameAndParentFolderId(
-			updateFolderReq.userName(), updateFolderReq.newFolderName(), updateFolderReq.parentFolderId()
-		)).willReturn(Optional.empty()); // 바꿀 폴더 중복 안됨
-
-		// 이름 바꾼 폴더 경로
-		var newFolderPath = parentFolderPath.resolve(mockNewFolderName);
-		given(storagePathService.createFolderPath(parentFolderData.getFolderPath(), mockNewFolderName)).willReturn(
-			newFolderPath);
-
-		// 하위에 폴더 하나 있었다고 가정
-		var folderList = new LinkedList<FolderMetaData>();
-		var childFolder = FolderMetaData.builder()
-			.folderName("child_folder")
-			.folderPath(newFolderPath.resolve("childFolder").toString())
-			.userName(mockUserName)
-			.parentFolderId(2L)
-			.build();
-		folderList.add(childFolder);
-		ReflectionTestUtils.setField(childFolder, "folderId", 3L);
-
-		// 기존 폴더(my_folder이자 random_folder)의 PK는 2이라고 가정
-		// 하위 폴더의 PK는 3이라고 가정
-		given(folderRepository.findAllByParentFolderId(2L)).willReturn(Optional.of(folderList));
-		given(folderRepository.findAllByParentFolderId(3L)).willReturn(Optional.empty());
-		given(storagePathService.createFolderPath(newFolderPath.toString(),
-			folderList.get(0).getFolderName())).willReturn(newFolderPath.resolve("childFolder"));
+		// 바꿀 폴더 중복 안됨
+		given(folderRepository.findByFolderNameAndParentFolderIdAndUserName(
+			mockNewFolderName, req.parentFolderId(), req.userName())).willReturn(Optional.empty());
 
 		// when
-		folderService.updateFolderName(updateFolderReq);
+		folderService.updateFolderName(req.folderId(), req.parentFolderId(), req.userName(), req.newFolderName());
 
 		// then
-		verify(folderRepository, times(1)).findByFolderId(1L);
+		verify(folderRepository, times(1)).findByFolderId(2L);
+		verify(folderRepository, times(1)).findByFolderNameAndParentFolderIdAndUserName(mockNewFolderName, 1L,
+			MOCK_USER_NAME);
 	}
 
 	@Test
@@ -239,28 +210,30 @@ class FolderServiceTest {
 	void updateFolderNameFail() {
 		// given
 		var mockNewFolderName = "random_folder";
-		var updateFolderReq = new UpdateFolderNameReq("my_folder", mockUserName, mockNewFolderName, 1L);
-		var parentFolderPath = Path.of(mockRootPath).resolve(mockUserName);
-		var parentFolderData = FolderMetaData.builder().folderName(mockUserName).userName(mockUserName).folderPath(
-			parentFolderPath.toString()).parentFolderId(0L).build();
+		var req = new UpdateFolderNameReq(2L, 1L, MOCK_USER_NAME, mockNewFolderName);
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("my_folder")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(1L)
+			.build();
 
-		given(folderRepository.findByFolderId(1L)).willReturn(Optional.of(parentFolderData)); // 부모 폴더 존재
-		given(folderRepository.findByUserNameAndFolderNameAndParentFolderId(updateFolderReq.userName(),
-			updateFolderReq.folderName(), updateFolderReq.parentFolderId()))
-			.willReturn(Optional.of(mock(FolderMetaData.class))); // 기존 폴더 존재
+		// 기존 폴더 존재
+		given(folderRepository.findByFolderId(req.folderId())).willReturn(
+			Optional.of(mockFolderMetaData));
 
-		given(folderRepository.findByUserNameAndFolderNameAndParentFolderId(
-			updateFolderReq.userName(), updateFolderReq.newFolderName(), updateFolderReq.parentFolderId()
-		)).willReturn(Optional.of(mock(FolderMetaData.class))); // 바꿀 폴더 중복 안됨
+		// 바꿀 폴더 중복
+		given(folderRepository.findByFolderNameAndParentFolderIdAndUserName(
+			req.newFolderName(), req.parentFolderId(), req.userName()
+		)).willReturn(Optional.of(mock(FolderMetaData.class)));
 
 		// when
-		var exception = assertThrows(ServiceException.class, () -> folderService.updateFolderName(updateFolderReq));
+		var exception = assertThrows(ServiceException.class,
+			() -> folderService.updateFolderName(2L, 1L, MOCK_USER_NAME, mockNewFolderName));
 
 		// then
 		assertEquals(exception.getErrCode(), ErrorCd.DUPLICATE_FOLDER.name());
-		verify(folderRepository, times(1)).findByFolderId(1L);
-		verify(folderRepository, times(1)).findByUserNameAndFolderNameAndParentFolderId(mockUserName, "my_folder", 1L);
-		verify(folderRepository, times(1)).findByUserNameAndFolderNameAndParentFolderId(mockUserName, mockNewFolderName,
-			1L);
+		verify(folderRepository, times(1)).findByFolderId(2L);
+		verify(folderRepository, times(1)).findByFolderNameAndParentFolderIdAndUserName(mockNewFolderName, 1L,
+			MOCK_USER_NAME);
 	}
 }

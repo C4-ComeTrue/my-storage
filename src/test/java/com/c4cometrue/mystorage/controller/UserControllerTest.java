@@ -24,12 +24,12 @@ class UserControllerTest {
 	@DisplayName("회원가입")
 	void signUp() {
 		// given
-		var signUpReq = new SignUpReq(mockUserName);
+		var req = new SignUpReq(MOCK_USER_NAME);
 
 		// when
-		userController.signUp(signUpReq);
+		userController.signUp(req);
 
 		// then
-		verify(userService, times(1)).signUp(signUpReq);
+		verify(userService, times(1)).signUp(req.userName());
 	}
 }
