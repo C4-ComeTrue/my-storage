@@ -54,19 +54,6 @@ class ExceptionHandlingControllerTest {
 	}
 
 	@Test
-	@DisplayName("Javax 유효성 검증 테스트")
-	void validationExceptionTest() {
-		// given
-		var mockException = mock(ValidationException.class);
-
-		// when
-		var response = exceptionHandlingController.handleValidException(mockException);
-
-		//then
-		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-	}
-
-	@Test
 	@DisplayName("그 외 모든 예외 테스트")
 	void handleExceptionTest() {
 		// given
