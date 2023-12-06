@@ -41,7 +41,7 @@ public class FileService {
 		// 특정 사용자의 동일한 파일명 중복 처리
 		checkDuplicate(folderId, userName, file.getOriginalFilename());
 		// 파일 저장소 이름
-		String fileStorageName = UUID.randomUUID() + file.getOriginalFilename();
+		String fileStorageName = getFileName(file.getOriginalFilename());
 
 		// DB 저장 -> 롤백 가능
 		FileMetaData fileMetaData = FileMetaData.builder()
@@ -118,6 +118,15 @@ public class FileService {
 			folderId, userName, fileName).isPresent()) {
 			throw ErrorCd.DUPLICATE_FILE.serviceException();
 		}
+	}
+
+	/**
+	 * 파일이 서버에 저장될 이름을 반환한다.
+	 * @param fileOriginalName 파일의 원래 이름
+	 * @return 파일이 서버에 저장될 중복되지 않는 이름
+	 */
+	private String getFileName(String fileOriginalName) {
+		return UUID.randomUUID() + fileOriginalName;
 	}
 
 	/**
