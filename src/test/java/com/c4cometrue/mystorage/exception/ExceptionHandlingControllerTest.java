@@ -13,8 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import jakarta.validation.ValidationException;
-
 @ExtendWith(MockitoExtension.class)
 class ExceptionHandlingControllerTest {
 	@InjectMocks
@@ -33,7 +31,7 @@ class ExceptionHandlingControllerTest {
 
 		// then
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-		assertEquals("File not exist", response.getBody().message());
+		assertEquals("File not exist", Objects.requireNonNull(response.getBody()).message());
 	}
 
 	@Test
