@@ -29,18 +29,6 @@ class MetadataServiceTest {
 	private FileService fileService;
 
 	@Test
-	@DisplayName("업로드 파일 테스트")
-	void uploadFile() {
-		given(folderService.findPathBy(PARENT_ID)).willReturn(PARENT_PATH);
-		doNothing().when(fileService).uploadFile(MOCK_MULTIPART_FILE, FILE_ID, PARENT_ID, PARENT_PATH);
-
-		metadataService.uploadFile(MOCK_MULTIPART_FILE, FILE_ID, PARENT_ID);
-
-		verify(folderService, times(1)).findPathBy(PARENT_ID);
-		verify(fileService, times(1)).uploadFile(MOCK_MULTIPART_FILE, FILE_ID, PARENT_ID, PARENT_PATH);
-	}
-
-	@Test
 	@DisplayName("폴더 조회 테스트")
 	void getFolderContentsTest() {
 		given(folderService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FOLDER_METADATA));

@@ -20,11 +20,6 @@ public class MetadataService {
 	private final FolderService folderService;
 	private final FileService fileService;
 
-	public void uploadFile(MultipartFile file, Long userId, Long parentId) {
-		String basePath = folderService.findPathBy(parentId);
-		fileService.uploadFile(file, userId, parentId, basePath);
-	}
-
 	/**
 	 * 폴더 하위 폴더, 파일을 조회한다
 	 * folderId 를 parentId 로 가지는 폴더와 파일을 조회

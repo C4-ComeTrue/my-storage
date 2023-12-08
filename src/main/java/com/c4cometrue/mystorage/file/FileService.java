@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,13 @@ import lombok.RequiredArgsConstructor;
 public class FileService {
 	private final FileReader fileReader;
 	private final FileWriter fileWriter;
+	private final FolderService folderService;
 
 	@Value("${file.buffer}")
 	private int bufferSize;
 
-	public void uploadFile(MultipartFile file, Long userId, Long parentId, String basePath) {
+	public void uploadFile(MultipartFile file, Long userId, Long parentId) {
+		String basePath = folderService.findPathBy(parentId);
 		String originalFileName = file.getOriginalFilename();
 		String storedFileName = FileMetadata.storedName();
 		Path path = Paths.get(basePath, storedFileName);

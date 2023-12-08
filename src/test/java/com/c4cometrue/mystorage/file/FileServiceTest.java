@@ -25,12 +25,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
 import com.c4cometrue.mystorage.exception.ServiceException;
+import com.c4cometrue.mystorage.folder.FolderService;
 
 @DisplayName("파일 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class FileServiceTest {
 	@Mock
 	private FileDataAccessService fileDataAccessService;
+	@Mock
+	private FolderService folderService;
 
 	@InjectMocks
 	private FileService fileService;
@@ -43,9 +46,10 @@ class FileServiceTest {
 	@Test
 	@DisplayName("업로드 실패 테스트")
 	void uploadFileFailTest() throws IOException {
+		when(folderService.findPathBy(PARENT_ID)).thenReturn(PARENT_PATH);
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
-			() -> fileService.uploadFile(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID, PARENT_PATH)
+			() -> fileService.uploadFile(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID)
 		);
 
 		assertEquals(ErrorCode.FILE_COPY_ERROR.name(), thrown.getErrCode());
@@ -81,10 +85,11 @@ class FileServiceTest {
 		MultipartFile mockFile = mock(MultipartFile.class);
 		when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(MOCK_MULTIPART_FILE.getBytes()));
 		when(mockFile.getOriginalFilename()).thenReturn(ORIGINAL_FILE_NAME);
+		when(folderService.findPathBy(PARENT_ID)).thenReturn(PARENT_PATH);
 
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
-			() -> fileService.uploadFile(mockFile, USER_ID, PARENT_ID, PARENT_PATH)
+			() -> fileService.uploadFile(mockFile, USER_ID, PARENT_ID)
 		);
 	}
 
@@ -97,6 +102,7 @@ class FileServiceTest {
 		var outStream = mock(OutputStream.class);
 		var files = mockStatic(Files.class);
 
+		given(folderService.findPathBy(PARENT_ID)).willReturn(PARENT_PATH);
 		given(multipartFile.getInputStream()).willReturn(inputStream);
 		given(multipartFile.getOriginalFilename()).willReturn(ORIGINAL_FILE_NAME);
 		given(Files.newOutputStream(any())).willReturn(outStream);
@@ -107,7 +113,7 @@ class FileServiceTest {
 			.willReturn(-1);
 
 		// when
-		fileService.uploadFile(multipartFile, USER_ID, PARENT_ID, PARENT_PATH);
+		fileService.uploadFile(multipartFile, USER_ID, PARENT_ID);
 
 		// then
 		then(outStream).should(times(3)).write(any(), eq(0), anyInt());
@@ -119,6 +125,7 @@ class FileServiceTest {
 	@DisplayName("파일 조회 테스트")
 	void getFile() {
 		given(fileDataAccessService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FILE_METADATA));
+
 
 		fileService.findChildBy(PARENT_ID, USER_ID);
 

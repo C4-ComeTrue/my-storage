@@ -24,10 +24,4 @@ public class MetadataController {
 		List<MetaResponse> res = metadataService.getFolderContents(req.folderId(), req.userId());
 		return ResponseEntity.ok(res);
 	}
-
-	@PostMapping("/files")
-	@ResponseStatus(HttpStatus.CREATED)
-	public void uploadFile(FileUploadRequest req) {
-		metadataService.uploadFile(req.multipartFile(), req.userId(), req.parentId());
-	}
 }

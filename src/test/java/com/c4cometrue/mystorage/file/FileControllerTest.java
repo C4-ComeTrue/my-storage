@@ -40,4 +40,11 @@ class FileControllerTest {
 		fileController.deleteFile(FileDeleteRequest.of(FILE_ID, USER_ID));
 		verify(fileService, times(1)).deleteFile(anyLong(), anyLong());
 	}
+
+	@Test
+	@DisplayName("업로드 파일 테스트")
+	void uploadFileTest() {
+		fileController.uploadFile(FileUploadRequest.of(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID));
+		verify(fileService, times(1)).uploadFile(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID);
+	}
 }
