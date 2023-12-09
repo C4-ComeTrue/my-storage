@@ -13,16 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.internal.stubbing.answers.DoesNothing;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.exception.ServiceException;
 
 @DisplayName("파일 데이터 액세스 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
-class FileDataAccessServiceTest {
+class FileDataHandlerServiceTest {
 	@InjectMocks
-	private FileDataAccessService fileDataAccessService;
+	private FileDataHandlerService fileDataHandlerService;
 	@Mock
 	FileRepository fileRepository;
 
@@ -30,7 +29,7 @@ class FileDataAccessServiceTest {
 	@DisplayName("파일 삭제 테스트")
 	void shouldDeleteByFileId() {
 		when(fileRepository.existsById(FILE_ID)).thenReturn(true);
-		assertDoesNotThrow(() -> fileDataAccessService.deleteBy(FILE_ID));
+		assertDoesNotThrow(() -> fileDataHandlerService.deleteBy(FILE_ID));
 		verify(fileRepository, times(1)).deleteById(FILE_ID);
 	}
 
@@ -38,7 +37,7 @@ class FileDataAccessServiceTest {
 	@DisplayName("파일 삭제 테스트 : 실패")
 	void shouldDeleteByFileIdFail() {
 		when(fileRepository.existsById(FILE_ID)).thenReturn(false);
-		assertThrows(ServiceException.class, () -> fileDataAccessService.deleteBy(FILE_ID));
+		assertThrows(ServiceException.class, () -> fileDataHandlerService.deleteBy(FILE_ID));
 	}
 
 	@Test
@@ -46,7 +45,7 @@ class FileDataAccessServiceTest {
 	void shouldFindByFileIdAndUserId() {
 		when(fileRepository.findByIdAndUploaderId(FILE_ID, USER_ID)).thenReturn(Optional.of(FILE_METADATA));
 
-		fileDataAccessService.findBy(FILE_ID, USER_ID);
+		fileDataHandlerService.findBy(FILE_ID, USER_ID);
 
 		verify(fileRepository, times(1)).findByIdAndUploaderId(FILE_ID, USER_ID);
 	}
@@ -55,7 +54,7 @@ class FileDataAccessServiceTest {
 	@DisplayName("파일 조회 테스트 : 실패")
 	void shouldThrowExceptionWhenFileNotFount() {
 		when(fileRepository.findByIdAndUploaderId(FILE_ID, USER_ID)).thenReturn(Optional.empty());
-		assertThrows(ServiceException.class, () -> fileDataAccessService.findBy(FILE_ID, USER_ID));
+		assertThrows(ServiceException.class, () -> fileDataHandlerService.findBy(FILE_ID, USER_ID));
 	}
 
 	@Test
@@ -64,7 +63,7 @@ class FileDataAccessServiceTest {
 		given(fileRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(TRUE);
 		given(fileRepository.checkDuplicateFileName(PARENT_ID, USER_ID, ORIGINAL_FILE_NAME)).willReturn(FALSE);
 
-		fileDataAccessService.persist(FILE_METADATA, USER_ID, PARENT_ID);
+		fileDataHandlerService.persist(FILE_METADATA, USER_ID, PARENT_ID);
 
 		verify(fileRepository, times(1)).save(FILE_METADATA);
 	}
@@ -74,7 +73,7 @@ class FileDataAccessServiceTest {
 	void shouldNotPersistFileInOtherFolder() {
 		given(fileRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(FALSE);
 
-		assertThrows(ServiceException.class, () -> fileDataAccessService.persist(FILE_METADATA, USER_ID, PARENT_ID));
+		assertThrows(ServiceException.class, () -> fileDataHandlerService.persist(FILE_METADATA, USER_ID, PARENT_ID));
 	}
 
 	@Test
@@ -83,7 +82,7 @@ class FileDataAccessServiceTest {
 		given(fileRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(TRUE);
 		given(fileRepository.checkDuplicateFileName(PARENT_ID, USER_ID, ORIGINAL_FILE_NAME)).willReturn(TRUE);
 
-		assertThrows(ServiceException.class, () -> fileDataAccessService.persist(FILE_METADATA, USER_ID, PARENT_ID));
+		assertThrows(ServiceException.class, () -> fileDataHandlerService.persist(FILE_METADATA, USER_ID, PARENT_ID));
 	}
 
 	@Test
@@ -91,7 +90,7 @@ class FileDataAccessServiceTest {
 	void findChild() {
 		given(fileRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(TRUE);
 
-		fileDataAccessService.findChildBy(PARENT_ID, USER_ID);
+		fileDataHandlerService.findChildBy(PARENT_ID, USER_ID);
 
 		verify(fileRepository, times(1)).existsByIdAndUploaderId(PARENT_ID, USER_ID);
 	}
@@ -102,7 +101,7 @@ class FileDataAccessServiceTest {
 	void findChildFail() {
 		given(fileRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(FALSE);
 
-		assertThrows(ServiceException.class, () -> fileDataAccessService.findChildBy(PARENT_ID, USER_ID));
+		assertThrows(ServiceException.class, () -> fileDataHandlerService.findChildBy(PARENT_ID, USER_ID));
 	}
 
 	@Test
@@ -111,7 +110,7 @@ class FileDataAccessServiceTest {
 		// given(fileRepository.existsByIdAndUploaderId(null, USER_ID)).willReturn(TRUE);
 		given(fileRepository.findByParentIdAndUploaderId(null, USER_ID)).willReturn(new ArrayList<>());
 
-		fileDataAccessService.findChildBy(null, USER_ID);
+		fileDataHandlerService.findChildBy(null, USER_ID);
 
 		// verify(fileRepository, times(1)).existsByIdAndUploaderId(null, USER_ID);
 		verify(fileRepository, times(1)).findByParentIdAndUploaderId(null, USER_ID);

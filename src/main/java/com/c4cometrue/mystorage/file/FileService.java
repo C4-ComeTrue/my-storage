@@ -16,8 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class FileService {
-	private final FileReader fileReader;
-	private final FileWriter fileWriter;
+	private final FileDataHandlerService fileDataHandlerService;
 	private final FolderService folderService;
 
 	@Value("${file.buffer}")
@@ -37,11 +36,11 @@ public class FileService {
 			.build();
 
 		FileUtil.uploadFile(file, path, bufferSize);
-		fileWriter.persist(fileMetadata, userId, parentId);
+		fileDataHandlerService.persist(fileMetadata, userId, parentId);
 	}
 
 	public void downloadFile(Long fileId, String userPath, Long userId) {
-		FileMetadata fileMetadata = fileReader.findBy(fileId, userId);
+		FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
 		Path originalPath = Paths.get(fileMetadata.getFilePath());
 		Path userDesignatedPath = Paths.get(userPath).resolve(fileMetadata.getOriginalFileName()).normalize();
 
@@ -49,15 +48,15 @@ public class FileService {
 	}
 
 	public void deleteFile(Long fileId, Long userId) {
-		FileMetadata fileMetadata = fileReader.findBy(fileId, userId);
+		FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
 		Path path = Paths.get(fileMetadata.getFilePath());
 
 		FileUtil.delete(path);
 
-		fileWriter.deleteBy(fileId);
+		fileDataHandlerService.deleteBy(fileId);
 	}
 
 	public List<FileMetadata> findChildBy(Long parentId, Long userId) {
-		return fileReader.findChildBy(parentId, userId);
+		return fileDataHandlerService.findChildBy(parentId, userId);
 	}
 }

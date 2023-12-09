@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class FileDataAccessService implements FileReader, FileWriter {
+public class FileDataHandlerService {
 	private final FileRepository fileRepository;
 	@Transactional
 	public void deleteBy(Long fileId) {

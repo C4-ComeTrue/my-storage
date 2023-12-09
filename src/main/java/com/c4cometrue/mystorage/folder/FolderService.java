@@ -13,8 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class FolderService {
-	private final FolderReader folderReader;
-	private final FolderWriter folderWriter;
+	private final FolderDataHandlerService folderDataHandlerService;
 
 	// 부모 폴더는 null 이 될 수 있다
 	public void createBy(Long userId, String userFolderName, Long parentId) {
@@ -23,19 +22,19 @@ public class FolderService {
 
 		Path path = Paths.get(parentPath, storedFolderName);
 
-		folderWriter.persist(userFolderName, storedFolderName, path.toString(), userId, parentId);
+		folderDataHandlerService.persist(userFolderName, storedFolderName, path.toString(), userId, parentId);
 		FolderUtil.createFolder(path);
 	}
 
 	public void changeFolderNameBy(String folderName, Long folderId, Long userId) {
-		folderWriter.changeFolderNameBy(folderName, folderId, userId);
+		folderDataHandlerService.changeFolderNameBy(folderName, folderId, userId);
 	}
 
 	public String findPathBy(Long parentId) {
-		return folderReader.findPathBy(parentId);
+		return folderDataHandlerService.findPathBy(parentId);
 	}
 
 	public List<FolderMetadata> findChildBy(Long parentId, Long userId) {
-		return folderReader.findChildBy(parentId, userId);
+		return folderDataHandlerService.findChildBy(parentId, userId);
 	}
 }

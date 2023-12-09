@@ -19,26 +19,20 @@ class FolderServiceTest {
 	private FolderService folderService;
 
 	@Mock
-	private FolderReader folderReader;
-
-	@Mock
-	private FolderWriter folderWriter;
-
-	@Mock
-	private FolderMetadata folderMetadata;
+	private FolderDataHandlerService folderDataHandlerService;
 
 	@Test
 	@DisplayName("폴더 업로드 테스트")
 	void createBy() {
 		// given
-		given(folderReader.findPathBy(PARENT_ID)).willReturn(PARENT_PATH);
+		given(folderDataHandlerService.findPathBy(PARENT_ID)).willReturn(PARENT_PATH);
 
 		// when
 		folderService.createBy(USER_ID, USER_FOLDER_NAME, PARENT_ID);
 
 		//then
-		verify(folderReader, times(1)).findPathBy(PARENT_ID);
-		verify(folderWriter, times(1)).persist(any(), any(), any(), any(), any());
+		verify(folderDataHandlerService, times(1)).findPathBy(PARENT_ID);
+		verify(folderDataHandlerService, times(1)).persist(any(), any(), any(), any(), any());
 	}
 
 	@Test
@@ -46,16 +40,16 @@ class FolderServiceTest {
 	void changeFolderNameTest() {
 		folderService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
 
-		verify(folderWriter, times(1)).changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
+		verify(folderDataHandlerService, times(1)).changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
 	}
 
 	@Test
 	@DisplayName("폴더 조회 테스트")
 	void getFolder() {
-		given(folderReader.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FOLDER_METADATA));
+		given(folderDataHandlerService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FOLDER_METADATA));
 
 		folderService.findChildBy(PARENT_ID, USER_ID);
 
-		then(folderReader).should(times(1)).findChildBy(PARENT_ID, USER_ID);
+		then(folderDataHandlerService).should(times(1)).findChildBy(PARENT_ID, USER_ID);
 	}
 }

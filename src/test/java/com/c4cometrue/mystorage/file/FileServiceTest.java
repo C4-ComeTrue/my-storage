@@ -31,7 +31,7 @@ import com.c4cometrue.mystorage.folder.FolderService;
 @ExtendWith(MockitoExtension.class)
 class FileServiceTest {
 	@Mock
-	private FileDataAccessService fileDataAccessService;
+	private FileDataHandlerService fileDataHandlerService;
 	@Mock
 	private FolderService folderService;
 
@@ -58,7 +58,7 @@ class FileServiceTest {
 	@Test
 	@DisplayName("다운로드 실패 테스트")
 	void downloadFileFailTest() throws IOException {
-		when(fileDataAccessService.findBy(anyLong(), anyLong())).thenReturn(FILE_METADATA);
+		when(fileDataHandlerService.findBy(anyLong(), anyLong())).thenReturn(FILE_METADATA);
 
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
@@ -70,7 +70,7 @@ class FileServiceTest {
 	@Test
 	@DisplayName("삭제 실패 테스트")
 	void deleteFileFailTest() throws IOException {
-		when(fileDataAccessService.findBy(FILE_ID, USER_ID)).thenReturn(FILE_METADATA);
+		when(fileDataHandlerService.findBy(FILE_ID, USER_ID)).thenReturn(FILE_METADATA);
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
 			() -> fileService.deleteFile(FILE_ID, USER_ID)
@@ -124,11 +124,11 @@ class FileServiceTest {
 	@Test
 	@DisplayName("파일 조회 테스트")
 	void getFile() {
-		given(fileDataAccessService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FILE_METADATA));
+		given(fileDataHandlerService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FILE_METADATA));
 
 
 		fileService.findChildBy(PARENT_ID, USER_ID);
 
-		then(fileDataAccessService).should(times(1)).findChildBy(PARENT_ID, USER_ID);
+		then(fileDataHandlerService).should(times(1)).findChildBy(PARENT_ID, USER_ID);
 	}
 }

@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class FolderDataAccessService implements FolderReader, FolderWriter {
+public class FolderDataHandlerService {
 	private final FolderRepository folderRepository;
 	@Value("${file.storage-path}")
 	private String storagePath;

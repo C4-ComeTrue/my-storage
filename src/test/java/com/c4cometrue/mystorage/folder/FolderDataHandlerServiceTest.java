@@ -19,9 +19,9 @@ import com.c4cometrue.mystorage.exception.ServiceException;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("폴더 데이터 어세스 서비스 테스트")
-class FolderDataAccessServiceTest {
+class FolderDataHandlerServiceTest {
 	@InjectMocks
-	private FolderDataAccessService folderDataAccessService;
+	private FolderDataHandlerService folderDataHandlerService;
 
 	@Mock
 	private FolderRepository folderRepository;
@@ -31,7 +31,7 @@ class FolderDataAccessServiceTest {
 	void findPathBy() {
 		given(folderRepository.findById(PARENT_ID)).willReturn(Optional.of(FOLDER_METADATA));
 
-		folderDataAccessService.findPathBy(PARENT_ID);
+		folderDataHandlerService.findPathBy(PARENT_ID);
 
 		verify(folderRepository, times(1)).findById(PARENT_ID);
 	}
@@ -39,7 +39,7 @@ class FolderDataAccessServiceTest {
 	@Test
 	@DisplayName("폴더 경로 찾기 : 부모id 가 null")
 	void findPathParentIsNull() {
-		folderDataAccessService.findPathBy(null);
+		folderDataHandlerService.findPathBy(null);
 		verify(folderRepository, times(0)).findById(null);
 	}
 
@@ -50,7 +50,7 @@ class FolderDataAccessServiceTest {
 		given(folderRepository.existsByParentIdAndUploaderIdAndOriginalFolderName(PARENT_ID, USER_ID, USER_FOLDER_NAME))
 			.willReturn(FALSE);
 
-		folderDataAccessService.persist(USER_FOLDER_NAME, STORED_FOLDER_NAME, FOLDER_PATH.toString(), USER_ID,
+		folderDataHandlerService.persist(USER_FOLDER_NAME, STORED_FOLDER_NAME, FOLDER_PATH.toString(), USER_ID,
 			PARENT_ID);
 
 		verify(folderRepository, times(1)).save(any());
@@ -64,7 +64,7 @@ class FolderDataAccessServiceTest {
 			.willReturn(TRUE);
 
 		assertThrows(ServiceException.class,
-			() -> folderDataAccessService.persist(USER_FOLDER_NAME, STORED_FOLDER_NAME, USER_PATH, USER_ID,
+			() -> folderDataHandlerService.persist(USER_FOLDER_NAME, STORED_FOLDER_NAME, USER_PATH, USER_ID,
 				PARENT_ID));
 	}
 
@@ -74,7 +74,7 @@ class FolderDataAccessServiceTest {
 		given(folderRepository.existsByIdAndUploaderId(FOLDER_ID, USER_ID)).willReturn(TRUE);
 		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.of(FOLDER_METADATA));
 
-		folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
+		folderDataHandlerService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
 
 		verify(folderRepository, times(1)).existsByIdAndUploaderId(FOLDER_ID, USER_ID);
 		verify(folderRepository, times(1)).save(FOLDER_METADATA);
@@ -85,7 +85,7 @@ class FolderDataAccessServiceTest {
 	void changeFolderParentIdIsNullTest() {
 		given(folderRepository.findById(null)).willReturn(Optional.of(FOLDER_METADATA));
 
-		folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, null, USER_ID);
+		folderDataHandlerService.changeFolderNameBy(USER_FOLDER_NAME, null, USER_ID);
 
 		verify(folderRepository, times(1)).save(FOLDER_METADATA);
 	}
@@ -96,13 +96,13 @@ class FolderDataAccessServiceTest {
 		given(folderRepository.existsByIdAndUploaderId(FOLDER_ID, USER_ID)).willReturn(TRUE);
 
 		assertThrows(ServiceException.class,
-			() -> folderDataAccessService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID));
+			() -> folderDataHandlerService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID));
 	}
 
 	@Test
 	@DisplayName("루트 폴더 조회 테스트")
 	void getChildFolder() {
-		folderDataAccessService.findChildBy(null, USER_ID);
+		folderDataHandlerService.findChildBy(null, USER_ID);
 
 		then(folderRepository).should(times(1)).findByParentIdAndUploaderId(null, USER_ID);
 	}
@@ -112,6 +112,6 @@ class FolderDataAccessServiceTest {
 	void getChildFolderFail() {
 		given(folderRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(FALSE);
 
-		assertThrows(ServiceException.class, () -> folderDataAccessService.findChildBy(PARENT_ID, USER_ID));
+		assertThrows(ServiceException.class, () -> folderDataHandlerService.findChildBy(PARENT_ID, USER_ID));
 	}
 }
