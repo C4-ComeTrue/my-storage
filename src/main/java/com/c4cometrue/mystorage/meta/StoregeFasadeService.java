@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.dto.MetaResponse;
 import com.c4cometrue.mystorage.file.FileMetadata;
@@ -16,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class MetadataService {
+public class StoregeFasadeService {
 	private final FolderService folderService;
 	private final FileService fileService;
 
