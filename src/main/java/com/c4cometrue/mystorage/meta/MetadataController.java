@@ -14,10 +14,10 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class MetadataController {
-	private final StoregeFasadeService storegeFasadeService;
+	private final StoregeFacadeService storegeFacadeService;
 	@GetMapping("/metadata")
 	public ResponseEntity<List<MetaResponse>> getFolderContents(FolderContentsRequest req) {
-		List<MetaResponse> res = storegeFasadeService.getFolderContents(req.folderId(), req.userId());
+		List<MetaResponse> res = storegeFacadeService.getFolderContents(req.folderId(), req.userId());
 		return ResponseEntity.ok(res);
 	}
 }

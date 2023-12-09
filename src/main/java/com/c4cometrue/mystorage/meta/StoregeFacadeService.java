@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class StoregeFasadeService {
+public class StoregeFacadeService {
 	private final FolderService folderService;
 	private final FileService fileService;
 
