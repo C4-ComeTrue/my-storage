@@ -39,11 +39,12 @@ class FileServiceTest {
 	@Test
 	void 파일이_없다면_실패한다() {
 		//given
-		long userId = 1;
+		var userId = 1L;
+		var folderId = 1L;
 
 		// when + then
 		assertThatThrownBy(() -> {
-			fileService.fileUpload(null, userId);
+			fileService.fileUpload(null, userId, folderId);
 		}).isInstanceOf(BusinessException.class)
 			.hasMessageContaining(ErrorCode.FILE_EMPTY.getMsg());
 	}
@@ -52,15 +53,16 @@ class FileServiceTest {
 	void 중복된_파일이라면_실패한다() {
 		// given
 		var userId = 1L;
+		var folderId = 1L;
 		var file = mock(MultipartFile.class);
 
 		given(file.getOriginalFilename()).willReturn("dd.jpg");
-		given(fileMetaDataRepository.existsByFileNameAndUserId(anyString(), anyLong()))
+		given(fileMetaDataRepository.existsByFileNameAndUserIdAndParent(anyString(), anyLong(), any()))
 			.willReturn(true);
 
 		// when + then
 		assertThatThrownBy(() -> {
-			fileService.fileUpload(file, userId);
+			fileService.fileUpload(file, userId, folderId);
 		}).isInstanceOf(BusinessException.class)
 			.hasMessageContaining(ErrorCode.DUPLICATE_FILE.getMsg());
 	}
@@ -69,6 +71,7 @@ class FileServiceTest {
 	void 파일_메타데이터를_등록한다() {
 		// given
 		var fileId = 1L;
+		var folderId = 2L;
 		var userId = 1L;
 		var file = mock(MultipartFile.class);
 		var originFileName = "dd.jpg";
@@ -87,7 +90,7 @@ class FileServiceTest {
 		given(fileMetaDataRepository.save(any())).willReturn(fileMetaData);
 
 		// when
-		var response = fileService.fileUpload(file, userId);
+		var response = fileService.fileUpload(file, userId, folderId);
 
 		// then
 		assertThat(response)

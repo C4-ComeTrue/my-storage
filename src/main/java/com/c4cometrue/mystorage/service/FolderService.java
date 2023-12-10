@@ -29,10 +29,10 @@ public class FolderService {
 		String fullPath = pathService.getFullFilePath(ROOT_PATH, name);
 
 		// 이미 폴더가 존재하는지 확인
-		validateDuplicateFolderName(null, name);
+		folderReader.validateDuplicateFolder(name, userId, null);
 
 		// 메타데이터 저장
-		FileMetaData folder = folderWriter.saveFolderMetaData(userId, name, ROOT_PATH, null);
+		FileMetaData folder = folderWriter.saveFolderMetaData(userId, name, null);
 
 		// 물리적인 루트 폴더 생성
 		fileUtil.createFolder(fullPath);
@@ -41,28 +41,33 @@ public class FolderService {
 
 	public FolderUploadDto.Res createFolder(long userId, Long parentId, String name) {
 		// 부모 폴더 유효성 검사
-		FileMetaData parent = getParentFolder(parentId, userId);
+		FileMetaData parent = getFolder(parentId, userId);
 
 		// 중복되는 이름이 같은 뎁스에 있는 경우 확인
-		validateDuplicateFolderName(parent, name);
+		folderReader.validateDuplicateFolder(name, userId, parent);
 
 		// 메타 데이터만 저장
-		String folderPath = pathService.getFilePath(parent.getFolderPath(), parent.getFileName());
-		FileMetaData folder = folderWriter.saveFolderMetaData(userId, name, folderPath, parent);
+		FileMetaData folder = folderWriter.saveFolderMetaData(userId, name, parent);
 		return new FolderUploadDto.Res(folder.getId());
 	}
 
-	private FileMetaData getParentFolder(Long id, long userId) {
-		FileMetaData folder = this.folderReader.get(id, userId);
+	public void renameFolder(long userId, long folderId, String newName) {
+		// 폴더 존재 여부 확인
+		FileMetaData folder = getFolder(folderId, userId);
+
+		// 변경하려는 이름이 중복되는지 확인
+		folderReader.validateDuplicateFolder(newName, userId, folder.getParent());
+
+		// 자식들 제외하고 변경하려는 폴더 자체만 이름 수정
+		folder.rename(newName);
+	}
+
+	private FileMetaData getFolder(Long id, long userId) {
+		FileMetaData folder = folderReader.get(id, userId);
 		if (folder.getFileType() != FileType.FOLDER) {
 			throw new BusinessException(ErrorCode.INVALID_FOLDER);
 		}
 		return folder;
 	}
 
-	private void validateDuplicateFolderName(FileMetaData folder, String name) {
-		if (this.folderReader.isDuplicateFolderName(folder, name)) {
-			throw new BusinessException(ErrorCode.DUPLICATE_FOLDER);
-		}
-	}
 }

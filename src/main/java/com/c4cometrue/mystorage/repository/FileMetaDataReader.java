@@ -19,11 +19,21 @@ public class FileMetaDataReader {
 			() -> new BusinessException(ErrorCode.FILE_NOT_FOUND));
 	}
 
-	public boolean isDuplicateFile(String fileName, long userId) {
-		return repository.existsByFileNameAndUserId(fileName, userId);
+	public FileMetaData getRootFolder(long userId) {
+		return repository.findByUserIdAndParent(userId, null).orElseThrow(
+			() -> new BusinessException(ErrorCode.FILE_NOT_FOUND));
 	}
 
-	public boolean isDuplicateFolderName(FileMetaData folder, String name) {
-		return repository.existsByParentAndFileName(folder, name);
+	public void validateDuplicateFile(String fileName, long userId, FileMetaData parent) {
+		if (repository.existsByFileNameAndUserIdAndParent(fileName, userId, parent)) {
+			throw new BusinessException(ErrorCode.DUPLICATE_FILE);
+		}
 	}
+
+	public void validateDuplicateFolder(String folderName, long userId, FileMetaData parent) {
+		if (repository.existsByFileNameAndUserIdAndParent(folderName, userId, parent)) {
+			throw new BusinessException(ErrorCode.DUPLICATE_FOLDER);
+		}
+	}
+
 }

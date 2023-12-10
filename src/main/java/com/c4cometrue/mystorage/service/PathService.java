@@ -19,16 +19,6 @@ public class PathService {
 	}
 
 	/**
-	 * 파일의 논리적인 경로 반환
-	 * @param parentDir
-	 * @param parentName
-	 * @return
-	 */
-	public String getFilePath(String parentDir, String parentName) {
-		return parentDir + DELIMITER + parentName;
-	}
-
-	/**
 	 * 파일의 물리적인 경로 반환
 	 * @param parentDir
 	 * @param fileName

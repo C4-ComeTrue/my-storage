@@ -8,10 +8,10 @@ import com.c4cometrue.mystorage.domain.FileMetaData;
 
 public interface FileMetaDataRepository extends JpaRepository<FileMetaData, Long> {
 
-	boolean existsByFileNameAndUserId(String fileName, long userId);
-
-	boolean existsByParentAndFileName(FileMetaData parent, String name);
+	boolean existsByFileNameAndUserIdAndParent(String fileName, long userId, FileMetaData parent);
 
 	Optional<FileMetaData> findByIdAndUserId(long fileId, long userId);
+
+	Optional<FileMetaData> findByUserIdAndParent(long userId, FileMetaData parent);
 
 }

@@ -1,7 +1,6 @@
 package com.c4cometrue.mystorage.service;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -29,35 +28,39 @@ public class FileService {
 	private final FileMetaDataReader fileMetaDataReader;
 	private final FileMetaDataWriter fileMetaDataWriter;
 
-	public FileUploadDto.Response fileUpload(MultipartFile file, long userId, long folderId) {  // root folder Id 전달
-		if (Objects.isNull(file) || file.isEmpty()) {
+	public FileUploadDto.Response fileUpload(MultipartFile file, long userId, long folderId) {
+		if (file.isEmpty()) {
 			throw new BusinessException(ErrorCode.FILE_EMPTY);
 		}
 
+		FileMetaData rootFolder = fileMetaDataReader.getRootFolder(userId);
+		FileMetaData parentFolder = getParentFolder(rootFolder, userId, folderId);
+
+		// 이미 같은 폴더 아래에 파일이 존재하는지 확인
 		String originName = file.getOriginalFilename();
-		if (isDuplicateFile(originName, userId)) {
-			throw new BusinessException(ErrorCode.DUPLICATE_FILE, originName);
-		}
+		fileMetaDataReader.validateDuplicateFile(originName, userId, parentFolder);
 
-		FileMetaData parentFolder = fileMetaDataReader.get(folderId, userId);
+		// 파일 메타데이터 저장
 		String uploadFileName = pathService.createUniqueFileName(originName);
-		String uploadFullPath = pathService.getFullFilePath(parentFolder.getFolderPath(), uploadFileName);
 		FileMetaData fileMetaData = fileMetaDataWriter.saveFileMetaData(
-			file, userId, uploadFileName, parentFolder.getFolderPath()
+			file, userId, uploadFileName, parentFolder
 		);
-		fileMetaData.addParentFolder(parentFolder);
 
+		// 실제 물리 파일 저장
+		String uploadFullPath = pathService.getFullFilePath(rootFolder.getFileName(), uploadFileName);
 		fileUtil.uploadFile(file, uploadFullPath);
 		return new FileUploadDto.Response(fileMetaData);
 	}
 
 	@Transactional(readOnly = true)
 	public FileDownloadDto.Response fileDownLoad(long userId, long fileId) {
+		// 파일 유효성 검증
 		FileMetaData fileMetaData = fileMetaDataReader.get(fileId, userId);
 		validateFileAccess(userId, fileMetaData.getUserId());
 
-		String uploadFilePath = pathService.getFullFilePath(fileMetaData.getFolderPath(),
-			fileMetaData.getUploadName());
+		// 루트 파일 아래에 저장되어 있는 파일 다운로드
+		FileMetaData root = fileMetaDataReader.getRootFolder(userId);
+		String uploadFilePath = pathService.getFullFilePath(root.getFileName(), fileMetaData.getUploadName());
 		Resource file = fileUtil.downloadFile(uploadFilePath);
 
 		try {
@@ -78,8 +81,11 @@ public class FileService {
 		fileMetaDataWriter.delete(fileMetaData);
 	}
 
-	private boolean isDuplicateFile(String fileName, long userId) {
-		return fileMetaDataReader.isDuplicateFile(fileName, userId);
+	private FileMetaData getParentFolder(FileMetaData root, long userId, long folderId) {
+		if (root.getId() != folderId) {
+			fileMetaDataReader.get(folderId, userId);
+		}
+		return root;
 	}
 
 	private void validateFileAccess(long userId, long fileUserId) {

@@ -15,7 +15,7 @@ public class FileMetaDataWriter {
 	private final FileMetaDataRepository repository;
 
 	public FileMetaData saveFileMetaData(
-		MultipartFile file, long userId, String uploadFileName, String folderPath
+		MultipartFile file, long userId, String uploadFileName, FileMetaData parent
 	) {
 		FileMetaData fileMetaData = FileMetaData.fileBuilder()
 			.userId(userId)
@@ -23,7 +23,7 @@ public class FileMetaDataWriter {
 			.uploadName(uploadFileName)
 			.size(file.getSize())
 			.type(file.getContentType())
-			.folderPath(folderPath)
+			.parent(parent)
 			.fileType(FileType.FILE)
 			.build();
 
@@ -31,17 +31,16 @@ public class FileMetaDataWriter {
 	}
 
 	public FileMetaData saveFolderMetaData(
-		long userId, String folderName, String folderPath, FileMetaData parent
+		long userId, String folderName, FileMetaData parent
 	) {
 		FileMetaData folderMetaData = FileMetaData.folderBuilder()
 			.userId(userId)
 			.fileName(folderName)
-			.folderPath(folderPath)
 			.uploadName(".")
 			.fileType(FileType.FOLDER)
+			.parent(parent)
 			.build();
 
-		folderMetaData.addParentFolder(parent);
 		return repository.save(folderMetaData);
 	}
 
