@@ -7,24 +7,13 @@ import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.c4cometrue.mystorage.entity.FileMetaData;
-
 public class TestParameter {
-    public static final MultipartFile mockMultipartFile = mock(MultipartFile.class);
-    public static final String mockUserName = "userName";
-    public static final String mockFileName = "file.txt";
-    public static final String mockFileStorageName = UUID.randomUUID() + mockFileName;
-    public static final long mockSize = 100L;
-    public static final String mockContentType = "text/plain";
-    public static final FileMetaData mockFileMetaData = FileMetaData.builder()
-        .fileName(mockFileName)
-        .fileStorageName(mockFileStorageName)
-        .size(mockSize)
-        .mime(mockContentType)
-        .username(mockUserName)
-        .build();
-
-    public static final String mockRootPath = "C:/Users/pear/study/C4/storage";
-    public static final Path mockStoragePath = Path.of(mockRootPath).resolve(mockFileStorageName);
-
+    public static final MultipartFile MOCK_MULTIPART_FILE = mock(MultipartFile.class);
+    public static final String MOCK_USER_NAME = "userName";
+    public static final String MOCK_FILE_NAME = "file.txt";
+    public static final String MOCK_FILE_STORAGE_NAME = UUID.randomUUID() + MOCK_FILE_NAME;
+    public static final long MOCK_SIZE = 100L;
+    public static final String MOCK_CONTENT_TYPE = "text/plain";
+    public static final String MOCK_ROOT_PATH = "C:/Users/pear/study/C4/storage";
+    public static final Path MOCK_STORAGE_PATH = Path.of(MOCK_ROOT_PATH).resolve(MOCK_FILE_STORAGE_NAME);
 }

@@ -11,14 +11,14 @@ class ErrorCdTest {
     void noArgumentConstructor() {
         var exception = ErrorCd.FILE_NOT_EXIST.serviceException();
         assertEquals("FILE_NOT_EXIST", exception.getErrCode());
-        assertEquals("File not exist", exception.getErrMessage());
+        assertEquals("File doesn't exist", exception.getErrMessage());
     }
 
     @Test
     void debugMessageConstructor() {
         var exception = ErrorCd.FILE_NOT_EXIST.serviceException("File %s not found", "test.txt");
         assertEquals("FILE_NOT_EXIST", exception.getErrCode());
-        assertEquals("File not exist", exception.getErrMessage());
+        assertEquals("File doesn't exist", exception.getErrMessage());
         assertEquals("File test.txt not found", exception.getDebugMessage());
     }
 
@@ -27,14 +27,14 @@ class ErrorCdTest {
         var cause = mock(Throwable.class);
         var exception = ErrorCd.FILE_NOT_EXIST.serviceException(cause, "File %s not found", "test.txt");
         assertEquals("FILE_NOT_EXIST", exception.getErrCode());
-        assertEquals("File not exist", exception.getErrMessage());
+        assertEquals("File doesn't exist", exception.getErrMessage());
         assertEquals("File test.txt not found", exception.getDebugMessage());
     }
 
     @Test
     void fileNotExist() {
         assertEquals(HttpStatus.NOT_FOUND, ErrorCd.FILE_NOT_EXIST.getHttpStatus());
-        assertEquals("File not exist", ErrorCd.FILE_NOT_EXIST.getMessage());
+        assertEquals("File doesn't exist", ErrorCd.FILE_NOT_EXIST.getMessage());
     }
 
     @Test

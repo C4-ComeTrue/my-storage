@@ -1,0 +1,17 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mystorage?&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    name: pear
+    password: pear00!
+
+storage:
+  dir: C:/Users/pear/study/C4/storage
