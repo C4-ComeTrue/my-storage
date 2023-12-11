@@ -1,5 +1,7 @@
 package com.c4cometrue.mystorage.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.c4cometrue.mystorage.common.exception.BusinessException;
@@ -34,6 +36,10 @@ public class FileMetaDataReader {
 		if (repository.existsByFileNameAndUserIdAndParent(folderName, userId, parent)) {
 			throw new BusinessException(ErrorCode.DUPLICATE_FOLDER);
 		}
+	}
+
+	public List<FileMetaData> getFiles(long userId, FileMetaData parent) {
+		return repository.findAllByUserIdAndParent(userId, parent);
 	}
 
 }

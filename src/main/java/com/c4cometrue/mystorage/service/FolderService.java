@@ -1,8 +1,11 @@
 package com.c4cometrue.mystorage.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.c4cometrue.mystorage.api.dto.FolderGetDto;
 import com.c4cometrue.mystorage.api.dto.FolderUploadDto;
 import com.c4cometrue.mystorage.common.exception.BusinessException;
 import com.c4cometrue.mystorage.common.exception.ErrorCode;
@@ -39,7 +42,7 @@ public class FolderService {
 		return new FolderUploadDto.Res(folder.getId());
 	}
 
-	public FolderUploadDto.Res createFolder(long userId, Long parentId, String name) {
+	public FolderUploadDto.Res createFolder(long userId, long parentId, String name) {
 		// 부모 폴더 유효성 검사
 		FileMetaData parent = getFolder(parentId, userId);
 
@@ -62,12 +65,25 @@ public class FolderService {
 		folder.rename(newName);
 	}
 
-	private FileMetaData getFolder(Long id, long userId) {
+	@Transactional(readOnly = true)
+	public FolderGetDto.Res getFolderContents(long userId, long folderId) {
+		// 폴더 존재 여부 확인
+		FileMetaData folder = getFolder(folderId, userId);
+
+		// 폴더 내부에 존재하는 파일 및 폴더 목록 반환
+		List<FileMetaData> files = folderReader.getFiles(userId, folder);
+		List<FolderGetDto.FileDto> fileDtoList = files.stream()
+			.map(FolderGetDto.FileDto::from)
+			.toList();
+
+		return new FolderGetDto.Res(folder.getId(), folder.getFileName(), fileDtoList);
+	}
+
+	private FileMetaData getFolder(long id, long userId) {
 		FileMetaData folder = folderReader.get(id, userId);
 		if (folder.getFileType() != FileType.FOLDER) {
 			throw new BusinessException(ErrorCode.INVALID_FOLDER);
 		}
 		return folder;
 	}
-
 }

@@ -26,7 +26,7 @@ public class FileMetaData extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_id")
-	private FileMetaData parent = null;
+	private FileMetaData parent;
 
 	// @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE) // 읽기 전용 메서드
 	// private List<FileMetaData> childList;
@@ -39,7 +39,7 @@ public class FileMetaData extends BaseEntity {
 
 	private String uploadName;
 
-	private long size;
+	private long size = 0;
 
 	private String type;
 

@@ -1,5 +1,6 @@
 package com.c4cometrue.mystorage.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,7 @@ public interface FileMetaDataRepository extends JpaRepository<FileMetaData, Long
 	Optional<FileMetaData> findByIdAndUserId(long fileId, long userId);
 
 	Optional<FileMetaData> findByUserIdAndParent(long userId, FileMetaData parent);
+
+	List<FileMetaData> findAllByUserIdAndParent(long userId, FileMetaData parent);
 
 }
