@@ -24,9 +24,9 @@ public class FolderGetDto {
 	}
 
 	public record FileDto(
-		long folderId,
+		long fileId,
 		FileType fileType,
-		String folderName,
+		String fileName,
 		String createdAt,
 		long fileSize
 	) {

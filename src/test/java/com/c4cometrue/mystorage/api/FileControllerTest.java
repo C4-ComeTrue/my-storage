@@ -57,6 +57,7 @@ class FileControllerTest {
 				multipart("/v1/files")
 					.file("file", content.getBytes())
 					.param("userId", "1")
+					.param("folderId", "1")
 			)
 			.andExpectAll(
 				status().isCreated(),
