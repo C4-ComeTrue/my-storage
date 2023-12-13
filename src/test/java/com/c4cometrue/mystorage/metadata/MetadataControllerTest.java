@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.dto.FolderContentsRequest;
 import com.c4cometrue.mystorage.meta.MetadataController;
-import com.c4cometrue.mystorage.meta.StoregeFacadeService;
+import com.c4cometrue.mystorage.meta.StorageFacadeService;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("메타데이타 컨트롤러 테스트")
@@ -21,13 +21,13 @@ class MetadataControllerTest {
 	private MetadataController metadataController;
 
 	@Mock
-	private StoregeFacadeService storegeFacadeService;
+	private StorageFacadeService storageFacadeService;
 
 	@Test
 	@DisplayName("특정 폴더 상세 조회 테스트")
 	void getFolderContentsTest() {
-		given(storegeFacadeService.getFolderContents(FOLDER_ID, USER_ID)).willReturn(eq(anyList()));
+		given(storageFacadeService.getFolderContents(FOLDER_ID, USER_ID)).willReturn(eq(anyList()));
 		metadataController.getFolderContents(FolderContentsRequest.of(FOLDER_ID, USER_ID));
-		verify(storegeFacadeService, times(1)).getFolderContents(FOLDER_ID, USER_ID);
+		verify(storageFacadeService, times(1)).getFolderContents(FOLDER_ID, USER_ID);
 	}
 }

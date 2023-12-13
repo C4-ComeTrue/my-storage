@@ -14,13 +14,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.file.FileService;
 import com.c4cometrue.mystorage.folder.FolderService;
-import com.c4cometrue.mystorage.meta.StoregeFacadeService;
+import com.c4cometrue.mystorage.meta.StorageFacadeService;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("메타데이터 서비스 테스트")
 class StorageFacadeServiceTest {
 	@InjectMocks
-	private StoregeFacadeService storegeFacadeService;
+	private StorageFacadeService storageFacadeService;
 
 	@Mock
 	private FolderService folderService;
@@ -34,7 +34,7 @@ class StorageFacadeServiceTest {
 		given(folderService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FOLDER_METADATA));
 		given(fileService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FILE_METADATA));
 
-		storegeFacadeService.getFolderContents(PARENT_ID, USER_ID);
+		storageFacadeService.getFolderContents(PARENT_ID, USER_ID);
 
 		verify(folderService, times(1)).findChildBy(PARENT_ID, USER_ID);
 		verify(fileService, times(1)).findChildBy(PARENT_ID, USER_ID);

@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class StoregeFacadeService {
+public class StorageFacadeService {
 	private final FolderService folderService;
 	private final FileService fileService;
 
@@ -27,7 +27,6 @@ public class StoregeFacadeService {
 	 * @return
 	 */
 	public List<MetaResponse> getFolderContents(Long folderId, Long userId) {
-
 		List<FolderMetadata> folderResponses = folderService.findChildBy(folderId, userId);
 		List<FileMetadata> fileResponses = fileService.findChildBy(folderId, userId);
 

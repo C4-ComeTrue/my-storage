@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.c4cometrue.mystorage.dto.FolderCreateRequest;
 import com.c4cometrue.mystorage.dto.FolderNameChangeRequest;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,13 +21,13 @@ public class FolderController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createFolder(FolderCreateRequest req) {
+	public void createFolder(@Valid FolderCreateRequest req) {
 		folderService.createBy(req.userId(), req.userFolderName(), req.parentId());
 	}
 
 	@PatchMapping
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void changeFolderNameBy(FolderNameChangeRequest req) {
+	public void changeFolderNameBy(@Valid FolderNameChangeRequest req) {
 		folderService.changeFolderNameBy(req.folderName(), req.folderId(), req.userId());
 	}
 }

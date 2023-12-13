@@ -34,11 +34,11 @@ public class FileDataHandlerService {
 	@Transactional
 	public void persist(FileMetadata fileMetadata, Long userId, Long parentId) {
 		validateFileOwnershipBy(parentId, userId);
-		duplicateBy(fileMetadata.getOriginalFileName(), userId, parentId);
+		duplicateBy(parentId, userId, fileMetadata.getOriginalFileName());
 		fileRepository.save(fileMetadata);
 	}
 
-	private void duplicateBy(String fileName, Long userId, Long parentId) {
+	private void duplicateBy(Long parentId, Long userId, String fileName) {
 		if (fileRepository.checkDuplicateFileName(parentId, userId, fileName)) {
 			throw ErrorCode.DUPLICATE_FILE_NAME.serviceException("fileName : {}", fileName);
 		}

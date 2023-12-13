@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "folder_metadata", indexes = @Index(name = "idx_folder_meta", columnList = "parentId, uploaderId, originalFolderName"))
+@Table(indexes = @Index(name = "idx_folder_meta", columnList = "parentId, uploaderId, originalFolderName"))
 public class FolderMetadata {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

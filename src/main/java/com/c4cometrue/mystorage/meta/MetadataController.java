@@ -9,15 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.c4cometrue.mystorage.dto.FolderContentsRequest;
 import com.c4cometrue.mystorage.dto.MetaResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 public class MetadataController {
-	private final StoregeFacadeService storegeFacadeService;
+	private final StorageFacadeService storageFacadeService;
 	@GetMapping("/metadata")
-	public ResponseEntity<List<MetaResponse>> getFolderContents(FolderContentsRequest req) {
-		List<MetaResponse> res = storegeFacadeService.getFolderContents(req.folderId(), req.userId());
+	public ResponseEntity<List<MetaResponse>> getFolderContents(@Valid FolderContentsRequest req) {
+		List<MetaResponse> res = storageFacadeService.getFolderContents(req.folderId(), req.userId());
 		return ResponseEntity.ok(res);
 	}
 }

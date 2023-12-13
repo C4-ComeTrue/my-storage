@@ -12,6 +12,7 @@ import com.c4cometrue.mystorage.dto.FileDeleteRequest;
 import com.c4cometrue.mystorage.dto.FileDownloadRequest;
 import com.c4cometrue.mystorage.dto.FileUploadRequest;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,19 +23,19 @@ public class FileController {
 
 	@PostMapping("/files")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void uploadFile(FileUploadRequest req) {
+	public void uploadFile(@Valid FileUploadRequest req) {
 		fileService.uploadFile(req.multipartFile(), req.userId(), req.parentId());
 	}
 
 	@DeleteMapping
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteFile(FileDeleteRequest request) {
+	public void deleteFile(@Valid FileDeleteRequest request) {
 		fileService.deleteFile(request.fileId(), request.userId());
 	}
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void downloadFile(FileDownloadRequest request) {
+	public void downloadFile(@Valid FileDownloadRequest request) {
 		fileService.downloadFile(request.fileId(), request.userPath(), request.userId());
 	}
 
