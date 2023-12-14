@@ -10,9 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.c4cometrue.mystorage.dto.request.CreateFolderReq;
-import com.c4cometrue.mystorage.dto.request.GetFolderReq;
-import com.c4cometrue.mystorage.dto.request.UpdateFolderNameReq;
+import com.c4cometrue.mystorage.dto.request.folder.CreateFolderReq;
+import com.c4cometrue.mystorage.dto.request.folder.GetFolderReq;
+import com.c4cometrue.mystorage.dto.request.folder.UpdateFolderNameReq;
 import com.c4cometrue.mystorage.service.FolderService;
 
 @ExtendWith(MockitoExtension.class)

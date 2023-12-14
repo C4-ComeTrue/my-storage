@@ -1,6 +1,8 @@
-package com.c4cometrue.mystorage.dto.response;
+package com.c4cometrue.mystorage.dto.response.folder;
 
 import java.util.List;
+
+import com.c4cometrue.mystorage.dto.response.file.FileMetaDataRes;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

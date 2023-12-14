@@ -1,4 +1,4 @@
-package com.c4cometrue.mystorage.dto.request;
+package com.c4cometrue.mystorage.dto.request.file;
 
 import org.springframework.web.multipart.MultipartFile;
 

@@ -6,10 +6,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.c4cometrue.mystorage.dto.response.CreateFolderRes;
-import com.c4cometrue.mystorage.dto.response.FileMetaDataRes;
-import com.c4cometrue.mystorage.dto.response.FolderMetaDataRes;
-import com.c4cometrue.mystorage.dto.response.FolderOverviewRes;
+import com.c4cometrue.mystorage.dto.response.folder.CreateFolderRes;
+import com.c4cometrue.mystorage.dto.response.file.FileMetaDataRes;
+import com.c4cometrue.mystorage.dto.response.folder.FolderMetaDataRes;
+import com.c4cometrue.mystorage.dto.response.folder.FolderOverviewRes;
 import com.c4cometrue.mystorage.entity.FileMetaData;
 import com.c4cometrue.mystorage.entity.FolderMetaData;
 import com.c4cometrue.mystorage.exception.ErrorCd;
@@ -29,7 +29,7 @@ public class FolderService {
 	 * 특정 폴더의 대략적인 정보 반환
 	 * @param folderId 해당 폴더 기본키
 	 * @param userName 사용자 이름
-	 * @return {@link com.c4cometrue.mystorage.dto.response.FolderOverviewRes}
+	 * @return {@link FolderOverviewRes}
 	 */
 	public FolderOverviewRes getFolderData(long folderId, String userName) {
 		// 폴더 정보 조회
@@ -66,7 +66,7 @@ public class FolderService {
 	 * @param parentFolderId 부모 폴더 기본키
 	 * @param userName 사용자 이름
 	 * @param folderName 생성할 폴더 이름
-	 * @return {@link com.c4cometrue.mystorage.dto.response.CreateFolderRes}
+	 * @return {@link CreateFolderRes}
 	 */
 	public CreateFolderRes createFolder(long parentFolderId, String userName, String folderName) {
 		// 중복 폴더 존재 확인

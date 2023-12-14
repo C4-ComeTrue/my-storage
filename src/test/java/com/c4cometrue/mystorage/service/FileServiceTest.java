@@ -21,8 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-import com.c4cometrue.mystorage.dto.request.FileReq;
-import com.c4cometrue.mystorage.dto.request.UploadFileReq;
+import com.c4cometrue.mystorage.dto.request.file.FileReq;
+import com.c4cometrue.mystorage.dto.request.file.UploadFileReq;
 import com.c4cometrue.mystorage.entity.FileMetaData;
 import com.c4cometrue.mystorage.entity.FolderMetaData;
 import com.c4cometrue.mystorage.exception.ErrorCd;

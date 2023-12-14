@@ -17,9 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.c4cometrue.mystorage.dto.request.CreateFolderReq;
-import com.c4cometrue.mystorage.dto.request.GetFolderReq;
-import com.c4cometrue.mystorage.dto.request.UpdateFolderNameReq;
+import com.c4cometrue.mystorage.dto.request.folder.CreateFolderReq;
+import com.c4cometrue.mystorage.dto.request.folder.GetFolderReq;
+import com.c4cometrue.mystorage.dto.request.folder.UpdateFolderNameReq;
 import com.c4cometrue.mystorage.entity.FileMetaData;
 import com.c4cometrue.mystorage.entity.FolderMetaData;
 import com.c4cometrue.mystorage.exception.ErrorCd;

@@ -1,4 +1,4 @@
-package com.c4cometrue.mystorage.dto.request;
+package com.c4cometrue.mystorage.dto.request.folder;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

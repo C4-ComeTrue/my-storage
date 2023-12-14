@@ -8,8 +8,8 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.c4cometrue.mystorage.dto.response.FileDownloadRes;
-import com.c4cometrue.mystorage.dto.response.FileMetaDataRes;
+import com.c4cometrue.mystorage.dto.response.file.FileDownloadRes;
+import com.c4cometrue.mystorage.dto.response.file.FileMetaDataRes;
 import com.c4cometrue.mystorage.entity.FileMetaData;
 import com.c4cometrue.mystorage.exception.ErrorCd;
 import com.c4cometrue.mystorage.repository.FileRepository;
@@ -172,4 +172,8 @@ public class FileService {
 		return file;
 	}
 
+
+	public void moveFile(long fileId, String userName, long targetFolderId) {
+
+	}
 }

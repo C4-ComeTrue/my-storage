@@ -1,4 +1,4 @@
-package com.c4cometrue.mystorage.dto.response;
+package com.c4cometrue.mystorage.dto.response.file;
 
 import org.springframework.core.io.Resource;
 

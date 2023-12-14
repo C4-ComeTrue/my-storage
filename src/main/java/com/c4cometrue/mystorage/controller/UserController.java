@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.c4cometrue.mystorage.dto.request.SignUpReq;
+import com.c4cometrue.mystorage.dto.request.file.SignUpReq;
 import com.c4cometrue.mystorage.dto.response.SignUpRes;
 import com.c4cometrue.mystorage.service.UserService;
 
