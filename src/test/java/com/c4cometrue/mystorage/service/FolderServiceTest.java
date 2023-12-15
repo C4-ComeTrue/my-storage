@@ -138,8 +138,11 @@ class FolderServiceTest {
 		given(folderReader.get(anyLong(), anyLong())).willReturn(folderMetaData);
 		given(folderReader.isDuplicateFile(anyString(), anyLong(), any())).willReturn(false);
 
-		// when + then
+		// when
 		folderService.renameFolder(userId, parentId, folderName);
+
+		// then
+		verify(folderMetaData, times(1)).rename(anyString());
 	}
 
 	@Test

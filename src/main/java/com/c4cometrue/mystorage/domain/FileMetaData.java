@@ -29,9 +29,6 @@ public class FileMetaData extends BaseEntity {
 	@JoinColumn(name = "parent_id")
 	private FileMetaData parent;
 
-	// @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE) // 읽기 전용 메서드
-	// private List<FileMetaData> childList;
-
 	@Column(nullable = false)
 	private Long userId;
 
@@ -73,13 +70,6 @@ public class FileMetaData extends BaseEntity {
 		this.fileType = fileType;
 		this.parent = parent;
 	}
-
-	// public void addParentFolder(FileMetaData fileMetaData) {
-	// 	this.parent = fileMetaData;
-	// 	if (parent != null) {
-	// 		parent.childList.add(this);
-	// 	}
-	// }
 
 	public void rename(String newName) {
 		this.fileName = newName;
