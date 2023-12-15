@@ -1,6 +1,7 @@
 package com.c4cometrue.mystorage.repository;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.domain.FileMetaData;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class FileMetaDataWriter {
 
 	private final FileMetaDataRepository repository;
@@ -33,7 +35,7 @@ public class FileMetaDataWriter {
 	public FileMetaData saveFolderMetaData(
 		long userId, String folderName, FileMetaData parent
 	) {
-		FileMetaData folderMetaData = FileMetaData.folderBuilder()
+		FileMetaData folderMetaData = FileMetaData.fileBuilder()
 			.userId(userId)
 			.fileName(folderName)
 			.uploadName(".")

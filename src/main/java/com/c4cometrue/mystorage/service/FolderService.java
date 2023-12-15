@@ -32,7 +32,7 @@ public class FolderService {
 		String fullPath = pathService.getFullFilePath(ROOT_PATH, name);
 
 		// 이미 폴더가 존재하는지 확인
-		folderReader.validateDuplicateFolder(name, userId, null);
+		validateDuplicateFolder(name, userId, null);
 
 		// 메타데이터 저장
 		FileMetaData folder = folderWriter.saveFolderMetaData(userId, name, null);
@@ -47,7 +47,7 @@ public class FolderService {
 		FileMetaData parent = getFolder(parentId, userId);
 
 		// 중복되는 이름이 같은 뎁스에 있는 경우 확인
-		folderReader.validateDuplicateFolder(name, userId, parent);
+		validateDuplicateFolder(name, userId, parent);
 
 		// 메타 데이터만 저장
 		FileMetaData folder = folderWriter.saveFolderMetaData(userId, name, parent);
@@ -59,7 +59,7 @@ public class FolderService {
 		FileMetaData folder = getFolder(folderId, userId);
 
 		// 변경하려는 이름이 중복되는지 확인
-		folderReader.validateDuplicateFolder(newName, userId, folder.getParent());
+		validateDuplicateFolder(newName, userId, folder.getParent());
 
 		// 자식들 제외하고 변경하려는 폴더 자체만 이름 수정
 		folder.rename(newName);
@@ -85,5 +85,11 @@ public class FolderService {
 			throw new BusinessException(ErrorCode.INVALID_FOLDER);
 		}
 		return folder;
+	}
+
+	public void validateDuplicateFolder(String folderName, long userId, FileMetaData parent) {
+		if (folderReader.isDuplicateFile(folderName, userId, parent)) {
+			throw new BusinessException(ErrorCode.DUPLICATE_FOLDER);
+		}
 	}
 }

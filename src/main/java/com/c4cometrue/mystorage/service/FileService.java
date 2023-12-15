@@ -38,7 +38,7 @@ public class FileService {
 
 		// 이미 같은 폴더 아래에 파일이 존재하는지 확인
 		String originName = file.getOriginalFilename();
-		fileMetaDataReader.validateDuplicateFile(originName, userId, parentFolder);
+		validateDuplicateFile(originName, userId, parentFolder);
 
 		// 파일 메타데이터 저장
 		String uploadFileName = pathService.createUniqueFileName(originName);
@@ -94,4 +94,9 @@ public class FileService {
 		}
 	}
 
+	public void validateDuplicateFile(String fileName, long userId, FileMetaData parent) {
+		if (fileMetaDataReader.isDuplicateFile(fileName, userId, parent)) {
+			throw new BusinessException(ErrorCode.DUPLICATE_FILE);
+		}
+	}
 }
