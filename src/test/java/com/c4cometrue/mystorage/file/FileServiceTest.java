@@ -25,7 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
 import com.c4cometrue.mystorage.exception.ServiceException;
+import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
 import com.c4cometrue.mystorage.folder.FolderService;
+import com.c4cometrue.mystorage.util.PagingUtil;
 
 @DisplayName("파일 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -131,4 +133,20 @@ class FileServiceTest {
 
 		then(fileDataHandlerService).should(times(1)).findChildBy(PARENT_ID, USER_ID);
 	}
+
+	@Test
+	@DisplayName("파일 조회 테스트")
+	void getFiles() {
+		given(fileDataHandlerService.getFileList(PARENT_ID, FILE_ID, USER_ID, PagingUtil.createPageable(10)))
+			.willReturn(List.of(FILE_METADATA));
+		given(fileDataHandlerService.hashNext(PARENT_ID, USER_ID, FILE_METADATA.getId()))
+			.willReturn(Boolean.FALSE);
+
+		CursorFileResponse response = fileService.getFiles(PARENT_ID, FILE_ID, USER_ID, PagingUtil.createPageable(10));
+
+		assertNotNull(response);
+		then(fileDataHandlerService).should(times(1)).getFileList(PARENT_ID, FILE_ID, USER_ID, PagingUtil.createPageable(10));
+		then(fileDataHandlerService).should(times(1)).hashNext(PARENT_ID, USER_ID, FILE_METADATA.getId());
+	}
+
 }

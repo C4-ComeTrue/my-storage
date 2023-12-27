@@ -2,6 +2,7 @@ package com.c4cometrue.mystorage.file;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
@@ -53,5 +54,14 @@ public class FileDataHandlerService {
 		if (folderId != null && !fileRepository.existsByIdAndUploaderId(folderId, userId)) {
 			throw ErrorCode.UNAUTHORIZED_FILE_ACCESS.serviceException();
 		}
+	}
+
+	public List<FileMetadata> getFileList(Long parentId, Long cursorId, Long userId, Pageable page) {
+		return cursorId == null ? fileRepository.findAllByParentIdAndUploaderIdOrderByIdDesc(parentId, userId, page)
+			: fileRepository.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(parentId, cursorId, userId, page);
+	}
+
+	public Boolean hashNext(Long parentId, Long userId, Long lastIdOfList) {
+		return fileRepository.existsByParentIdAndUploaderIdAndIdLessThan(parentId, userId, lastIdOfList);
 	}
 }

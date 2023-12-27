@@ -8,6 +8,7 @@ import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
 import com.c4cometrue.mystorage.meta.dto.CursorMetaResponse;
+import com.c4cometrue.mystorage.util.PagingUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,26 +17,23 @@ import lombok.RequiredArgsConstructor;
 public class StorageFacadeService {
 	private final FolderService folderService;
 	private final FileService fileService;
-	private final PagingHelper pagingHelper;
 
 	public CursorMetaResponse getFolderContents(Long parentId, Long cursorId, Long userId, Integer size,
 		boolean cursorFlag) {
-		Integer contentsSize = pagingHelper.calculateSize(size);
+		Integer contentsSize = PagingUtil.calculateSize(size);
 
-		if (cursorFlag) {
-			return handleFolderFirstStrategy(parentId, cursorId, userId, contentsSize);
-		} else {
-			return handleFileFirstStrategy(parentId, cursorId, userId, contentsSize);
-		}
+		return cursorFlag
+			? handleFolderFirstStrategy(parentId, cursorId, userId, contentsSize)
+			: handleFileFirstStrategy(parentId, cursorId, userId, contentsSize);
 	}
 
 	private CursorMetaResponse handleFolderFirstStrategy(Long parentId, Long cursorId, Long userId,
 		Integer contentsSize) {
-		Pageable page = pagingHelper.createPageable(contentsSize);
+		Pageable page = PagingUtil.createPageable(contentsSize);
 		CursorFolderResponse cursorFolderResponse = folderService.getFolders(parentId, cursorId, userId, page);
 
 		if (Boolean.FALSE.equals(cursorFolderResponse.folderHasNext())) {
-			Pageable remainPage = pagingHelper.createPageable(
+			Pageable remainPage = PagingUtil.createPageable(
 				contentsSize - cursorFolderResponse.folderMetadata().size());
 			CursorFileResponse cursorFileResponse = fileService.getFiles(parentId, null, userId, remainPage);
 			return CursorMetaResponse.of(cursorFolderResponse, cursorFileResponse);
@@ -45,7 +43,7 @@ public class StorageFacadeService {
 
 	private CursorMetaResponse handleFileFirstStrategy(Long parentId, Long cursorId, Long userId,
 		Integer contentsSize) {
-		Pageable page = pagingHelper.createPageable(contentsSize);
+		Pageable page = PagingUtil.createPageable(contentsSize);
 		CursorFileResponse cursorFileResponse = fileService.getFiles(parentId, cursorId, userId, page);
 		return CursorMetaResponse.of(CursorFolderResponse.of(null, false), cursorFileResponse);
 	}

@@ -1,6 +1,7 @@
 package com.c4cometrue.mystorage.folder;
 
 import static com.c4cometrue.mystorage.TestConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.List;
@@ -11,6 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
+import com.c4cometrue.mystorage.util.PagingUtil;
 
 @DisplayName("폴더 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -51,5 +55,21 @@ class FolderServiceTest {
 		folderService.findChildBy(PARENT_ID, USER_ID);
 
 		then(folderDataHandlerService).should(times(1)).findChildBy(PARENT_ID, USER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 조회 테스트")
+	void getFoldersTest() {
+
+		given(folderDataHandlerService.getFolderList(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10)))
+			.willReturn(List.of(FOLDER_METADATA));
+		given(folderDataHandlerService.hasNext(PARENT_ID, USER_ID, FOLDER_METADATA.getId()))
+			.willReturn(Boolean.FALSE);
+
+		CursorFolderResponse response = folderService.getFolders(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10));
+
+		assertNotNull(response);
+		then(folderDataHandlerService).should(times(1)).getFolderList(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10));
+		then(folderDataHandlerService).should(times(1)).hasNext(PARENT_ID, USER_ID, FOLDER_METADATA.getId());
 	}
 }

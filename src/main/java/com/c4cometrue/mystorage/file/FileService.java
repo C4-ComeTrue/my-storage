@@ -3,6 +3,7 @@ package com.c4cometrue.mystorage.file;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
+import com.c4cometrue.mystorage.file.dto.FileContent;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.util.FileUtil;
 
@@ -20,8 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class FileService {
 	private final FileDataHandlerService fileDataHandlerService;
 	private final FolderService folderService;
-
-	private final FileRepository fileRepository;
 
 	@Value("${file.buffer}")
 	private int bufferSize;
@@ -65,17 +65,11 @@ public class FileService {
 	}
 
 	public CursorFileResponse getFiles(Long parentId, Long cursorId, Long userId, Pageable page) {
-		List<FileMetadata> files = getFileList(parentId, cursorId, userId, page);
+		List<FileMetadata> files = fileDataHandlerService.getFileList(parentId, cursorId, userId, page);
+		List<FileContent> fileContents = files.stream()
+			.map(file -> FileContent.of(file.getId(), file.getOriginalFileName()))
+			.collect(Collectors.toList());
 		Long lastIdOfList = files.isEmpty() ? null : files.get(files.size() - 1).getId();
-		return CursorFileResponse.of(files, hashNext(parentId, userId, lastIdOfList));
-	}
-
-	private List<FileMetadata> getFileList(Long parentId, Long cursorId, Long userId, Pageable page) {
-		return cursorId == null ? fileRepository.findAllByParentIdAndUploaderIdOrderByIdDesc(parentId, userId, page)
-			: fileRepository.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(parentId, cursorId, userId, page);
-	}
-
-	private Boolean hashNext(Long parentId, Long userId, Long lastIdOfList) {
-		return fileRepository.existsByParentIdAndUploaderIdAndIdLessThan(parentId, userId, lastIdOfList);
+		return CursorFileResponse.of(fileContents, fileDataHandlerService.hashNext(parentId, userId, lastIdOfList));
 	}
 }

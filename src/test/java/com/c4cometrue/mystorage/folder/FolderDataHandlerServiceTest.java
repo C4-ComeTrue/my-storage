@@ -6,6 +6,7 @@ import static java.lang.Boolean.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.exception.ServiceException;
+import com.c4cometrue.mystorage.util.PagingUtil;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("폴더 데이터 어세스 서비스 테스트")
@@ -101,7 +103,7 @@ class FolderDataHandlerServiceTest {
 
 	@Test
 	@DisplayName("루트 폴더 조회 테스트")
-	void getChildFolder() {
+	void getChildFolderTest() {
 		folderDataHandlerService.findChildBy(null, USER_ID);
 
 		then(folderRepository).should(times(1)).findByParentIdAndUploaderId(null, USER_ID);
@@ -109,9 +111,53 @@ class FolderDataHandlerServiceTest {
 
 	@Test
 	@DisplayName("폴더 조회 테스트 : 실패")
-	void getChildFolderFail() {
+	void getChildFolderFailTest() {
 		given(folderRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(FALSE);
 
 		assertThrows(ServiceException.class, () -> folderDataHandlerService.findChildBy(PARENT_ID, USER_ID));
 	}
+
+	@Test
+	@DisplayName("폴더 리스트 조회 테스트 커서Id 가 널 일때")
+	void getFolderListCursorIdIsNullTest() {
+		given(folderRepository.findAllByParentIdAndUploaderIdOrderByIdDesc(PARENT_ID, USER_ID, PagingUtil.createPageable(10)))
+			.willReturn(List.of(FOLDER_METADATA));
+
+		List<FolderMetadata> result = folderDataHandlerService.getFolderList(PARENT_ID, null, USER_ID, PagingUtil.createPageable(10));
+
+		assertNotNull(result);
+		assertEquals(List.of(FOLDER_METADATA), result);
+
+		then(folderRepository).should(times(1))
+			.findAllByParentIdAndUploaderIdOrderByIdDesc(PARENT_ID, USER_ID, PagingUtil.createPageable(10));
+	}
+
+	@Test
+	@DisplayName("폴더 리스트 조회 테스트")
+	void getFolderListTest() {
+		List<FolderMetadata> mockFolderList = List.of(FOLDER_METADATA); // Create a mock list of FolderMetadata
+		given(folderRepository.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(PARENT_ID, USER_ID, FOLDER_ID, PagingUtil.createPageable(10)))
+			.willReturn(mockFolderList);
+
+		List<FolderMetadata> result = folderDataHandlerService.getFolderList(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10));
+
+		assertNotNull(result);
+		assertEquals(mockFolderList, result);
+
+		then(folderRepository).should(times(1))
+			.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(PARENT_ID, USER_ID, FOLDER_ID, PagingUtil.createPageable(10));
+	}
+
+	@Test
+	@DisplayName("다음 폴더가 있는 지 테스트")
+	void hasNextTest() {
+		given(folderRepository.existsByParentIdAndUploaderIdAndIdLessThan(PARENT_ID, USER_ID, FOLDER_ID))
+			.willReturn(FALSE);
+
+		folderDataHandlerService.hasNext(PARENT_ID, USER_ID, FOLDER_ID);
+
+		then(folderRepository).should(times(1))
+			.existsByParentIdAndUploaderIdAndIdLessThan(PARENT_ID, USER_ID, FOLDER_ID);
+	}
+
 }
