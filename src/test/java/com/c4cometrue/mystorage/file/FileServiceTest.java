@@ -125,17 +125,6 @@ class FileServiceTest {
 
 	@Test
 	@DisplayName("파일 조회 테스트")
-	void getFile() {
-		given(fileDataHandlerService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FILE_METADATA));
-
-
-		fileService.findChildBy(PARENT_ID, USER_ID);
-
-		then(fileDataHandlerService).should(times(1)).findChildBy(PARENT_ID, USER_ID);
-	}
-
-	@Test
-	@DisplayName("파일 조회 테스트")
 	void getFiles() {
 		given(fileDataHandlerService.getFileList(PARENT_ID, FILE_ID, USER_ID, PagingUtil.createPageable(10)))
 			.willReturn(List.of(FILE_METADATA));

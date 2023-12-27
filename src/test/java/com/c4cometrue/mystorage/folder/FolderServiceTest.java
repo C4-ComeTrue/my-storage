@@ -49,16 +49,6 @@ class FolderServiceTest {
 
 	@Test
 	@DisplayName("폴더 조회 테스트")
-	void getFolder() {
-		given(folderDataHandlerService.findChildBy(PARENT_ID, USER_ID)).willReturn(List.of(FOLDER_METADATA));
-
-		folderService.findChildBy(PARENT_ID, USER_ID);
-
-		then(folderDataHandlerService).should(times(1)).findChildBy(PARENT_ID, USER_ID);
-	}
-
-	@Test
-	@DisplayName("폴더 조회 테스트")
 	void getFoldersTest() {
 
 		given(folderDataHandlerService.getFolderList(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10)))

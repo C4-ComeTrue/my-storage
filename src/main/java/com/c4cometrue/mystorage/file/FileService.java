@@ -60,15 +60,11 @@ public class FileService {
 		fileDataHandlerService.deleteBy(fileId);
 	}
 
-	public List<FileMetadata> findChildBy(Long parentId, Long userId) {
-		return fileDataHandlerService.findChildBy(parentId, userId);
-	}
-
 	public CursorFileResponse getFiles(Long parentId, Long cursorId, Long userId, Pageable page) {
 		List<FileMetadata> files = fileDataHandlerService.getFileList(parentId, cursorId, userId, page);
 		List<FileContent> fileContents = files.stream()
 			.map(file -> FileContent.of(file.getId(), file.getOriginalFileName()))
-			.collect(Collectors.toList());
+			.toList();
 		Long lastIdOfList = files.isEmpty() ? null : files.get(files.size() - 1).getId();
 		return CursorFileResponse.of(fileContents, fileDataHandlerService.hashNext(parentId, userId, lastIdOfList));
 	}

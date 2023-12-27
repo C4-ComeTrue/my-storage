@@ -71,6 +71,7 @@ public class FolderDataHandlerService {
 		return folderRepository.findById(folderId)
 			.orElseThrow(() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("folderId { }", folderId));
 	}
+
 	public List<FolderMetadata> getFolderList(Long parentId, Long cursorId, Long userId, Pageable page) {
 		return cursorId == null ? folderRepository.findAllByParentIdAndUploaderIdOrderByIdDesc(parentId, userId, page) :
 			folderRepository.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(parentId, userId, cursorId, page);

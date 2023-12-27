@@ -38,16 +38,13 @@ public class FolderService {
 		return folderDataHandlerService.findPathBy(parentId);
 	}
 
-	public List<FolderMetadata> findChildBy(Long parentId, Long userId) {
-		return folderDataHandlerService.findChildBy(parentId, userId);
-	}
-
 	public CursorFolderResponse getFolders(Long parentId, Long cursorId, Long userId, Pageable page) {
 		List<FolderMetadata> folders = folderDataHandlerService.getFolderList(parentId, cursorId, userId, page);
 		List<FolderContent> folderContents = folders.stream()
 			.map(folder -> FolderContent.of(folder.getId(), folder.getOriginalFolderName()))
-			.collect(Collectors.toList());
+			.toList();
 		Long lastIdOfList = folders.isEmpty() ? null : folders.get(folders.size() - 1).getId();
-		return CursorFolderResponse.of(folderContents, folderDataHandlerService.hasNext(parentId, userId, lastIdOfList));
+		return CursorFolderResponse.of(folderContents,
+			folderDataHandlerService.hasNext(parentId, userId, lastIdOfList));
 	}
 }

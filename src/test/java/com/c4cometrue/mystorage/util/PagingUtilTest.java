@@ -23,7 +23,7 @@ class PagingUtilTest {
 	}
 
 	@Test
-	@DisplayName("페이지 생성 태스트")
+	@DisplayName("페이지 생성 테스트")
 	void createPageableTest() {
 		Assertions.assertEquals(PageRequest.of(0, 10), PagingUtil.createPageable(10));
 	}
