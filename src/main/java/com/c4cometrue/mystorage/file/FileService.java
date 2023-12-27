@@ -5,9 +5,11 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.util.FileUtil;
 
@@ -18,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 public class FileService {
 	private final FileDataHandlerService fileDataHandlerService;
 	private final FolderService folderService;
+
+	private final FileRepository fileRepository;
 
 	@Value("${file.buffer}")
 	private int bufferSize;
@@ -58,5 +62,20 @@ public class FileService {
 
 	public List<FileMetadata> findChildBy(Long parentId, Long userId) {
 		return fileDataHandlerService.findChildBy(parentId, userId);
+	}
+
+	public CursorFileResponse getFiles(Long parentId, Long cursorId, Long userId, Pageable page) {
+		List<FileMetadata> files = getFileList(parentId, cursorId, userId, page);
+		Long lastIdOfList = files.isEmpty() ? null : files.get(files.size() - 1).getId();
+		return CursorFileResponse.of(files, hashNext(parentId, userId, lastIdOfList));
+	}
+
+	private List<FileMetadata> getFileList(Long parentId, Long cursorId, Long userId, Pageable page) {
+		return cursorId == null ? fileRepository.findAllByParentIdAndUploaderIdOrderByIdDesc(parentId, userId, page)
+			: fileRepository.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(parentId, cursorId, userId, page);
+	}
+
+	private Boolean hashNext(Long parentId, Long userId, Long lastIdOfList) {
+		return fileRepository.existsByParentIdAndUploaderIdAndIdLessThan(parentId, userId, lastIdOfList);
 	}
 }

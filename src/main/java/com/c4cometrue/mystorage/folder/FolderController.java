@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.c4cometrue.mystorage.dto.FolderCreateRequest;
-import com.c4cometrue.mystorage.dto.FolderNameChangeRequest;
+import com.c4cometrue.mystorage.folder.dto.FolderCreateRequest;
+import com.c4cometrue.mystorage.folder.dto.FolderNameChangeRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

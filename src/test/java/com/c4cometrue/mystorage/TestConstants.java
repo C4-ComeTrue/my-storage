@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.c4cometrue.mystorage.dto.FolderNameChangeRequest;
+import com.c4cometrue.mystorage.folder.dto.FolderNameChangeRequest;
 import com.c4cometrue.mystorage.file.FileMetadata;
 import com.c4cometrue.mystorage.folder.FolderMetadata;
 

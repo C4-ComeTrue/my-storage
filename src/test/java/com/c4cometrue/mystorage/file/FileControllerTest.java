@@ -10,9 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.c4cometrue.mystorage.dto.FileDeleteRequest;
-import com.c4cometrue.mystorage.dto.FileDownloadRequest;
-import com.c4cometrue.mystorage.dto.FileUploadRequest;
+import com.c4cometrue.mystorage.file.dto.FileDeleteRequest;
+import com.c4cometrue.mystorage.file.dto.FileDownloadRequest;
+import com.c4cometrue.mystorage.file.dto.FileUploadRequest;
 
 @DisplayName("파일 컨트롤러 테스트")
 class FileControllerTest {

@@ -6,7 +6,7 @@ spring:
     password: ab1010
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -16,7 +16,6 @@ spring:
     multipart:
       max-file-size: 15GB
       max-request-size: 15GB
-
 file:
   storage-path: C:\\Users\\g2c10\\OneDrive\\C4\\myStorage
   buffer: 10240

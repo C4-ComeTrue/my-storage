@@ -66,10 +66,8 @@ public class FolderDataHandlerService {
 		}
 	}
 
-	// 적절한 예외 던져라
 	private FolderMetadata findBy(Long folderId) {
-		return folderRepository.findById(folderId).orElseThrow(
-			() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("folderId { }", folderId)
-		);
+		return folderRepository.findById(folderId)
+			.orElseThrow(() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("folderId { }", folderId));
 	}
 }

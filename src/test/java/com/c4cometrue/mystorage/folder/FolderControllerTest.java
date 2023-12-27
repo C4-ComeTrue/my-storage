@@ -10,9 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.c4cometrue.mystorage.TestConstants;
-import com.c4cometrue.mystorage.dto.FolderCreateRequest;
-import com.c4cometrue.mystorage.dto.FolderNameChangeRequest;
+import com.c4cometrue.mystorage.folder.dto.FolderCreateRequest;
 
 @DisplayName("폴더 컨트롤러 테스트")
 @ExtendWith(MockitoExtension.class)
