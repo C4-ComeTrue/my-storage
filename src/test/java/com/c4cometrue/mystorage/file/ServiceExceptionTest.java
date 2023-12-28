@@ -1,6 +1,6 @@
 package com.c4cometrue.mystorage.file;
 
-import static com.c4cometrue.mystorage.file.TestConstants.*;
+import static com.c4cometrue.mystorage.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;

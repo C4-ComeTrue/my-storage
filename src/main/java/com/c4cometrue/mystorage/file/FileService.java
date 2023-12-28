@@ -2,52 +2,70 @@ package com.c4cometrue.mystorage.file;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
+import com.c4cometrue.mystorage.file.dto.FileContent;
+import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.util.FileUtil;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class FileService {
-	private final FileDataAccessService fileDataAccessService;
-
-	@Value("${file.storage-path}")
-	private String storagePath;
+	private final FileDataHandlerService fileDataHandlerService;
+	private final FolderService folderService;
 
 	@Value("${file.buffer}")
 	private int bufferSize;
 
-	@Transactional
-	public void uploadFile(MultipartFile file, Long userId) {
+	public void uploadFile(MultipartFile file, Long userId, Long parentId) {
+		String basePath = folderService.findPathBy(parentId);
 		String originalFileName = file.getOriginalFilename();
-		String storedFileName = Metadata.storedName();
-		Path path = Paths.get(storagePath, storedFileName);
-		Metadata metadata = Metadata.of(originalFileName, storedFileName, path.toString(), userId);
+		String storedFileName = FileMetadata.storedName();
+		Path path = Paths.get(basePath, storedFileName);
+		FileMetadata fileMetadata = FileMetadata.builder()
+			.originalFileName(originalFileName)
+			.storedFileName(storedFileName)
+			.filePath(path.toString())
+			.uploaderId(userId)
+			.parentId(parentId)
+			.build();
 
-		fileDataAccessService.persist(metadata, userId);
 		FileUtil.uploadFile(file, path, bufferSize);
+		fileDataHandlerService.persist(fileMetadata, userId, parentId);
 	}
 
 	public void downloadFile(Long fileId, String userPath, Long userId) {
-		Metadata metadata = fileDataAccessService.findBy(fileId, userId);
-		Path originalPath = Paths.get(metadata.getFilePath());
-		Path userDesignatedPath = Paths.get(userPath).resolve(metadata.getOriginalFileName()).normalize();
+		FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
+		Path originalPath = Paths.get(fileMetadata.getFilePath());
+		Path userDesignatedPath = Paths.get(userPath).resolve(fileMetadata.getOriginalFileName()).normalize();
 
 		FileUtil.download(originalPath, userDesignatedPath, bufferSize);
 	}
 
-	@Transactional
 	public void deleteFile(Long fileId, Long userId) {
-		Metadata metadata = fileDataAccessService.findBy(fileId, userId);
-		fileDataAccessService.deleteBy(fileId);
-		Path path = Paths.get(metadata.getFilePath());
+		FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
+		Path path = Paths.get(fileMetadata.getFilePath());
 
 		FileUtil.delete(path);
+
+		fileDataHandlerService.deleteBy(fileId);
+	}
+
+	public CursorFileResponse getFiles(Long parentId, Long cursorId, Long userId, Pageable page) {
+		List<FileMetadata> files = fileDataHandlerService.getFileList(parentId, cursorId, userId, page);
+		List<FileContent> fileContents = files.stream()
+			.map(file -> FileContent.of(file.getId(), file.getOriginalFileName()))
+			.toList();
+		Long lastIdOfList = files.isEmpty() ? null : files.get(files.size() - 1).getId();
+		return CursorFileResponse.of(fileContents, fileDataHandlerService.hashNext(parentId, userId, lastIdOfList));
 	}
 }

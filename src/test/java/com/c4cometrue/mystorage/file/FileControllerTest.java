@@ -1,6 +1,6 @@
 package com.c4cometrue.mystorage.file;
 
-import static com.c4cometrue.mystorage.file.TestConstants.*;
+import static com.c4cometrue.mystorage.TestConstants.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -10,9 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.c4cometrue.mystorage.dto.FileDeleteRequest;
-import com.c4cometrue.mystorage.dto.FileDownloadRequest;
-import com.c4cometrue.mystorage.dto.FileUploadRequest;
+import com.c4cometrue.mystorage.file.dto.FileDeleteRequest;
+import com.c4cometrue.mystorage.file.dto.FileDownloadRequest;
+import com.c4cometrue.mystorage.file.dto.FileUploadRequest;
 
 @DisplayName("파일 컨트롤러 테스트")
 class FileControllerTest {
@@ -28,13 +28,6 @@ class FileControllerTest {
 	}
 
 	@Test
-	@DisplayName("업로드 컨트롤러 테스트")
-	void uploadFile() {
-		fileController.uploadFile(FileUploadRequest.of(MOCK_MULTIPART_FILE, USER_ID));
-		verify(fileService, times(1)).uploadFile(any(), anyLong());
-	}
-
-	@Test
 	@DisplayName("파일 다운로드 컨트롤러 테스트")
 	void downloadFile() {
 		fileController.downloadFile(FileDownloadRequest.of(FILE_ID, USER_PATH, USER_ID));
@@ -46,5 +39,12 @@ class FileControllerTest {
 	void deleteFile() {
 		fileController.deleteFile(FileDeleteRequest.of(FILE_ID, USER_ID));
 		verify(fileService, times(1)).deleteFile(anyLong(), anyLong());
+	}
+
+	@Test
+	@DisplayName("업로드 파일 테스트")
+	void uploadFileTest() {
+		fileController.uploadFile(FileUploadRequest.of(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID));
+		verify(fileService, times(1)).uploadFile(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID);
 	}
 }
