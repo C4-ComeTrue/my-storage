@@ -62,7 +62,7 @@ public class FolderDataHandlerService {
 		}
 	}
 
-	private FolderMetadata findBy(Long folderId, Long userId) {
+	public FolderMetadata findBy(Long folderId, Long userId) {
 		return folderRepository.findByIdAndUploaderId(folderId, userId)
 			.orElseThrow(() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("folderId { }", folderId));
 	}
@@ -74,5 +74,9 @@ public class FolderDataHandlerService {
 
 	public Boolean hasNext(Long parentId, Long userId, Long id) {
 		return folderRepository.existsByParentIdAndUploaderIdAndIdLessThan(parentId, userId, id);
+	}
+
+	public void persist(FolderMetadata folderMetadata) {
+		folderRepository.save(folderMetadata);
 	}
 }

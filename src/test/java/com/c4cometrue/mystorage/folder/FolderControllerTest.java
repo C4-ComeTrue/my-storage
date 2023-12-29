@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.folder.dto.FolderCreateRequest;
+import com.c4cometrue.mystorage.folder.dto.FolderMoveReq;
 
 @DisplayName("폴더 컨트롤러 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -34,5 +35,13 @@ class FolderControllerTest {
 		folderController.changeFolderNameBy(FOLDER_NAME_CHANGE_REQUEST);
 
 		verify(folderService, times(1)).changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 이동 테스트")
+	void moveFolderTest(){
+		folderController.moveFolder(FolderMoveReq.of(FOLDER_ID, USER_ID, 2L));
+
+		verify(folderService, times(1)).moveFolder(FOLDER_ID, USER_ID, 2L);
 	}
 }

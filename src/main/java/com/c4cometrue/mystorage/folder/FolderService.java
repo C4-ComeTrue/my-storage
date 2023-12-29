@@ -51,4 +51,16 @@ public class FolderService {
 	public void validateBy(Long folderId, Long userId) {
 		folderDataHandlerService.validateFolderOwnershipBy(folderId, userId);
 	}
+
+	public void moveFolder(Long folderId, Long userId, Long destinationFolderId) {
+		// 해당 폴더가 접근 가능 한 폴더 인지 체크
+		validateBy(destinationFolderId, userId);
+
+		FolderMetadata folderMetadata = folderDataHandlerService.findBy(folderId, userId);
+		
+		folderMetadata.changeParentId(destinationFolderId);
+
+		folderDataHandlerService.persist(folderMetadata);
+
+	}
 }

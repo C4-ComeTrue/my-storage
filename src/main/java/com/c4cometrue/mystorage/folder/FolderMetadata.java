@@ -49,6 +49,10 @@ public class FolderMetadata {
 		this.originalFolderName = userFolderName;
 	}
 
+	public void changeParentId(Long parentId) {
+		this.parentId = parentId;
+	}
+
 	@Builder
 	public FolderMetadata(String originalFolderName, String storedFolderName, Long parentId, String filePath,
 		Long uploaderId) {

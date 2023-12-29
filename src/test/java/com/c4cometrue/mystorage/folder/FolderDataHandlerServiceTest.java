@@ -163,4 +163,12 @@ class FolderDataHandlerServiceTest {
 		verify(folderRepository, never()).existsByIdAndUploaderId(any(), any());
 	}
 
+	@Test
+	@DisplayName("폴더 저장 테스트")
+	void persistTest() {
+		folderDataHandlerService.persist(FOLDER_METADATA);
+
+		verify(folderRepository, times(1)).save(FOLDER_METADATA);
+	}
+
 }

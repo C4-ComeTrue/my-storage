@@ -72,4 +72,19 @@ class FolderServiceTest {
 
 		verify(folderDataHandlerService).validateFolderOwnershipBy(FOLDER_ID, USER_ID);
 	}
+
+	@Test
+	@DisplayName("폴더 이동 테스트")
+	void moveFolderTest() {
+		Long destinationFolderID = 2L;
+		doNothing().when(folderDataHandlerService).validateFolderOwnershipBy(destinationFolderID, USER_ID);
+		when(folderDataHandlerService.findBy(FOLDER_ID, USER_ID)).thenReturn(FOLDER_METADATA);
+
+
+		folderService.moveFolder(FOLDER_ID, USER_ID, destinationFolderID);
+
+		verify(folderDataHandlerService).validateFolderOwnershipBy(destinationFolderID, USER_ID);
+
+		verify(folderDataHandlerService).findBy(FOLDER_ID, USER_ID);
+	}
 }
