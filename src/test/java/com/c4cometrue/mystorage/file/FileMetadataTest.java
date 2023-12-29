@@ -22,7 +22,7 @@ class FileMetadataTest {
 
 	@Test
 	@DisplayName("메타데이터 생성")
-	void testMetadataCreation() {
+	void metadataCreationTest() {
 		FileMetadata data = FILE_METADATA;
 		Assertions.assertNotNull(data);
 		Assertions.assertEquals(ORIGINAL_FILE_NAME, data.getOriginalFileName());
@@ -30,5 +30,4 @@ class FileMetadataTest {
 		Assertions.assertEquals(USER_PATH, data.getFilePath());
 		Assertions.assertEquals(USER_ID, data.getUploaderId());
 	}
-
 }

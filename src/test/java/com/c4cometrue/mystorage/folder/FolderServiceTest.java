@@ -29,13 +29,13 @@ class FolderServiceTest {
 	@DisplayName("폴더 업로드 테스트")
 	void createBy() {
 		// given
-		given(folderDataHandlerService.findPathBy(PARENT_ID)).willReturn(PARENT_PATH);
+		given(folderDataHandlerService.findPathBy(PARENT_ID, USER_ID)).willReturn(PARENT_PATH);
 
 		// when
 		folderService.createBy(USER_ID, USER_FOLDER_NAME, PARENT_ID);
 
 		//then
-		verify(folderDataHandlerService, times(1)).findPathBy(PARENT_ID);
+		verify(folderDataHandlerService, times(1)).findPathBy(PARENT_ID, USER_ID);
 		verify(folderDataHandlerService, times(1)).persist(any(), any(), any(), any(), any());
 	}
 
@@ -56,10 +56,20 @@ class FolderServiceTest {
 		given(folderDataHandlerService.hasNext(PARENT_ID, USER_ID, FOLDER_METADATA.getId()))
 			.willReturn(Boolean.FALSE);
 
-		CursorFolderResponse response = folderService.getFolders(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10));
+		CursorFolderResponse response = folderService.getFolders(PARENT_ID, FOLDER_ID, USER_ID,
+			PagingUtil.createPageable(10));
 
 		assertNotNull(response);
-		then(folderDataHandlerService).should(times(1)).getFolderList(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10));
+		then(folderDataHandlerService).should(times(1))
+			.getFolderList(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10));
 		then(folderDataHandlerService).should(times(1)).hasNext(PARENT_ID, USER_ID, FOLDER_METADATA.getId());
+	}
+
+	@Test
+	@DisplayName("유효성 검사")
+	void validateTest() {
+		folderService.validateBy(FOLDER_ID, USER_ID);
+
+		verify(folderDataHandlerService).validateFolderOwnershipBy(FOLDER_ID, USER_ID);
 	}
 }

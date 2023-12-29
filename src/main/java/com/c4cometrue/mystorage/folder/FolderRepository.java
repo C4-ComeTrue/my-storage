@@ -1,6 +1,7 @@
 package com.c4cometrue.mystorage.folder;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,6 @@ public interface FolderRepository extends JpaRepository<FolderMetadata, Long> {
 
 	List<FolderMetadata> findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(Long parentId, Long userId,
 		Long cursorId, Pageable page);
+
+	Optional<FolderMetadata> findByIdAndUploaderId(Long folderId, Long userId);
 }

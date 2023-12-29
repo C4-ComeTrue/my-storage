@@ -29,6 +29,8 @@ import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.util.PagingUtil;
 
+import jakarta.validation.Valid;
+
 @DisplayName("파일 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class FileServiceTest {
@@ -48,7 +50,7 @@ class FileServiceTest {
 	@Test
 	@DisplayName("업로드 실패 테스트")
 	void uploadFileFailTest() throws IOException {
-		when(folderService.findPathBy(PARENT_ID)).thenReturn(PARENT_PATH);
+		when(folderService.findPathBy(PARENT_ID, USER_ID)).thenReturn(PARENT_PATH);
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
 			() -> fileService.uploadFile(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID)
@@ -87,7 +89,7 @@ class FileServiceTest {
 		MultipartFile mockFile = mock(MultipartFile.class);
 		when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(MOCK_MULTIPART_FILE.getBytes()));
 		when(mockFile.getOriginalFilename()).thenReturn(ORIGINAL_FILE_NAME);
-		when(folderService.findPathBy(PARENT_ID)).thenReturn(PARENT_PATH);
+		when(folderService.findPathBy(PARENT_ID, USER_ID)).thenReturn(PARENT_PATH);
 
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
@@ -104,7 +106,7 @@ class FileServiceTest {
 		var outStream = mock(OutputStream.class);
 		var files = mockStatic(Files.class);
 
-		given(folderService.findPathBy(PARENT_ID)).willReturn(PARENT_PATH);
+		given(folderService.findPathBy(PARENT_ID, USER_ID)).willReturn(PARENT_PATH);
 		given(multipartFile.getInputStream()).willReturn(inputStream);
 		given(multipartFile.getOriginalFilename()).willReturn(ORIGINAL_FILE_NAME);
 		given(Files.newOutputStream(any())).willReturn(outStream);
@@ -137,5 +139,22 @@ class FileServiceTest {
 		then(fileDataHandlerService).should(times(1)).getFileList(PARENT_ID, FILE_ID, USER_ID, PagingUtil.createPageable(10));
 		then(fileDataHandlerService).should(times(1)).hashNext(PARENT_ID, USER_ID, FILE_METADATA.getId());
 	}
+
+	@Test
+	@DisplayName("파일 이동 테스트")
+	void moveFileTest() {
+		Long destinationFolderID = 2L;
+		doNothing().when(folderService).validateBy(destinationFolderID, USER_ID);
+
+		when(fileDataHandlerService.findBy(FILE_ID, USER_ID)).thenReturn(FILE_METADATA);
+
+		fileService.moveFile(FILE_ID, USER_ID, destinationFolderID);
+
+
+		verify(folderService).validateBy(destinationFolderID, USER_ID);
+
+		verify(fileDataHandlerService).findBy(FILE_ID, USER_ID);
+	}
+
 
 }

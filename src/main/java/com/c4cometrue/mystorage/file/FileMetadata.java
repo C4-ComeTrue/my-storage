@@ -45,6 +45,10 @@ public class FileMetadata {
 		return UUID.randomUUID().toString();
 	}
 
+	public void changeParentId(Long parentId) {
+		this.parentId = parentId;
+	}
+
 	@Builder
 	public FileMetadata(String originalFileName, String storedFileName, String filePath, Long uploaderId,
 		Long parentId) {
