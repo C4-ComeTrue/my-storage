@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.c4cometrue.mystorage.folder.dto.FolderContentsRequest;
 import com.c4cometrue.mystorage.meta.MetadataController;
 import com.c4cometrue.mystorage.meta.StorageFacadeService;
+import com.c4cometrue.mystorage.meta.dto.DeleteFolderReq;
 
 @DisplayName("메타데이터 컨트롤러 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -28,5 +29,13 @@ class MetadataControllerTest {
 	void getContents() {
 		metadataController.getFolderContents(FolderContentsRequest.of(PARENT_ID, FOLDER_ID, USER_ID, null, true));
 		verify(storageFacadeService, times(1)).getFolderContents(PARENT_ID, FOLDER_ID, USER_ID, null, true);
+	}
+
+	@Test
+	@DisplayName("폴더 삭제 컨트롤러 테스트")
+	void deleteFolderTest() {
+		metadataController.deleteFolder(DeleteFolderReq.of(FOLDER_ID, USER_ID));
+
+		verify(storageFacadeService, times(1)).deleteFolderContents(FOLDER_ID, USER_ID);
 	}
 }

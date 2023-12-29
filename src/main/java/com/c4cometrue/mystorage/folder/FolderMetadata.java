@@ -37,6 +37,8 @@ public class FolderMetadata {
 	@Column(nullable = false)
 	private Long uploaderId;
 
+	private Boolean isDeleted;
+
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private MetadataType metadataType;
@@ -53,6 +55,10 @@ public class FolderMetadata {
 		this.parentId = parentId;
 	}
 
+	public void deleteFile() {
+		this.isDeleted = true;
+	}
+
 	@Builder
 	public FolderMetadata(String originalFolderName, String storedFolderName, Long parentId, String filePath,
 		Long uploaderId) {
@@ -62,5 +68,6 @@ public class FolderMetadata {
 		this.filePath = filePath;
 		this.uploaderId = uploaderId;
 		this.metadataType = MetadataType.FOLDER;
+		this.isDeleted = Boolean.FALSE;
 	}
 }

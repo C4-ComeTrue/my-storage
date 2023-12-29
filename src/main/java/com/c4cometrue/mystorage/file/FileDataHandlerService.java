@@ -51,4 +51,8 @@ public class FileDataHandlerService {
 	public Boolean hashNext(Long parentId, Long userId, Long lastIdOfList) {
 		return fileRepository.existsByParentIdAndUploaderIdAndIdLessThan(parentId, userId, lastIdOfList);
 	}
+
+	public List<FileMetadata> findAllBy(Long parentId) {
+		return fileRepository.findAllByParentId(parentId);
+	}
 }

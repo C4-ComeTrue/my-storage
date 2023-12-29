@@ -27,7 +27,7 @@ public class FolderService {
 		Path path = Paths.get(parentPath, storedFolderName);
 
 		folderDataHandlerService.persist(userFolderName, storedFolderName, path.toString(), userId, parentId);
-		FolderUtil.createFolder(path);
+		// FolderUtil.createFolder(path);
 	}
 
 	public void changeFolderNameBy(String folderName, Long folderId, Long userId) {
@@ -62,5 +62,19 @@ public class FolderService {
 
 		folderDataHandlerService.persist(folderMetadata);
 
+	}
+
+	public void deleteFile(FolderMetadata folderMetadata) {
+		folderMetadata.deleteFile();
+
+		folderDataHandlerService.persist(folderMetadata);
+	}
+
+	public List<FolderMetadata> findAllBy(Long parentId) {
+		return folderDataHandlerService.findAllBy(parentId);
+	}
+
+	public FolderMetadata findBy(long folderId, long userId) {
+		return folderDataHandlerService.findBy(folderId, userId);
 	}
 }

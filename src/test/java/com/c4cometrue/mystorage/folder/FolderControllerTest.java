@@ -38,7 +38,7 @@ class FolderControllerTest {
 	}
 
 	@Test
-	@DisplayName("폴더 이동 테스트")
+	@DisplayName("폴더 이동 컨트롤러 테스트")
 	void moveFolderTest(){
 		folderController.moveFolder(FolderMoveReq.of(FOLDER_ID, USER_ID, 2L));
 

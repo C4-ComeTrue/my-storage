@@ -22,4 +22,6 @@ public interface FolderRepository extends JpaRepository<FolderMetadata, Long> {
 		Long cursorId, Pageable page);
 
 	Optional<FolderMetadata> findByIdAndUploaderId(Long folderId, Long userId);
+
+	List<FolderMetadata> findAllByParentId(Long parentId);
 }

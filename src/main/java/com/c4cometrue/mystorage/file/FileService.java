@@ -25,7 +25,9 @@ public class FileService {
 
 	@Value("${file.buffer}")
 	private int bufferSize;
-
+	// Todo
+	// basePath 이러고 있는 데 findPathBy 로 유저id 만 넘길거다
+	// init controller 를 도입 해서
 	public void uploadFile(MultipartFile file, Long userId, Long parentId) {
 		String basePath = folderService.findPathBy(parentId, userId);
 
@@ -84,5 +86,15 @@ public class FileService {
 
 		// 변경 사항을 저장
 		fileDataHandlerService.persist(fileMetadata);
+	}
+
+	// 소프트 딜리트
+	public void deleteFile(FileMetadata fileMetadata) {
+		fileMetadata.deleteFile();
+		fileDataHandlerService.persist(fileMetadata);
+	}
+
+	public List<FileMetadata> findAllBy(Long parentId) {
+		return fileDataHandlerService.findAllBy(parentId);
 	}
 }

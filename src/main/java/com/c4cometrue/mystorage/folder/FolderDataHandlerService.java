@@ -79,4 +79,8 @@ public class FolderDataHandlerService {
 	public void persist(FolderMetadata folderMetadata) {
 		folderRepository.save(folderMetadata);
 	}
+
+	public List<FolderMetadata> findAllBy(Long parentId) {
+		return folderRepository.findAllByParentId(parentId);
+	}
 }
