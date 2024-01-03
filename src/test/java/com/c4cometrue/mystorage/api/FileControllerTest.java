@@ -50,13 +50,14 @@ class FileControllerTest {
 		var content = "hello";
 
 		var response = new FileUploadDto.Response(fileId, userId, uploadFileName, fileSize);
-		given(fileService.fileUpload(any(), anyLong())).willReturn(response);
+		given(fileService.fileUpload(any(), anyLong(), anyLong())).willReturn(response);
 
 		// when + then
 		mockMvc.perform(
 				multipart("/v1/files")
 					.file("file", content.getBytes())
 					.param("userId", "1")
+					.param("folderId", "1")
 			)
 			.andExpectAll(
 				status().isCreated(),
