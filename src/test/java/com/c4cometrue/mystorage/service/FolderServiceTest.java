@@ -77,7 +77,7 @@ class FolderServiceTest {
 		assertThatThrownBy(() -> {
 			folderService.createFolder(userId, parentId, folderName);
 		}).isInstanceOf(BusinessException.class)
-			.hasMessageContaining(ErrorCode.INVALID_FOLDER.getMsg());
+			.hasMessageContaining(ErrorCode.INVALID_TYPE.getMsg());
 	}
 
 	@Test

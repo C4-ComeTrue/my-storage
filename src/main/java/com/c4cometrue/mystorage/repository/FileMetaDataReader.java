@@ -2,7 +2,7 @@ package com.c4cometrue.mystorage.repository;
 
 import java.util.List;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.c4cometrue.mystorage.common.exception.BusinessException;
 import com.c4cometrue.mystorage.common.exception.ErrorCode;
@@ -10,7 +10,7 @@ import com.c4cometrue.mystorage.domain.FileMetaData;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class FileMetaDataReader {
 

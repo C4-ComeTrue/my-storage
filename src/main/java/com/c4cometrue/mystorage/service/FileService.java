@@ -12,6 +12,7 @@ import com.c4cometrue.mystorage.api.dto.FileUploadDto;
 import com.c4cometrue.mystorage.common.exception.BusinessException;
 import com.c4cometrue.mystorage.common.exception.ErrorCode;
 import com.c4cometrue.mystorage.domain.FileMetaData;
+import com.c4cometrue.mystorage.domain.FileType;
 import com.c4cometrue.mystorage.repository.FileMetaDataReader;
 import com.c4cometrue.mystorage.repository.FileMetaDataWriter;
 import com.c4cometrue.mystorage.utils.FileUtil;
@@ -19,7 +20,6 @@ import com.c4cometrue.mystorage.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class FileService {
 
@@ -28,6 +28,7 @@ public class FileService {
 	private final FileMetaDataReader fileMetaDataReader;
 	private final FileMetaDataWriter fileMetaDataWriter;
 
+	@Transactional
 	public FileUploadDto.Response fileUpload(MultipartFile file, long userId, long folderId) {
 		if (file.isEmpty()) {
 			throw new BusinessException(ErrorCode.FILE_EMPTY);
@@ -37,11 +38,10 @@ public class FileService {
 		FileMetaData parentFolder = getParentFolder(rootFolder, userId, folderId);
 
 		// 이미 같은 폴더 아래에 파일이 존재하는지 확인
-		String originName = file.getOriginalFilename();
-		validateDuplicateFile(originName, userId, parentFolder);
+		validateDuplicateFile(file.getOriginalFilename(), userId, parentFolder);
 
 		// 파일 메타데이터 저장
-		String uploadFileName = pathService.createUniqueFileName(originName);
+		String uploadFileName = pathService.createUniqueFileName();
 		FileMetaData fileMetaData = fileMetaDataWriter.saveFileMetaData(
 			file, userId, uploadFileName, parentFolder
 		);
@@ -55,7 +55,7 @@ public class FileService {
 	@Transactional(readOnly = true)
 	public FileDownloadDto.Response fileDownLoad(long userId, long fileId) {
 		// 파일 유효성 검증
-		FileMetaData fileMetaData = fileMetaDataReader.get(fileId, userId);
+		FileMetaData fileMetaData = getFile(userId, fileId);
 		validateFileAccess(userId, fileMetaData.getUserId());
 
 		// 루트 파일 아래에 저장되어 있는 파일 다운로드
@@ -74,8 +74,9 @@ public class FileService {
 		}
 	}
 
+	@Transactional
 	public void fileDelete(long userId, long fileId) {
-		FileMetaData fileMetaData = fileMetaDataReader.get(fileId, userId);
+		FileMetaData fileMetaData = getFile(userId, fileId);
 		validateFileAccess(userId, fileMetaData.getUserId());
 		fileUtil.deleteFile(fileMetaData.getUploadName());
 		fileMetaDataWriter.delete(fileMetaData);
@@ -83,9 +84,21 @@ public class FileService {
 
 	private FileMetaData getParentFolder(FileMetaData root, long userId, long folderId) {
 		if (root.getId() != folderId) {
-			fileMetaDataReader.get(folderId, userId);
+			FileMetaData folder = fileMetaDataReader.get(folderId, userId);
+			if (folder.getFileType() != FileType.FOLDER) {
+				throw new BusinessException(ErrorCode.INVALID_TYPE);
+			}
+			return folder;
 		}
 		return root;
+	}
+
+	private FileMetaData getFile(long userId, long fileId) {
+		FileMetaData file = fileMetaDataReader.get(fileId, userId);
+		if (file.getFileType() != FileType.FILE) {
+			throw new BusinessException(ErrorCode.INVALID_TYPE);
+		}
+		return file;
 	}
 
 	private void validateFileAccess(long userId, long fileUserId) {
@@ -94,7 +107,7 @@ public class FileService {
 		}
 	}
 
-	public void validateDuplicateFile(String fileName, long userId, FileMetaData parent) {
+	private void validateDuplicateFile(String fileName, long userId, FileMetaData parent) {
 		if (fileMetaDataReader.isDuplicateFile(fileName, userId, parent)) {
 			throw new BusinessException(ErrorCode.DUPLICATE_FILE);
 		}

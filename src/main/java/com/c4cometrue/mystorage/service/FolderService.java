@@ -18,7 +18,6 @@ import com.c4cometrue.mystorage.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class FolderService {
 	private final PathService pathService;
@@ -28,6 +27,7 @@ public class FolderService {
 
 	private static final String ROOT_PATH = "";
 
+	@Transactional
 	public FolderUploadDto.Res createRootFolder(long userId, String name) {
 		String fullPath = pathService.getFullFilePath(ROOT_PATH, name);
 
@@ -42,6 +42,7 @@ public class FolderService {
 		return new FolderUploadDto.Res(folder.getId());
 	}
 
+	@Transactional
 	public FolderUploadDto.Res createFolder(long userId, long parentId, String name) {
 		// 부모 폴더 유효성 검사
 		FileMetaData parent = getFolder(parentId, userId);
@@ -54,6 +55,7 @@ public class FolderService {
 		return new FolderUploadDto.Res(folder.getId());
 	}
 
+	@Transactional
 	public void renameFolder(long userId, long folderId, String newName) {
 		// 폴더 존재 여부 확인
 		FileMetaData folder = getFolder(folderId, userId);
@@ -65,6 +67,7 @@ public class FolderService {
 		folder.rename(newName);
 	}
 
+	// 페이징 필요
 	@Transactional(readOnly = true)
 	public FolderGetDto.Res getFolderContents(long userId, long folderId) {
 		// 폴더 존재 여부 확인
@@ -82,12 +85,12 @@ public class FolderService {
 	private FileMetaData getFolder(long id, long userId) {
 		FileMetaData folder = folderReader.get(id, userId);
 		if (folder.getFileType() != FileType.FOLDER) {
-			throw new BusinessException(ErrorCode.INVALID_FOLDER);
+			throw new BusinessException(ErrorCode.INVALID_TYPE);
 		}
 		return folder;
 	}
 
-	public void validateDuplicateFolder(String folderName, long userId, FileMetaData parent) {
+	private void validateDuplicateFolder(String folderName, long userId, FileMetaData parent) {
 		if (folderReader.isDuplicateFile(folderName, userId, parent)) {
 			throw new BusinessException(ErrorCode.DUPLICATE_FOLDER);
 		}

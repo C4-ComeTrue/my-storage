@@ -7,12 +7,13 @@ import com.c4cometrue.mystorage.domain.FileMetaData;
 import com.c4cometrue.mystorage.domain.FileType;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class FolderGetDto {
 
 	public record Req(
-		@NotNull(message = "유저 ID는 Null이 될 수 없습니다.") Long userId,
-		@NotNull(message = "폴더 ID는 Null이 될 수 없습니다.") Long folderId
+		@NotNull(message = "유저 ID는 Null이 될 수 없습니다.") @Positive Long userId,
+		@NotNull(message = "폴더 ID는 Null이 될 수 없습니다.") @Positive Long folderId
 	) {
 	}
 

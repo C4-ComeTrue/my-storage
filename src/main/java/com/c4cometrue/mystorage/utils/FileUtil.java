@@ -64,7 +64,7 @@ public class FileUtil {
 			Files.createDirectory(destinationPath);
 		} catch (FileAlreadyExistsException ex) {
 			throw new BusinessException(ErrorCode.DUPLICATE_FOLDER, ex);
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			throw new BusinessException(ErrorCode.FOLDER_CREATE_FAILED, ex);
 		}
 	}

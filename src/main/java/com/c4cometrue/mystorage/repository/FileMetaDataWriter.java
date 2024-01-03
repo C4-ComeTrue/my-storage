@@ -1,6 +1,6 @@
 package com.c4cometrue.mystorage.repository;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,7 +9,7 @@ import com.c4cometrue.mystorage.domain.FileType;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 @Transactional
 public class FileMetaDataWriter {

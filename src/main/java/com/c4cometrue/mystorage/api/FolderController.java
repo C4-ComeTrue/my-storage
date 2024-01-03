@@ -24,14 +24,6 @@ public class FolderController {
 
 	private final FolderService folderService;
 
-	@PostMapping("/root")
-	@ResponseStatus(HttpStatus.CREATED)
-	public FolderUploadDto.Res createRootFolder(
-		@RequestBody @Valid FolderUploadDto.Req req
-	) {
-		return folderService.createRootFolder(req.userId(), req.name());
-	}
-
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public FolderUploadDto.Res createFolder(

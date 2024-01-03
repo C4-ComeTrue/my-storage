@@ -110,7 +110,7 @@ class FileServiceTest {
 		given(fileMetaDataReader.getRootFolder(anyLong())).willReturn(rootFolder);
 		given(fileMetaDataWriter.saveFileMetaData(any(), anyLong(), anyString(), any())).willReturn(fileMetaData);
 		given(fileMetaDataReader.isDuplicateFile(anyString(), anyLong(), any())).willReturn(false);
-		given(pathService.createUniqueFileName(anyString())).willReturn(uploadFileName);
+		given(pathService.createUniqueFileName()).willReturn(uploadFileName);
 		given(pathService.getFullFilePath(anyString(), anyString())).willReturn("C://");
 
 		// when
@@ -132,6 +132,7 @@ class FileServiceTest {
 		var fileMetaData = mock(FileMetaData.class);
 
 		given(fileMetaData.getUserId()).willReturn(1L);
+		given(fileMetaData.getFileType()).willReturn(FileType.FILE);
 		given(fileMetaDataReader.get(anyLong(), anyLong())).willReturn(fileMetaData);
 
 		// when + then
@@ -152,6 +153,7 @@ class FileServiceTest {
 
 		given(fileMetaData.getUserId()).willReturn(userId);
 		given(fileMetaData.getUploadName()).willReturn(fileName);
+		given(fileMetaData.getFileType()).willReturn(FileType.FILE);
 
 		given(fileMetaDataReader.get(anyLong(), anyLong())).willReturn(fileMetaData);
 		given(fileMetaDataReader.getRootFolder(anyLong())).willReturn(rootFolder);
@@ -180,6 +182,7 @@ class FileServiceTest {
 		given(fileMetaData.getUploadName()).willReturn(fileName);
 		given(fileMetaData.getType()).willReturn(contentType);
 		given(fileMetaData.getUserId()).willReturn(userId);
+		given(fileMetaData.getFileType()).willReturn(FileType.FILE);
 
 		given(fileMetaDataReader.get(anyLong(), anyLong())).willReturn(fileMetaData);
 		given(fileMetaDataReader.getRootFolder(anyLong())).willReturn(rootFolder);
@@ -208,6 +211,7 @@ class FileServiceTest {
 		var fileMetaData = mock(FileMetaData.class);
 
 		given(fileMetaData.getUserId()).willReturn(1L);
+		given(fileMetaData.getFileType()).willReturn(FileType.FILE);
 		given(fileMetaDataReader.get(anyLong(), anyLong())).willReturn(fileMetaData);
 
 		// when + then
@@ -227,6 +231,7 @@ class FileServiceTest {
 
 		given(fileMetaData.getUserId()).willReturn(userId);
 		given(fileMetaData.getUploadName()).willReturn(uploadName);
+		given(fileMetaData.getFileType()).willReturn(FileType.FILE);
 		given(fileMetaDataReader.get(anyLong(), anyLong())).willReturn(fileMetaData);
 
 		// when

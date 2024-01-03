@@ -36,29 +36,6 @@ class FolderControllerTest {
 	ObjectMapper mapper = new ObjectMapper();
 
 	@Test
-	void 루트_폴더를_생성한다() throws Exception {
-		// given
-		var userId = 1L;
-		var folderId = 1L;
-		var name = "name";
-
-		var response = new FolderUploadDto.Res(folderId);
-		var request = new FolderUploadDto.Req(null, userId, name);
-		given(folderService.createRootFolder(anyLong(), anyString())).willReturn(response);
-
-		// when + then
-		mockMvc.perform(
-				post("/v1/folders/root")
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(mapper.writeValueAsString(request))
-			)
-			.andExpectAll(
-				status().isCreated(),
-				jsonPath("$.id").value(folderId)
-			);
-	}
-
-	@Test
 	void 폴더를_생성한다() throws Exception {
 		// given
 		var userId = 1L;
@@ -137,7 +114,6 @@ class FolderControllerTest {
 				jsonPath("$.subFileList[0].fileName").value(fileName),
 				jsonPath("$.subFileList[0].fileType").value(FileType.FILE.name())
 			);
-
 	}
 
 }

@@ -20,6 +20,7 @@ import com.c4cometrue.mystorage.service.FileService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -32,7 +33,7 @@ public class FileController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public FileUploadDto.Response upload(
-		@RequestPart @NotNull MultipartFile file, long userId, long folderId
+		@RequestPart @NotNull MultipartFile file, @Positive long userId, @Positive long folderId
 	) {
 		return fileService.fileUpload(file, userId, folderId);
 	}

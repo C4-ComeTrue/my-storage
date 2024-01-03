@@ -30,7 +30,7 @@ public enum ErrorCode {
 	// folder-create
 	FOLDER_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "폴더 생성에 실패했습니다."),
 	DUPLICATE_FOLDER(HttpStatus.BAD_REQUEST, "이미 존재하는 이름의 폴더입니다."),
-	INVALID_FOLDER(HttpStatus.BAD_REQUEST, "폴더 형식이 아닙니다.");
+	INVALID_TYPE(HttpStatus.BAD_REQUEST, "잘못된 폴더/파일 형식입니다.");
 
 	private final HttpStatus httpStatus;
 

@@ -45,7 +45,7 @@ class PathServiceTest {
 
 		// then
 		assertThat(response)
-			.matches(path -> path.equals(baseDir + "/test/name"));
+			.matches(path -> path.equals(baseDir + "/test/ name"));
 
 	}
 }
