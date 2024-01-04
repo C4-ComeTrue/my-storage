@@ -1,8 +1,7 @@
-package com.c4cometrue.mystorage.metadata;
+package com.c4cometrue.mystorage.storage;
 
 import static com.c4cometrue.mystorage.TestConstants.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.util.List;
 
@@ -13,19 +12,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.c4cometrue.mystorage.TestConstants;
 import com.c4cometrue.mystorage.file.FileService;
 import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
 import com.c4cometrue.mystorage.file.dto.FileContent;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
 import com.c4cometrue.mystorage.folder.dto.FolderContent;
-import com.c4cometrue.mystorage.meta.StorageFacadeService;
 import com.c4cometrue.mystorage.util.PagingUtil;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("스토리지 파사드 서비스 테스트")
-public class StorageFacadeServiceTest {
+class StorageFacadeServiceTest {
 	@InjectMocks
 	private StorageFacadeService storageFacadeService;
 	@Mock

@@ -1,4 +1,4 @@
-package com.c4cometrue.mystorage.metadata;
+package com.c4cometrue.mystorage.storage;
 
 import static com.c4cometrue.mystorage.TestConstants.*;
 import static org.mockito.Mockito.*;
@@ -11,15 +11,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.folder.dto.FolderContentsRequest;
-import com.c4cometrue.mystorage.meta.MetadataController;
-import com.c4cometrue.mystorage.meta.StorageFacadeService;
-import com.c4cometrue.mystorage.meta.dto.DeleteFolderReq;
+import com.c4cometrue.mystorage.storage.dto.DeleteFolderReq;
 
 @DisplayName("메타데이터 컨트롤러 테스트")
 @ExtendWith(MockitoExtension.class)
-class MetadataControllerTest {
+class StorageControllerTest {
 	@InjectMocks
-	private MetadataController metadataController;
+	private StorageController storageController;
 
 	@Mock
 	private StorageFacadeService storageFacadeService;
@@ -27,14 +25,14 @@ class MetadataControllerTest {
 	@Test
 	@DisplayName("폴더 조회 컨트롤러 테스트")
 	void getContents() {
-		metadataController.getFolderContents(FolderContentsRequest.of(PARENT_ID, FOLDER_ID, USER_ID, null, true));
+		storageController.getFolderContents(FolderContentsRequest.of(PARENT_ID, FOLDER_ID, USER_ID, null, true));
 		verify(storageFacadeService, times(1)).getFolderContents(PARENT_ID, FOLDER_ID, USER_ID, null, true);
 	}
 
 	@Test
 	@DisplayName("폴더 삭제 컨트롤러 테스트")
 	void deleteFolderTest() {
-		metadataController.deleteFolder(DeleteFolderReq.of(FOLDER_ID, USER_ID));
+		storageController.deleteFolder(DeleteFolderReq.of(FOLDER_ID, USER_ID));
 
 		verify(storageFacadeService, times(1)).deleteFolderContents(FOLDER_ID, USER_ID);
 	}

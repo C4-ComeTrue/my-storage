@@ -2,7 +2,8 @@ package com.c4cometrue.mystorage.file;
 
 import java.util.UUID;
 
-import com.c4cometrue.mystorage.meta.MetadataType;
+import com.c4cometrue.mystorage.storage.MetadataType;
+import com.c4cometrue.mystorage.storage.Status;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,8 +37,8 @@ public class FileMetadata {
 	@Column(nullable = false)
 	private Long uploaderId;
 	private Long parentId;
-
-	private Boolean isDeleted;
+	@Enumerated(EnumType.STRING)
+	private Status status;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -52,7 +53,7 @@ public class FileMetadata {
 	}
 
 	public void deleteFile() {
-		this.isDeleted = true;
+		this.status = Status.DELETED;
 	}
 
 	@Builder
@@ -64,6 +65,6 @@ public class FileMetadata {
 		this.uploaderId = uploaderId;
 		this.parentId = parentId;
 		this.metadataType = MetadataType.FILE;
-		this.isDeleted = Boolean.FALSE;
+		this.status = Status.ACTIVE;
 	}
 }

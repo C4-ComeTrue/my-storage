@@ -3,14 +3,12 @@ package com.c4cometrue.mystorage.folder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
 import com.c4cometrue.mystorage.folder.dto.FolderContent;
-import com.c4cometrue.mystorage.util.FolderUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,7 +55,7 @@ public class FolderService {
 		validateBy(destinationFolderId, userId);
 
 		FolderMetadata folderMetadata = folderDataHandlerService.findBy(folderId, userId);
-		
+
 		folderMetadata.changeParentId(destinationFolderId);
 
 		folderDataHandlerService.persist(folderMetadata);
@@ -65,9 +63,8 @@ public class FolderService {
 	}
 
 	public void deleteFile(FolderMetadata folderMetadata) {
-		folderMetadata.deleteFile();
-
-		folderDataHandlerService.persist(folderMetadata);
+		folderMetadata.deleteFolder();
+		// folderDataHandlerService.persist(folderMetadata);
 	}
 
 	public List<FolderMetadata> findAllBy(Long parentId) {
