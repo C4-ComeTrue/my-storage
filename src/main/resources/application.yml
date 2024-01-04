@@ -6,7 +6,7 @@ spring:
     password: ab1010
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect

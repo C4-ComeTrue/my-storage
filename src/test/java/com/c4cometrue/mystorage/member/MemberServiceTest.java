@@ -12,9 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.exception.ServiceException;
 
-@DisplayName("MemberService 테스트")
+@DisplayName("맴버 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
+
 	@InjectMocks
 	private MemberService memberService;
 
@@ -22,24 +23,22 @@ class MemberServiceTest {
 	private MemberRepository memberRepository;
 
 	@Test
-	@DisplayName("맴버 등록 테스트")
-	void registerTest() {
-		String basePath = "mockBasePath";
-		when(Member.makeBasePath()).thenReturn(basePath);
-		when(memberRepository.existsByBasePath(basePath)).thenReturn(false);
+	@DisplayName("맴버 생성 테스트")
+	void registerMemberTest() {
+		Member member = Member.builder().basePath("testPath").build();
+		doReturn(member).when(memberRepository).save(any(Member.class));
+		doReturn(false).when(memberRepository).existsByBasePath(anyString());
 
-		memberService.register();
-
+		assertDoesNotThrow(() -> memberService.register());
 		verify(memberRepository, times(1)).save(any(Member.class));
 	}
 
 	@Test
-	@DisplayName("중복 맴버 등록 예외 테스트")
-	void registerDuplicateTest() {
-		String basePath = "mockBasePath";
-		when(Member.makeBasePath()).thenReturn(basePath);
-		when(memberRepository.existsByBasePath(basePath)).thenReturn(true);
+	@DisplayName("맴버 생성 실패 테스트 - 중복된 basePath")
+	void registerMemberFailTest() {
+		doReturn(true).when(memberRepository).existsByBasePath(anyString());
 
 		assertThrows(ServiceException.class, () -> memberService.register());
+		verify(memberRepository, never()).save(any(Member.class));
 	}
 }
