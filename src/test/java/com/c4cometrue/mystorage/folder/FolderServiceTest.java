@@ -1,6 +1,7 @@
 package com.c4cometrue.mystorage.folder;
 
 import static com.c4cometrue.mystorage.TestConstants.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
@@ -112,5 +114,16 @@ class FolderServiceTest {
 		given(folderDataHandlerService.findBy(FOLDER_ID, USER_ID)).willReturn(FOLDER_METADATA);
 		folderService.findBy(FOLDER_ID, USER_ID);
 		then(folderDataHandlerService).should(times(1)).findBy(FOLDER_ID, USER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 경로 조회")
+	void findPathTest() {
+		given(folderDataHandlerService.findPathBy()).willReturn(PARENT_PATH);
+
+		String actualPath = folderService.findPathBy();
+
+		assertThat(actualPath).isEqualTo(PARENT_PATH);
+		verify(folderDataHandlerService, times(1)).findPathBy();
 	}
 }

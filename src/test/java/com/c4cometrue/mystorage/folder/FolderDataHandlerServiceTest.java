@@ -3,6 +3,8 @@ package com.c4cometrue.mystorage.folder;
 import static com.c4cometrue.mystorage.TestConstants.*;
 
 import static java.lang.Boolean.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.c4cometrue.mystorage.exception.ServiceException;
 import com.c4cometrue.mystorage.util.PagingUtil;
@@ -27,6 +30,8 @@ class FolderDataHandlerServiceTest {
 
 	@Mock
 	private FolderRepository folderRepository;
+	@Value("${file.storage-path}")
+	private String STORAGE_PATH;
 
 	@Test
 	@DisplayName("부모 폴더 기반 경로 찾기")
@@ -171,4 +176,19 @@ class FolderDataHandlerServiceTest {
 		verify(folderRepository, times(1)).save(FOLDER_METADATA);
 	}
 
+	@Test
+	@DisplayName("경로 조회 테스트")
+	void findPathTest() {
+		String actualPath = folderDataHandlerService.findPathBy();
+
+		assertThat(actualPath).isEqualTo(STORAGE_PATH);
+	}
+
+	@Test
+	@DisplayName("폴더 리스트 조회")
+	void findAllTest() {
+		given(folderRepository.findAllByParentId(PARENT_ID)).willReturn(List.of(FOLDER_METADATA));
+		folderDataHandlerService.findAllBy(PARENT_ID);
+		then(folderRepository).should(times(1)).findAllByParentId(PARENT_ID);
+	}
 }

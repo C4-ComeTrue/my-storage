@@ -31,7 +31,7 @@ public class FolderService {
 		folderDataHandlerService.changeFolderNameBy(folderName, folderId, userId);
 	}
 
-	public String findPathBy(Long parentId, Long userId) {
+	private String findPathBy(Long parentId, Long userId) {
 		return folderDataHandlerService.findPathBy(parentId, userId);
 	}
 

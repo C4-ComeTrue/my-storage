@@ -15,14 +15,14 @@ import lombok.RequiredArgsConstructor;
 public class FolderDataHandlerService {
 	private final FolderRepository folderRepository;
 	@Value("${file.storage-path}")
-	private String storagePath;
+	private String STORAGE_PATH;
 
 	public String findPathBy() {
-		return storagePath;
+		return STORAGE_PATH;
 	}
 
 	public String findPathBy(Long parentId, Long userId) {
-		return parentId == null ? storagePath : findBy(parentId, userId).getFilePath();
+		return parentId == null ? STORAGE_PATH : findBy(parentId, userId).getFilePath();
 	}
 
 	// 자신의 폴더나 null 밑에서만 폴더를 만들수 있어야 한다
@@ -51,6 +51,7 @@ public class FolderDataHandlerService {
 
 	public void changeFolderNameBy(String folderName, Long folderId, Long userId) {
 		validateFolderOwnershipBy(folderId, userId);
+		checkDuplicateBy(folderName, folderId, userId);
 		changeFolderName(folderName, folderId, userId);
 	}
 
