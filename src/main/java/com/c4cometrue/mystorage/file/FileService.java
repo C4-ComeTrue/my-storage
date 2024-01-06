@@ -23,13 +23,12 @@ public class FileService {
 	private final FileDataHandlerService fileDataHandlerService;
 	private final FolderService folderService;
 
+
 	@Value("${file.buffer}")
 	private int bufferSize;
-	// Todo
-	// basePath 이러고 있는 데 findPathBy 로 유저id 만 넘길거다
-	// init controller 를 도입 해서
+
 	public void uploadFile(MultipartFile file, Long userId, Long parentId) {
-		String basePath = folderService.findPathBy(parentId, userId);
+		String basePath = folderService.findPathBy();
 
 		String originalFileName = file.getOriginalFilename();
 		fileDataHandlerService.duplicateBy(parentId, userId, originalFileName);

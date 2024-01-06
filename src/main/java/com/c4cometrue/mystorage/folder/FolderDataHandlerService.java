@@ -17,6 +17,10 @@ public class FolderDataHandlerService {
 	@Value("${file.storage-path}")
 	private String storagePath;
 
+	public String findPathBy() {
+		return storagePath;
+	}
+
 	public String findPathBy(Long parentId, Long userId) {
 		return parentId == null ? storagePath : findBy(parentId, userId).getFilePath();
 	}

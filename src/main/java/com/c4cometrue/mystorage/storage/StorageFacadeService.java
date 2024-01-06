@@ -68,6 +68,6 @@ public class StorageFacadeService {
 		fileService.findAllBy(folderMetadata.getParentId())
 			.forEach(FileMetadata::deleteFile);
 		// 현재 폴더 약한 삭제
-		folderService.deleteFile(folderMetadata);
+		folderService.deleteFolder(folderMetadata);
 	}
 }

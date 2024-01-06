@@ -94,7 +94,7 @@ class FolderServiceTest {
 	@DisplayName("소프트 딜리트")
 	void softDeleteTest() {
 		FolderMetadata mockFolderMetadata = FOLDER_METADATA;
-		folderService.deleteFile(mockFolderMetadata);
+		folderService.deleteFolder(mockFolderMetadata);
 		Assertions.assertEquals(Status.DELETED, mockFolderMetadata.getStatus());
 	}
 

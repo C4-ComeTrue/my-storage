@@ -20,12 +20,11 @@ public class FolderService {
 	// 부모 폴더는 null 이 될 수 있다
 	public void createBy(Long userId, String userFolderName, Long parentId) {
 		String storedFolderName = FolderMetadata.storedName(userFolderName);
-		String parentPath = findPathBy(parentId, userId);
+		String parentPath = folderDataHandlerService.findPathBy(parentId, userId);
 
 		Path path = Paths.get(parentPath, storedFolderName);
 
 		folderDataHandlerService.persist(userFolderName, storedFolderName, path.toString(), userId, parentId);
-		// FolderUtil.createFolder(path);
 	}
 
 	public void changeFolderNameBy(String folderName, Long folderId, Long userId) {
@@ -34,6 +33,10 @@ public class FolderService {
 
 	public String findPathBy(Long parentId, Long userId) {
 		return folderDataHandlerService.findPathBy(parentId, userId);
+	}
+
+	public String findPathBy() {
+		return folderDataHandlerService.findPathBy();
 	}
 
 	public CursorFolderResponse getFolders(Long parentId, Long cursorId, Long userId, Pageable page) {
@@ -62,9 +65,8 @@ public class FolderService {
 
 	}
 
-	public void deleteFile(FolderMetadata folderMetadata) {
+	public void deleteFolder(FolderMetadata folderMetadata) {
 		folderMetadata.deleteFolder();
-		// folderDataHandlerService.persist(folderMetadata);
 	}
 
 	public List<FolderMetadata> findAllBy(Long parentId) {
