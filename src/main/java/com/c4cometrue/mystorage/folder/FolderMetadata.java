@@ -2,7 +2,8 @@ package com.c4cometrue.mystorage.folder;
 
 import java.util.UUID;
 
-import com.c4cometrue.mystorage.meta.MetadataType;
+import com.c4cometrue.mystorage.storage.MetadataType;
+import com.c4cometrue.mystorage.storage.Status;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +38,9 @@ public class FolderMetadata {
 	@Column(nullable = false)
 	private Long uploaderId;
 
+	@Enumerated(EnumType.STRING)
+	private Status status;
+
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private MetadataType metadataType;
@@ -49,6 +53,14 @@ public class FolderMetadata {
 		this.originalFolderName = userFolderName;
 	}
 
+	public void changeParentId(Long parentId) {
+		this.parentId = parentId;
+	}
+
+	public void deleteFolder() {
+		this.status = Status.DELETED;
+	}
+
 	@Builder
 	public FolderMetadata(String originalFolderName, String storedFolderName, Long parentId, String filePath,
 		Long uploaderId) {
@@ -58,5 +70,6 @@ public class FolderMetadata {
 		this.filePath = filePath;
 		this.uploaderId = uploaderId;
 		this.metadataType = MetadataType.FOLDER;
+		this.status = Status.ACTIVE;
 	}
 }

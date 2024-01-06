@@ -41,7 +41,7 @@ public class TestConstants {
 	public static final String STORED_FOLDER_NAME = "폴더@";
 	public static final String PARENT_PATH = FolderMetadata.storedName(USER_PATH);
 	public static final Path FOLDER_PATH = Paths.get(PARENT_PATH, STORED_FOLDER_NAME);
-	public static final FolderMetadata FOLDER_METADATA = FolderMetadata.builder().build();
+	public static final FolderMetadata FOLDER_METADATA = FolderMetadata.builder().parentId(PARENT_ID).build();
 
 	public static final Long FOLDER_ID = 1L;
 

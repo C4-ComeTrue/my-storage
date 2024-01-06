@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.c4cometrue.mystorage.folder.dto.FolderCreateRequest;
+import com.c4cometrue.mystorage.folder.dto.FolderMoveReq;
 import com.c4cometrue.mystorage.folder.dto.FolderNameChangeRequest;
 
 import jakarta.validation.Valid;
@@ -29,5 +30,11 @@ public class FolderController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void changeFolderNameBy(@Valid FolderNameChangeRequest req) {
 		folderService.changeFolderNameBy(req.folderName(), req.folderId(), req.userId());
+	}
+
+	@PostMapping("/move")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void moveFolder(FolderMoveReq req) {
+		folderService.moveFolder(req.folderId(), req.userId(), req.destinationFolderId());
 	}
 }

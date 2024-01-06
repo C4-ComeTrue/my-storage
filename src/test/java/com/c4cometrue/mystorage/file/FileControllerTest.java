@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.c4cometrue.mystorage.file.dto.FileDeleteRequest;
 import com.c4cometrue.mystorage.file.dto.FileDownloadRequest;
+import com.c4cometrue.mystorage.file.dto.FileMoveReq;
 import com.c4cometrue.mystorage.file.dto.FileUploadRequest;
 
 @DisplayName("파일 컨트롤러 테스트")
@@ -46,5 +47,12 @@ class FileControllerTest {
 	void uploadFileTest() {
 		fileController.uploadFile(FileUploadRequest.of(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID));
 		verify(fileService, times(1)).uploadFile(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID);
+	}
+
+	@Test
+	@DisplayName("파일 이동 테스트")
+	void moveFileTest() {
+		fileController.moveFile(FileMoveReq.of(USER_ID, FILE_ID, FOLDER_ID));
+		verify(fileService, times(1)).moveFile(USER_ID, FILE_ID, FOLDER_ID);
 	}
 }
