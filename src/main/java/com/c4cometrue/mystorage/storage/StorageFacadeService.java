@@ -12,6 +12,7 @@ import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
 import com.c4cometrue.mystorage.storage.dto.CursorMetaRes;
 import com.c4cometrue.mystorage.util.PagingUtil;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
