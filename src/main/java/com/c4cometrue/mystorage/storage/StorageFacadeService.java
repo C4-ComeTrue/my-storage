@@ -51,6 +51,7 @@ public class StorageFacadeService {
 		return CursorMetaRes.of(CursorFolderResponse.of(null, false), cursorFileResponse);
 	}
 
+	@Transactional
 	public void deleteFolderContents(long folderId, long userId) {
 		// 유효성 검사
 		folderService.validateBy(folderId, userId);
@@ -61,7 +62,7 @@ public class StorageFacadeService {
 	}
 
 	// softDelete
-	public void deleteFolderContents(FolderMetadata folderMetadata) {
+	private void deleteFolderContents(FolderMetadata folderMetadata) {
 		// 하위 폴더 재귀적으로 약한 삭제
 		folderService.findAllBy(folderMetadata.getId())
 			.forEach(this::deleteFolderContents);
