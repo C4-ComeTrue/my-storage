@@ -2,6 +2,7 @@ package com.c4cometrue.mystorage.file;
 
 import java.util.UUID;
 
+import com.c4cometrue.mystorage.storage.MetadataBaseEntity;
 import com.c4cometrue.mystorage.storage.MetadataType;
 import com.c4cometrue.mystorage.storage.Status;
 
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "file_metadata", indexes = @Index(name = "index_parentId", columnList = "parentId"))
-public class FileMetadata {
+public class FileMetadata extends MetadataBaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

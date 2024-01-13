@@ -2,6 +2,7 @@ package com.c4cometrue.mystorage.folder;
 
 import java.util.UUID;
 
+import com.c4cometrue.mystorage.storage.MetadataBaseEntity;
 import com.c4cometrue.mystorage.storage.MetadataType;
 import com.c4cometrue.mystorage.storage.Status;
 
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = @Index(name = "idx_folder_meta", columnList = "parentId, uploaderId, originalFolderName"))
-public class FolderMetadata {
+public class FolderMetadata extends MetadataBaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
