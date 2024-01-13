@@ -1,10 +1,7 @@
 package com.c4cometrue.mystorage.service;
 
 import java.io.IOException;
-import java.util.Objects;
-import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,58 +12,57 @@ import com.c4cometrue.mystorage.api.dto.FileUploadDto;
 import com.c4cometrue.mystorage.common.exception.BusinessException;
 import com.c4cometrue.mystorage.common.exception.ErrorCode;
 import com.c4cometrue.mystorage.domain.FileMetaData;
-import com.c4cometrue.mystorage.repository.FileMetaDataRepository;
+import com.c4cometrue.mystorage.domain.FileType;
+import com.c4cometrue.mystorage.repository.FileMetaDataReader;
+import com.c4cometrue.mystorage.repository.FileMetaDataWriter;
 import com.c4cometrue.mystorage.utils.FileUtil;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class FileService {
 
-	private final FileMetaDataRepository fileMetaDataRepository;
-
 	private final FileUtil fileUtil;
+	private final PathService pathService;
+	private final FileMetaDataReader fileMetaDataReader;
+	private final FileMetaDataWriter fileMetaDataWriter;
 
-	@Value("${file.upload-dir}")
-	private String uploadDir;
-
-	/**
-	 * 파일 업로드
-	 * @param file
-	 * @param userId
-	 * @return fileId, userId, uploadFilePath, fileSize
-	 */
-	public FileUploadDto.Response fileUpload(MultipartFile file, long userId) {
-		if (Objects.isNull(file) || file.isEmpty()) {
+	@Transactional
+	public FileUploadDto.Response fileUpload(MultipartFile file, long userId, long folderId) {
+		if (file.isEmpty()) {
 			throw new BusinessException(ErrorCode.FILE_EMPTY);
 		}
 
-		String originName = file.getOriginalFilename();
-		if (isDuplicateFile(originName, userId)) {
-			throw new BusinessException(ErrorCode.DUPLICATE_FILE);
-		}
+		FileMetaData rootFolder = fileMetaDataReader.getRootFolder(userId);
+		FileMetaData parentFolder = getParentFolder(rootFolder, userId, folderId);
 
-		String uploadFilePath = getFullUploadFilePath(originName);
-		FileMetaData fileMetaData = saveFileMetaData(file, userId, uploadFilePath);
+		// 이미 같은 폴더 아래에 파일이 존재하는지 확인
+		validateDuplicateFile(file.getOriginalFilename(), userId, parentFolder);
 
-		fileUtil.uploadFile(file, uploadFilePath);
+		// 파일 메타데이터 저장
+		String uploadFileName = pathService.createUniqueFileName();
+		FileMetaData fileMetaData = fileMetaDataWriter.saveFileMetaData(
+			file, userId, uploadFileName, parentFolder
+		);
+
+		// 실제 물리 파일 저장
+		String uploadFullPath = pathService.getFullFilePath(rootFolder.getFileName(), uploadFileName);
+		fileUtil.uploadFile(file, uploadFullPath);
 		return new FileUploadDto.Response(fileMetaData);
 	}
 
-	/**
-	 * 파일 다운로드
-	 * @param userId
-	 * @param fileId
-	 * @return fileContentByteArray, FileContentType
-	 */
 	@Transactional(readOnly = true)
 	public FileDownloadDto.Response fileDownLoad(long userId, long fileId) {
-		FileMetaData fileMetaData = getFileMetaData(fileId);
+		// 파일 유효성 검증
+		FileMetaData fileMetaData = getFile(userId, fileId);
 		validateFileAccess(userId, fileMetaData.getUserId());
 
-		Resource file = fileUtil.downloadFile(fileMetaData.getUploadName());
+		// 루트 파일 아래에 저장되어 있는 파일 다운로드
+		FileMetaData root = fileMetaDataReader.getRootFolder(userId);
+		String uploadFilePath = pathService.getFullFilePath(root.getFileName(), fileMetaData.getUploadName());
+		Resource file = fileUtil.downloadFile(uploadFilePath);
+
 		try {
 			return new FileDownloadDto.Response(
 				new FileDownloadDto.Bytes(file.getContentAsByteArray()),
@@ -78,42 +74,31 @@ public class FileService {
 		}
 	}
 
-	/**
-	 * 파일 삭제
-	 * @param fileId
-	 * @param userId
-	 */
+	@Transactional
 	public void fileDelete(long userId, long fileId) {
-		FileMetaData fileMetaData = getFileMetaData(fileId);
+		FileMetaData fileMetaData = getFile(userId, fileId);
 		validateFileAccess(userId, fileMetaData.getUserId());
-		fileMetaDataRepository.delete(fileMetaData);
 		fileUtil.deleteFile(fileMetaData.getUploadName());
+		fileMetaDataWriter.delete(fileMetaData);
 	}
 
-	private boolean isDuplicateFile(String fileName, long userId) {
-		return fileMetaDataRepository.existsByFileNameAndUserId(fileName, userId);
+	private FileMetaData getParentFolder(FileMetaData root, long userId, long folderId) {
+		if (root.getId() != folderId) {
+			FileMetaData folder = fileMetaDataReader.get(folderId, userId);
+			if (folder.getFileType() != FileType.FOLDER) {
+				throw new BusinessException(ErrorCode.INVALID_TYPE);
+			}
+			return folder;
+		}
+		return root;
 	}
 
-	private String getFullUploadFilePath(String originalFileName) {
-		String uploadName = UUID.randomUUID() + originalFileName;
-		return uploadDir + uploadName;
-	}
-
-	private FileMetaData saveFileMetaData(MultipartFile file, long userId, String uploadFileName) {
-		FileMetaData fileMetaData = FileMetaData.builder()
-			.userId(userId)
-			.fileName(file.getOriginalFilename())
-			.uploadName(uploadFileName)
-			.size(file.getSize())
-			.type(file.getContentType())
-			.build();
-
-		return fileMetaDataRepository.save(fileMetaData);
-	}
-
-	private FileMetaData getFileMetaData(long fileId) {
-		return fileMetaDataRepository.findById(fileId).orElseThrow(
-			() -> new BusinessException(ErrorCode.FILE_NOT_FOUND));
+	private FileMetaData getFile(long userId, long fileId) {
+		FileMetaData file = fileMetaDataReader.get(fileId, userId);
+		if (file.getFileType() != FileType.FILE) {
+			throw new BusinessException(ErrorCode.INVALID_TYPE);
+		}
+		return file;
 	}
 
 	private void validateFileAccess(long userId, long fileUserId) {
@@ -122,4 +107,9 @@ public class FileService {
 		}
 	}
 
+	private void validateDuplicateFile(String fileName, long userId, FileMetaData parent) {
+		if (fileMetaDataReader.isDuplicateFile(fileName, userId, parent)) {
+			throw new BusinessException(ErrorCode.DUPLICATE_FILE);
+		}
+	}
 }

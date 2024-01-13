@@ -1,6 +1,7 @@
 package com.c4cometrue.mystorage.utils;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -53,6 +54,18 @@ public class FileUtil {
 			Files.delete(destinationPath);
 		} catch (IOException ex) {
 			throw new BusinessException(ErrorCode.FILE_DELETE_FAILED, ex);
+		}
+	}
+
+	public void createFolder(String folderPath) {
+		Path destinationPath = Path.of(folderPath).normalize();
+
+		try {
+			Files.createDirectory(destinationPath);
+		} catch (FileAlreadyExistsException ex) {
+			throw new BusinessException(ErrorCode.DUPLICATE_FOLDER, ex);
+		} catch (Exception ex) {
+			throw new BusinessException(ErrorCode.FOLDER_CREATE_FAILED, ex);
 		}
 	}
 

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -142,6 +143,32 @@ class FileUtilTest {
 
 		// then
 		assertEquals(ErrorCode.FILE_DELETE_FAILED, ex.getErrorCode());
+	}
+
+	@Test
+	void 폴더_생성_과정에서_이미_존재한다면_생성이_실패한다() {
+		// given
+		fileMockedStatic.when(() -> Files.createDirectory(any())).thenThrow(FileAlreadyExistsException.class);
+
+		// when
+		var ex = assertThrows(BusinessException.class,
+			() -> fileUtil.createFolder(fileUploadPath));
+
+		// then
+		assertEquals(ErrorCode.DUPLICATE_FOLDER, ex.getErrorCode());
+	}
+
+	@Test
+	void 폴더_생성_과정에서_문제가_발생하면_생성이_실패한다() {
+		// given
+		fileMockedStatic.when(() -> Files.createDirectory(any())).thenThrow(IOException.class);
+
+		// when
+		var ex = assertThrows(BusinessException.class,
+			() -> fileUtil.createFolder(fileUploadPath));
+
+		// then
+		assertEquals(ErrorCode.FOLDER_CREATE_FAILED, ex.getErrorCode());
 	}
 
 }

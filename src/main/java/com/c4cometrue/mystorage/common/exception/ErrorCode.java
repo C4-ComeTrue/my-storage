@@ -13,6 +13,7 @@ public enum ErrorCode {
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류입니다."),
 	BAD_REQUEST_ERROR(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
 	FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "파일이 존재하지 않습니다."),
+	FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, "폴더가 존재하지 않습니다."),
 
 	// file-upload
 	FILE_EMPTY(HttpStatus.BAD_REQUEST, "업로드할 파일이 없습니다."),
@@ -24,7 +25,12 @@ public enum ErrorCode {
 	FILE_DOWNLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 다운로드에 실패했습니다."),
 
 	// file-delete
-	FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패했습니다.");
+	FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패했습니다."),
+
+	// folder-create
+	FOLDER_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "폴더 생성에 실패했습니다."),
+	DUPLICATE_FOLDER(HttpStatus.BAD_REQUEST, "이미 존재하는 이름의 폴더입니다."),
+	INVALID_TYPE(HttpStatus.BAD_REQUEST, "잘못된 폴더/파일 형식입니다.");
 
 	private final HttpStatus httpStatus;
 

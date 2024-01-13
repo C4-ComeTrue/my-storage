@@ -19,6 +19,8 @@ import com.c4cometrue.mystorage.api.dto.FileUploadDto;
 import com.c4cometrue.mystorage.service.FileService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,9 +33,9 @@ public class FileController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public FileUploadDto.Response upload(
-		@RequestPart MultipartFile file, long userId
+		@RequestPart @NotNull MultipartFile file, @Positive long userId, @Positive long folderId
 	) {
-		return fileService.fileUpload(file, userId);
+		return fileService.fileUpload(file, userId, folderId);
 	}
 
 	@GetMapping
