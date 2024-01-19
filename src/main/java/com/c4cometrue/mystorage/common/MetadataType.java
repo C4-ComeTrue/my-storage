@@ -1,4 +1,4 @@
-package com.c4cometrue.mystorage.storage;
+package com.c4cometrue.mystorage.common;
 
 
 public enum MetadataType {

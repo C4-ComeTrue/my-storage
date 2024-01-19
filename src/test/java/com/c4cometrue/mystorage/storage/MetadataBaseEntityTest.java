@@ -7,6 +7,9 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.c4cometrue.mystorage.common.MetadataBaseEntity;
+
 @DisplayName("베이스엔티티 테스트")
 class MetadataBaseEntityTest {
 

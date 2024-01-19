@@ -66,8 +66,9 @@ public class FolderService {
 	}
 
 	public void deleteFolder(FolderMetadata folderMetadata) {
-		folderMetadata.deleteFolder();
+		folderDataHandlerService.delete(folderMetadata);
 	}
+
 
 	public List<FolderMetadata> findAllBy(Long parentId) {
 		return folderDataHandlerService.findAllBy(parentId);

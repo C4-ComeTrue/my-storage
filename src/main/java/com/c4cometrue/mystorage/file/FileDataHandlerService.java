@@ -55,4 +55,8 @@ public class FileDataHandlerService {
 	public List<FileMetadata> findAllBy(Long parentId) {
 		return fileRepository.findAllByParentId(parentId);
 	}
+
+	public void deleteAll(List<FileMetadata> fileMetadataList) {
+		fileRepository.deleteAll(fileMetadataList);
+	}
 }

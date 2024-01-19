@@ -7,17 +7,14 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
-import com.c4cometrue.mystorage.storage.Status;
 import com.c4cometrue.mystorage.util.PagingUtil;
 
 @DisplayName("폴더 서비스 테스트")
@@ -90,14 +87,6 @@ class FolderServiceTest {
 		verify(folderDataHandlerService).validateFolderOwnershipBy(destinationFolderID, USER_ID);
 
 		verify(folderDataHandlerService).findBy(FOLDER_ID, USER_ID);
-	}
-
-	@Test
-	@DisplayName("소프트 딜리트")
-	void softDeleteTest() {
-		FolderMetadata mockFolderMetadata = FOLDER_METADATA;
-		folderService.deleteFolder(mockFolderMetadata);
-		Assertions.assertEquals(Status.DELETED, mockFolderMetadata.getStatus());
 	}
 
 	@Test

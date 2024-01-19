@@ -88,4 +88,8 @@ public class FolderDataHandlerService {
 	public List<FolderMetadata> findAllBy(Long parentId) {
 		return folderRepository.findAllByParentId(parentId);
 	}
+
+	public void delete(FolderMetadata folderMetadata) {
+		folderRepository.delete(folderMetadata);
+	}
 }

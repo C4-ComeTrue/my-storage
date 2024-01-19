@@ -1,8 +1,13 @@
 package com.c4cometrue.mystorage.storage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.c4cometrue.mystorage.deletedmetadata.DeleteMetadataService;
+import com.c4cometrue.mystorage.deletedmetadata.DeletedMetadata;
 import com.c4cometrue.mystorage.file.FileMetadata;
 import com.c4cometrue.mystorage.file.FileService;
 import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
@@ -20,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class StorageFacadeService {
 	private final FolderService folderService;
 	private final FileService fileService;
+	private final DeleteMetadataService deleteMetadataService;
 
 	public CursorMetaRes getFolderContents(Long parentId, Long cursorId, Long userId, Integer size,
 		boolean cursorFlag) {
@@ -63,13 +69,53 @@ public class StorageFacadeService {
 
 	// softDelete
 	private void deleteFolderContents(FolderMetadata folderMetadata) {
-		// 하위 폴더 재귀적으로 약한 삭제
-		folderService.findAllBy(folderMetadata.getId())
-			.forEach(this::deleteFolderContents);
-		// 폴더에 속한 파일 약한 삭제
-		fileService.findAllBy(folderMetadata.getParentId())
-			.forEach(FileMetadata::deleteFile);
-		// 현재 폴더 약한 삭제
+		// 삭제 할 폴더리스트 조회
+		List<FolderMetadata> folderMetadataList = folderService.findAllBy(folderMetadata.getId());
+		// 삭제 할 파일리스트 조회
+		List<FileMetadata> fileMetadataList = fileService.findAllBy(folderMetadata.getId());
+
+		List<DeletedMetadata> deletedMetadataList = new ArrayList<>(
+			createDeletedMetadata(folderMetadataList, fileMetadataList));
+
+		// 삭제 메타베이스로 삭제할 파일,폴더 이관
+		// 삭제 메타베이스는 실제 hardDelete 수행되는 파일만 저장된다
+		deleteMetadataService.persist(deletedMetadataList);
+
+		// 파일 일괄 삭제 softDelete
+		fileService.deleteAll(fileMetadataList);
+		// 재귀적으로 폴더 삭제
+		folderMetadataList.forEach(this::deleteFolderContents);
+
 		folderService.deleteFolder(folderMetadata);
+	}
+
+	private List<DeletedMetadata> createDeletedMetadata(List<FolderMetadata> folderMetadataList,
+		List<FileMetadata> fileMetadataList) {
+		List<DeletedMetadata> deletedMetadataList = new ArrayList<>();
+		deletedMetadataList.addAll(createDeletedMetadataByFolders(folderMetadataList));
+		deletedMetadataList.addAll(createDeletedMetadataByFiles(fileMetadataList));
+		return deletedMetadataList;
+	}
+
+	private List<DeletedMetadata> createDeletedMetadataByFolders(List<FolderMetadata> folderMetadataList) {
+		return folderMetadataList.stream()
+			.map(metadata -> DeletedMetadata.builder()
+				.userId(metadata.getUploaderId())
+				.parentId(metadata.getParentId())
+				.type(metadata.getMetadataType())
+				.filePath(metadata.getFilePath())
+				.build())
+			.toList();
+	}
+
+	private List<DeletedMetadata> createDeletedMetadataByFiles(List<FileMetadata> fileMetadataList) {
+		return fileMetadataList.stream()
+			.map(metadata -> DeletedMetadata.builder()
+				.userId(metadata.getUploaderId())
+				.parentId(metadata.getParentId())
+				.type(metadata.getMetadataType())
+				.filePath(metadata.getFilePath())
+				.build())
+			.toList();
 	}
 }

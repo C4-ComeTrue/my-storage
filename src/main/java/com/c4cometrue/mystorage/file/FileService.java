@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.RequestPath;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +16,8 @@ import com.c4cometrue.mystorage.file.dto.FileContent;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.util.FileUtil;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -87,13 +91,11 @@ public class FileService {
 		fileDataHandlerService.persist(fileMetadata);
 	}
 
-	// 소프트 딜리트
-	public void deleteFile(FileMetadata fileMetadata) {
-		fileMetadata.deleteFile();
-		fileDataHandlerService.persist(fileMetadata);
-	}
-
 	public List<FileMetadata> findAllBy(Long parentId) {
 		return fileDataHandlerService.findAllBy(parentId);
+	}
+
+	public void deleteAll(List<FileMetadata> fileMetadataList) {
+		fileDataHandlerService.deleteAll(fileMetadataList);
 	}
 }
