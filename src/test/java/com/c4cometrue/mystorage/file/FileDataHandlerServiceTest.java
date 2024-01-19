@@ -117,4 +117,29 @@ class FileDataHandlerServiceTest {
 
 		assertThrows(ServiceException.class, () -> fileDataHandlerService.duplicateBy(PARENT_ID, USER_ID, ORIGINAL_FILE_NAME));
 	}
+
+	@Test
+	@DisplayName("부모 ID로 파일 조회 테스트")
+	void findAllByTest() {
+		List<FileMetadata> expectedFileMetadata = List.of(FILE_METADATA);
+		when(fileRepository.findAllByParentId(PARENT_ID)).thenReturn(expectedFileMetadata);
+
+		// When
+		List<FileMetadata> actualFileMetadata = fileRepository.findAllByParentId(PARENT_ID);
+
+		// Then
+		assertEquals(expectedFileMetadata, actualFileMetadata);
+		verify(fileRepository, times(1)).findAllByParentId(PARENT_ID);
+	}
+
+	@Test
+	@DisplayName("파일 일괄 삭제 테스트")
+	void deleteAllTest() {
+		List<FileMetadata> fileMetadataList = List.of(FILE_METADATA);
+		doNothing().when(fileRepository).deleteAll(fileMetadataList);
+
+		fileRepository.deleteAll(fileMetadataList);
+
+		verify(fileRepository, times(1)).deleteAll(fileMetadataList);
+	}
 }

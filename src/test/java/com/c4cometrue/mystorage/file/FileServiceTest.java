@@ -153,4 +153,27 @@ class FileServiceTest {
 
 		verify(fileDataHandlerService).findBy(FILE_ID, USER_ID);
 	}
+
+	@Test
+	@DisplayName("파일 리스트 조회 테스트")
+	void findAllByTest() {
+		List<FileMetadata> expectedFileMetadataList = List.of(FILE_METADATA);
+		when(fileDataHandlerService.findAllBy(PARENT_ID)).thenReturn(expectedFileMetadataList);
+
+		List<FileMetadata> actualFileMetadataList = fileService.findAllBy(PARENT_ID);
+
+		assertEquals(expectedFileMetadataList, actualFileMetadataList);
+		verify(fileDataHandlerService, times(1)).findAllBy(PARENT_ID);
+	}
+
+	@Test
+	@DisplayName("파일 삭제 테스트")
+	void deleteAllTest() {
+		List<FileMetadata> fileMetadataList = List.of(FILE_METADATA);
+		doNothing().when(fileDataHandlerService).deleteAll(fileMetadataList);
+
+		fileService.deleteAll(fileMetadataList);
+
+		verify(fileDataHandlerService, times(1)).deleteAll(fileMetadataList);
+	}
 }

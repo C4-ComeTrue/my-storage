@@ -27,7 +27,4 @@ public interface FileRepository extends JpaRepository<FileMetadata, Long> {
 	Boolean existsByParentIdAndUploaderIdAndIdLessThan(Long parentId, Long uploaderId, Long id);
 
 	List<FileMetadata> findAllByParentId(Long parentId);
-	@Query("SELECT m.status "
-		+ "FROM FileMetadata m ")
-	List<FileMetadata> findAllWithCursor(Long cursorId, Pageable pageable);
 }

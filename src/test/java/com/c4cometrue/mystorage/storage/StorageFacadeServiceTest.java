@@ -3,6 +3,8 @@ package com.c4cometrue.mystorage.storage;
 import static com.c4cometrue.mystorage.TestConstants.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -12,9 +14,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.c4cometrue.mystorage.deletedmetadata.DeleteMetadataService;
+import com.c4cometrue.mystorage.file.FileMetadata;
 import com.c4cometrue.mystorage.file.FileService;
 import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
 import com.c4cometrue.mystorage.file.dto.FileContent;
+import com.c4cometrue.mystorage.folder.FolderMetadata;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
 import com.c4cometrue.mystorage.folder.dto.FolderContent;
@@ -29,6 +34,8 @@ class StorageFacadeServiceTest {
 	private FolderService folderService;
 	@Mock
 	private FileService fileService;
+	@Mock
+	private DeleteMetadataService deleteMetadataService;
 	@Test
 	@DisplayName("폴더조회테스트 flag가 true 일때")
 	void getFolderContentsTrueTest() {
@@ -56,5 +63,16 @@ class StorageFacadeServiceTest {
 		storageFacadeService.getFolderContents(PARENT_ID, FOLDER_ID, USER_ID, 10, false);
 
 		verify(fileService, times(1)).getFiles(PARENT_ID, FILE_ID, USER_ID, PagingUtil.createPageable(10));
+	}
+	@Test
+	@DisplayName("폴더 삭제 테스트")
+	void deleteFolderContentsTest() {
+		doNothing().when(folderService).validateBy(FOLDER_ID, USER_ID);
+		when(folderService.findBy(FOLDER_ID, USER_ID)).thenReturn(FOLDER_METADATA);
+
+		storageFacadeService.deleteFolderContents(FOLDER_ID, USER_ID);
+
+		verify(folderService).validateBy(FOLDER_ID, USER_ID);
+		verify(folderService).findBy(FOLDER_ID, USER_ID);
 	}
 }

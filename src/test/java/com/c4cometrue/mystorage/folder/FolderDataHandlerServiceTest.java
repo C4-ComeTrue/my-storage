@@ -185,10 +185,20 @@ class FolderDataHandlerServiceTest {
 	}
 
 	@Test
-	@DisplayName("폴더 리스트 조회")
+	@DisplayName("폴더 리스트 조회 테스트")
 	void findAllTest() {
 		given(folderRepository.findAllByParentId(PARENT_ID)).willReturn(List.of(FOLDER_METADATA));
 		folderDataHandlerService.findAllBy(PARENT_ID);
 		then(folderRepository).should(times(1)).findAllByParentId(PARENT_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 삭제 테스트")
+	void deleteFolderTest() {
+		doNothing().when(folderRepository).delete(FOLDER_METADATA);
+
+		folderDataHandlerService.delete(FOLDER_METADATA);
+
+		verify(folderRepository, times(1)).delete(FOLDER_METADATA);
 	}
 }

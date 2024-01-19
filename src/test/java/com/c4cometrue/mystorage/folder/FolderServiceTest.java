@@ -106,7 +106,7 @@ class FolderServiceTest {
 	}
 
 	@Test
-	@DisplayName("폴더 경로 조회")
+	@DisplayName("폴더 경로 조회 테스트")
 	void findPathTest() {
 		given(folderDataHandlerService.findPathBy()).willReturn(PARENT_PATH);
 
@@ -114,5 +114,15 @@ class FolderServiceTest {
 
 		assertThat(actualPath).isEqualTo(PARENT_PATH);
 		verify(folderDataHandlerService, times(1)).findPathBy();
+	}
+
+	@Test
+	@DisplayName("폴더 삭제 테스트")
+	void deleteFolderTest() {
+		doNothing().when(folderDataHandlerService).delete(FOLDER_METADATA);
+
+		folderService.deleteFolder(FOLDER_METADATA);
+
+		verify(folderDataHandlerService, times(1)).delete(FOLDER_METADATA);
 	}
 }

@@ -20,6 +20,6 @@ public class PagingUtil {
 	}
 
 	public static Pageable createPageable() {
-		return PageRequest.of(0, DELETE_METADATA_SIZE);
+		return PageRequest.of(0, 100);
 	}
 }
