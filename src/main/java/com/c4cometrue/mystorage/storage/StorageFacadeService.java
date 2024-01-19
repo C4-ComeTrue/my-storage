@@ -86,6 +86,7 @@ public class StorageFacadeService {
 		// 재귀적으로 폴더 삭제
 		folderMetadataList.forEach(this::deleteFolderContents);
 
+
 		folderService.deleteFolder(folderMetadata);
 	}
 
