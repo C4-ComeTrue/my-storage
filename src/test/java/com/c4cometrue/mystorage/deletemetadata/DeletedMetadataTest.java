@@ -10,11 +10,11 @@ import org.junit.jupiter.api.Test;
 import com.c4cometrue.mystorage.common.MetadataType;
 import com.c4cometrue.mystorage.deletedmetadata.DeletedMetadata;
 
-public class DeletedMetadataTest {
+class DeletedMetadataTest {
 
 	@Test
 	@DisplayName("삭제메타데이터 생성 테스트")
-	public void DeletedMetadataEntityTest() {
+	void DeletedMetadataEntityTest() {
 		Long userId = 1L;
 		Long parentId = 1L;
 		String filePath = "testPath";

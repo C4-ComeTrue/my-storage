@@ -20,7 +20,7 @@ import com.c4cometrue.mystorage.deletedmetadata.DeletedMetadataRepository;
 
 @DisplayName("삭제메타데이터 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
-public class DeleteMetadataServiceTest {
+class DeleteMetadataServiceTest {
 	@InjectMocks
 	private DeleteMetadataService deleteMetadataService;
 

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface DeletedMetadataRepository extends JpaRepository<DeletedMetadata, Long> {
 	@Query("""
-		    SELECT m FROM DeletedMetadata m 
+		    SELECT m FROM DeletedMetadata m
 		    WHERE m.id > :cursorId
 		    ORDER BY m.id
 		""")
