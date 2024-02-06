@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
 @Service
@@ -56,15 +58,31 @@ public class StorageFacadeService {
 
     // hardDelete
     private void deleteFolderContents(FolderMetadata folderMetadata) {
-        // 삭제 할 폴더리스트 조회
-        List<FolderMetadata> folderMetadataList = folderService.findAllBy(folderMetadata.getId());
-        // 삭제 할 파일리스트 조회
-        List<FileMetadata> fileMetadataList;
-        fileMetadataList = fileService.findAllBy(folderMetadata.getId());
-        fileService.deleteAll(fileMetadataList);
-        // 재귀적으로 폴더 삭제
-        folderMetadataList.forEach(this::deleteFolderContents);
+        Deque<FolderMetadata> deleteProcess = new ArrayDeque<>();
+        deleteProcess.push(folderMetadata);
 
-        folderService.deleteFolder(folderMetadata);
+        while (!deleteProcess.isEmpty()) {
+            FolderMetadata currentFolder = deleteProcess.pop();
+            Long fodlerId = currentFolder.getId();
+
+            // 파일 삭제
+            deleteFilesInCurrentFolder(fodlerId);
+
+            // 하위 폴더를 스택에 추가
+            pushFolderIdInStack(deleteProcess, fodlerId);
+
+            // 현재 폴더 삭제
+            folderService.deleteFolder(currentFolder);
+        }
+    }
+
+    private void deleteFilesInCurrentFolder(Long fodlerId) {
+        List<FileMetadata> subFileList = fileService.findAllBy(fodlerId);
+        fileService.deleteAll(subFileList);
+    }
+
+    private void pushFolderIdInStack(Deque<FolderMetadata> stack, Long fodlerId) {
+        List<FolderMetadata> subFolderList = folderService.findAllBy(fodlerId);
+        subFolderList.forEach(stack::push);
     }
 }
