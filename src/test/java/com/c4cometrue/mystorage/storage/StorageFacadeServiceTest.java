@@ -3,6 +3,7 @@ package com.c4cometrue.mystorage.storage;
 import com.c4cometrue.mystorage.file.FileService;
 import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
 import com.c4cometrue.mystorage.file.dto.FileContent;
+import com.c4cometrue.mystorage.fileDeletionLog.FileDeletionLogService;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
 import com.c4cometrue.mystorage.folder.dto.FolderContent;
@@ -28,6 +29,8 @@ class StorageFacadeServiceTest {
 	private FolderService folderService;
 	@Mock
 	private FileService fileService;
+	@Mock
+	private FileDeletionLogService fileDeletionLogService;
 
 	@Test
 	@DisplayName("폴더조회테스트 flag가 true 일때")
@@ -65,7 +68,8 @@ class StorageFacadeServiceTest {
 
 		storageFacadeService.deleteFolderContents(FOLDER_ID, USER_ID);
 
-		verify(folderService).validateBy(FOLDER_ID, USER_ID);
-		verify(folderService).findBy(FOLDER_ID, USER_ID);
+		verify(folderService, times(1)).validateBy(FOLDER_ID, USER_ID);
+		verify(folderService, times(1)).findBy(FOLDER_ID, USER_ID);
+		verify(fileDeletionLogService, times(1)).saveFileDeleteLog(anyList());
 	}
 }

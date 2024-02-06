@@ -1,5 +1,6 @@
 package com.c4cometrue.mystorage.storage;
 
+import com.c4cometrue.mystorage.fileDeletionLog.FileDeletionLogService;
 import com.c4cometrue.mystorage.file.FileMetadata;
 import com.c4cometrue.mystorage.file.FileService;
 import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
@@ -22,6 +23,7 @@ import java.util.List;
 public class StorageFacadeService {
     private final FolderService folderService;
     private final FileService fileService;
+    private final FileDeletionLogService fileDeletionLogService;
 
     public CursorMetaRes getFolderContents(Long parentId, Long cursorId, Long userId, Integer size, boolean cursorFlag) {
         Integer contentsSize = PagingUtil.calculateSize(size);
@@ -76,9 +78,14 @@ public class StorageFacadeService {
         }
     }
 
-    private void deleteFilesInCurrentFolder(Long fodlerId) {
-        List<FileMetadata> subFileList = fileService.findAllBy(fodlerId);
+    private void deleteFilesInCurrentFolder(Long folderId) {
+        List<FileMetadata> subFileList = fileService.findAllBy(folderId);
         fileService.deleteAll(subFileList);
+        saveDeleteLog(subFileList);
+    }
+
+    private void saveDeleteLog(List<FileMetadata> files) {
+        fileDeletionLogService.saveFileDeleteLog(files);
     }
 
     private void pushFolderIdInStack(Deque<FolderMetadata> stack, Long fodlerId) {
