@@ -1,12 +1,12 @@
 package com.c4cometrue.mystorage.storage;
 
-import static com.c4cometrue.mystorage.TestConstants.*;
-import static org.mockito.BDDMockito.*;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import com.c4cometrue.mystorage.file.FileService;
+import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
+import com.c4cometrue.mystorage.file.dto.FileContent;
+import com.c4cometrue.mystorage.folder.FolderService;
+import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
+import com.c4cometrue.mystorage.folder.dto.FolderContent;
+import com.c4cometrue.mystorage.util.PagingUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,16 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.c4cometrue.mystorage.deletedmetadata.DeleteMetadataService;
-import com.c4cometrue.mystorage.file.FileMetadata;
-import com.c4cometrue.mystorage.file.FileService;
-import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
-import com.c4cometrue.mystorage.file.dto.FileContent;
-import com.c4cometrue.mystorage.folder.FolderMetadata;
-import com.c4cometrue.mystorage.folder.FolderService;
-import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
-import com.c4cometrue.mystorage.folder.dto.FolderContent;
-import com.c4cometrue.mystorage.util.PagingUtil;
+import java.util.List;
+
+import static com.c4cometrue.mystorage.TestConstants.*;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("스토리지 파사드 서비스 테스트")
@@ -34,8 +28,7 @@ class StorageFacadeServiceTest {
 	private FolderService folderService;
 	@Mock
 	private FileService fileService;
-	@Mock
-	private DeleteMetadataService deleteMetadataService;
+
 	@Test
 	@DisplayName("폴더조회테스트 flag가 true 일때")
 	void getFolderContentsTrueTest() {

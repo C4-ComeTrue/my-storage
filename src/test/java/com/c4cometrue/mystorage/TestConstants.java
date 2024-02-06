@@ -1,16 +1,13 @@
 package com.c4cometrue.mystorage;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import com.c4cometrue.mystorage.file.FileMetadata;
+import com.c4cometrue.mystorage.folder.FolderMetadata;
+import com.c4cometrue.mystorage.folder.dto.FolderNameChangeRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.c4cometrue.mystorage.common.MetadataType;
-import com.c4cometrue.mystorage.deletedmetadata.DeletedMetadata;
-import com.c4cometrue.mystorage.folder.dto.FolderNameChangeRequest;
-import com.c4cometrue.mystorage.file.FileMetadata;
-import com.c4cometrue.mystorage.folder.FolderMetadata;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class TestConstants {
 	public static final Long USER_ID = 1L;
@@ -48,11 +45,4 @@ public class TestConstants {
 	public static final Long FOLDER_ID = 1L;
 
 	public static final FolderNameChangeRequest FOLDER_NAME_CHANGE_REQUEST = FolderNameChangeRequest.of(USER_ID, FOLDER_ID, USER_FOLDER_NAME);
-
-	public static final DeletedMetadata DELETE_METADATA = DeletedMetadata.builder()
-		.type(MetadataType.FILE)
-		.filePath(PARENT_PATH)
-		.parentId(PARENT_ID)
-		.userId(USER_ID)
-		.build();
 }
