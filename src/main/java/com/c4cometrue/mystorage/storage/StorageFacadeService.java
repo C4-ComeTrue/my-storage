@@ -1,6 +1,6 @@
 package com.c4cometrue.mystorage.storage;
 
-import com.c4cometrue.mystorage.fileDeletionLog.FileDeletionLogService;
+import com.c4cometrue.mystorage.filedeletionlog.FileDeletionLogService;
 import com.c4cometrue.mystorage.file.FileMetadata;
 import com.c4cometrue.mystorage.file.FileService;
 import com.c4cometrue.mystorage.file.dto.CursorFileResponse;

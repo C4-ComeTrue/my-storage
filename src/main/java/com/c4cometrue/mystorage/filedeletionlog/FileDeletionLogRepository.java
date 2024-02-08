@@ -1,4 +1,4 @@
-package com.c4cometrue.mystorage.fileDeletionLog;
+package com.c4cometrue.mystorage.filedeletionlog;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

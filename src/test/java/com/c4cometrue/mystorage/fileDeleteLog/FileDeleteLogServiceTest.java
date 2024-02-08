@@ -1,13 +1,11 @@
 package com.c4cometrue.mystorage.fileDeleteLog;
 
 import com.c4cometrue.mystorage.file.FileMetadata;
-import com.c4cometrue.mystorage.fileDeletionLog.FileDeletionLog;
-import com.c4cometrue.mystorage.fileDeletionLog.FileDeletionLogRepository;
-import com.c4cometrue.mystorage.fileDeletionLog.FileDeletionLogService;
+import com.c4cometrue.mystorage.filedeletionlog.FileDeletionLogRepository;
+import com.c4cometrue.mystorage.filedeletionlog.FileDeletionLogService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
