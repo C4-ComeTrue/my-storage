@@ -19,7 +19,6 @@ public class FileDeletionLog {
     private String filePath;
     @Column(nullable = false)
     private Long deleterId;
-
     @Builder
     public FileDeletionLog(String originalFileName, String filePath, Long deleterId) {
         this.originalFileName = originalFileName;
