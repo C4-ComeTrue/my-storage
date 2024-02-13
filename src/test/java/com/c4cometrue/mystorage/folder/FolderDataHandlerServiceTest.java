@@ -3,6 +3,8 @@ package com.c4cometrue.mystorage.folder;
 import static com.c4cometrue.mystorage.TestConstants.*;
 
 import static java.lang.Boolean.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.c4cometrue.mystorage.exception.ServiceException;
 import com.c4cometrue.mystorage.util.PagingUtil;
@@ -27,21 +30,24 @@ class FolderDataHandlerServiceTest {
 
 	@Mock
 	private FolderRepository folderRepository;
+	@Value("${file.storage-path}")
+	private String STORAGE_PATH;
 
 	@Test
 	@DisplayName("부모 폴더 기반 경로 찾기")
 	void findPathBy() {
-		given(folderRepository.findById(PARENT_ID)).willReturn(Optional.of(FOLDER_METADATA));
+		given(folderRepository.findByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(
+			Optional.ofNullable(FOLDER_METADATA));
 
-		folderDataHandlerService.findPathBy(PARENT_ID);
+		folderDataHandlerService.findPathBy(PARENT_ID, USER_ID);
 
-		verify(folderRepository, times(1)).findById(PARENT_ID);
+		verify(folderRepository, times(1)).findByIdAndUploaderId(PARENT_ID, USER_ID);
 	}
 
 	@Test
 	@DisplayName("폴더 경로 찾기 : 부모id 가 null")
 	void findPathParentIsNull() {
-		folderDataHandlerService.findPathBy(null);
+		folderDataHandlerService.findPathBy(null, USER_ID);
 		verify(folderRepository, times(0)).findById(null);
 	}
 
@@ -74,7 +80,7 @@ class FolderDataHandlerServiceTest {
 	@DisplayName("폴더 이름 변경 테스트")
 	void changeFolderTest() {
 		given(folderRepository.existsByIdAndUploaderId(FOLDER_ID, USER_ID)).willReturn(TRUE);
-		given(folderRepository.findById(FOLDER_ID)).willReturn(Optional.of(FOLDER_METADATA));
+		given(folderRepository.findByIdAndUploaderId(FOLDER_ID, USER_ID)).willReturn(Optional.of(FOLDER_METADATA));
 
 		folderDataHandlerService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID);
 
@@ -85,7 +91,7 @@ class FolderDataHandlerServiceTest {
 	@Test
 	@DisplayName("폴더 이름 변경 테스트 id 가 널")
 	void changeFolderParentIdIsNullTest() {
-		given(folderRepository.findById(null)).willReturn(Optional.of(FOLDER_METADATA));
+		given(folderRepository.findByIdAndUploaderId(null, USER_ID)).willReturn(Optional.of(FOLDER_METADATA));
 
 		folderDataHandlerService.changeFolderNameBy(USER_FOLDER_NAME, null, USER_ID);
 
@@ -99,22 +105,6 @@ class FolderDataHandlerServiceTest {
 
 		assertThrows(ServiceException.class,
 			() -> folderDataHandlerService.changeFolderNameBy(USER_FOLDER_NAME, FOLDER_ID, USER_ID));
-	}
-
-	@Test
-	@DisplayName("루트 폴더 조회 테스트")
-	void getChildFolderTest() {
-		folderDataHandlerService.findChildBy(null, USER_ID);
-
-		then(folderRepository).should(times(1)).findByParentIdAndUploaderId(null, USER_ID);
-	}
-
-	@Test
-	@DisplayName("폴더 조회 테스트 : 실패")
-	void getChildFolderFailTest() {
-		given(folderRepository.existsByIdAndUploaderId(PARENT_ID, USER_ID)).willReturn(FALSE);
-
-		assertThrows(ServiceException.class, () -> folderDataHandlerService.findChildBy(PARENT_ID, USER_ID));
 	}
 
 	@Test
@@ -160,4 +150,55 @@ class FolderDataHandlerServiceTest {
 			.existsByParentIdAndUploaderIdAndIdLessThan(PARENT_ID, USER_ID, FOLDER_ID);
 	}
 
+	@Test
+	@DisplayName("폴더 유효성 검사 존재하지 않는 폴더 일때")
+	void validateFolderOwnershipTest() {
+		given(folderRepository.existsByIdAndUploaderId(FOLDER_ID, USER_ID)).willReturn(FALSE);
+
+		assertThrows(ServiceException.class, () -> folderDataHandlerService.validateFolderOwnershipBy(FOLDER_ID, USER_ID));
+	}
+
+	@Test
+	@DisplayName("폴더 유효성 검사 루트 폴더")
+	void validateFolderOwnershipFolderIdIsNullTest() {
+		assertDoesNotThrow(() -> {
+			folderDataHandlerService.validateFolderOwnershipBy(null, USER_ID);
+		});
+
+		verify(folderRepository, never()).existsByIdAndUploaderId(any(), any());
+	}
+
+	@Test
+	@DisplayName("폴더 저장 테스트")
+	void persistTest() {
+		folderDataHandlerService.persist(FOLDER_METADATA);
+
+		verify(folderRepository, times(1)).save(FOLDER_METADATA);
+	}
+
+	@Test
+	@DisplayName("경로 조회 테스트")
+	void findPathTest() {
+		String actualPath = folderDataHandlerService.findPathBy();
+
+		assertThat(actualPath).isEqualTo(STORAGE_PATH);
+	}
+
+	@Test
+	@DisplayName("폴더 리스트 조회 테스트")
+	void findAllTest() {
+		given(folderRepository.findAllByParentId(PARENT_ID)).willReturn(List.of(FOLDER_METADATA));
+		folderDataHandlerService.findAllBy(PARENT_ID);
+		then(folderRepository).should(times(1)).findAllByParentId(PARENT_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 삭제 테스트")
+	void deleteFolderTest() {
+		doNothing().when(folderRepository).delete(FOLDER_METADATA);
+
+		folderDataHandlerService.delete(FOLDER_METADATA);
+
+		verify(folderRepository, times(1)).delete(FOLDER_METADATA);
+	}
 }

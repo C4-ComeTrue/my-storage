@@ -1,6 +1,7 @@
 package com.c4cometrue.mystorage.folder;
 
 import static com.c4cometrue.mystorage.TestConstants.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -29,13 +30,13 @@ class FolderServiceTest {
 	@DisplayName("폴더 업로드 테스트")
 	void createBy() {
 		// given
-		given(folderDataHandlerService.findPathBy(PARENT_ID)).willReturn(PARENT_PATH);
+		given(folderDataHandlerService.findPathBy(PARENT_ID, USER_ID)).willReturn(PARENT_PATH);
 
 		// when
 		folderService.createBy(USER_ID, USER_FOLDER_NAME, PARENT_ID);
 
 		//then
-		verify(folderDataHandlerService, times(1)).findPathBy(PARENT_ID);
+		verify(folderDataHandlerService, times(1)).findPathBy(PARENT_ID, USER_ID);
 		verify(folderDataHandlerService, times(1)).persist(any(), any(), any(), any(), any());
 	}
 
@@ -56,10 +57,72 @@ class FolderServiceTest {
 		given(folderDataHandlerService.hasNext(PARENT_ID, USER_ID, FOLDER_METADATA.getId()))
 			.willReturn(Boolean.FALSE);
 
-		CursorFolderResponse response = folderService.getFolders(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10));
+		CursorFolderResponse response = folderService.getFolders(PARENT_ID, FOLDER_ID, USER_ID,
+			PagingUtil.createPageable(10));
 
 		assertNotNull(response);
-		then(folderDataHandlerService).should(times(1)).getFolderList(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10));
+		then(folderDataHandlerService).should(times(1))
+			.getFolderList(PARENT_ID, FOLDER_ID, USER_ID, PagingUtil.createPageable(10));
 		then(folderDataHandlerService).should(times(1)).hasNext(PARENT_ID, USER_ID, FOLDER_METADATA.getId());
+	}
+
+	@Test
+	@DisplayName("유효성 검사")
+	void validateTest() {
+		folderService.validateBy(FOLDER_ID, USER_ID);
+
+		verify(folderDataHandlerService).validateFolderOwnershipBy(FOLDER_ID, USER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 이동 테스트")
+	void moveFolderTest() {
+		Long destinationFolderID = 2L;
+		doNothing().when(folderDataHandlerService).validateFolderOwnershipBy(destinationFolderID, USER_ID);
+		when(folderDataHandlerService.findBy(FOLDER_ID, USER_ID)).thenReturn(FOLDER_METADATA);
+
+
+		folderService.moveFolder(FOLDER_ID, USER_ID, destinationFolderID);
+
+		verify(folderDataHandlerService).validateFolderOwnershipBy(destinationFolderID, USER_ID);
+
+		verify(folderDataHandlerService).findBy(FOLDER_ID, USER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 리스트 조회")
+	void findAllFolderListTest() {
+		given(folderDataHandlerService.findAllBy(PARENT_ID)).willReturn(List.of(FOLDER_METADATA));
+		folderService.findAllBy(PARENT_ID);
+		then(folderDataHandlerService).should(times(1)).findAllBy(PARENT_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 조회")
+	void findFolderTest() {
+		given(folderDataHandlerService.findBy(FOLDER_ID, USER_ID)).willReturn(FOLDER_METADATA);
+		folderService.findBy(FOLDER_ID, USER_ID);
+		then(folderDataHandlerService).should(times(1)).findBy(FOLDER_ID, USER_ID);
+	}
+
+	@Test
+	@DisplayName("폴더 경로 조회 테스트")
+	void findPathTest() {
+		given(folderDataHandlerService.findPathBy()).willReturn(PARENT_PATH);
+
+		String actualPath = folderService.findPathBy();
+
+		assertThat(actualPath).isEqualTo(PARENT_PATH);
+		verify(folderDataHandlerService, times(1)).findPathBy();
+	}
+
+	@Test
+	@DisplayName("폴더 삭제 테스트")
+	void deleteFolderTest() {
+		doNothing().when(folderDataHandlerService).delete(FOLDER_METADATA);
+
+		folderService.deleteFolder(FOLDER_METADATA);
+
+		verify(folderDataHandlerService, times(1)).delete(FOLDER_METADATA);
 	}
 }

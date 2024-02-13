@@ -27,4 +27,10 @@ class PagingUtilTest {
 	void createPageableTest() {
 		Assertions.assertEquals(PageRequest.of(0, 10), PagingUtil.createPageable(10));
 	}
+
+	@Test
+	@DisplayName("페이지 디폴트 사이즈 테스트")
+	void createPageableDefaultTest() {
+		Assertions.assertEquals(PagingUtil.createPageable(100), PagingUtil.createPageable());
+	}
 }

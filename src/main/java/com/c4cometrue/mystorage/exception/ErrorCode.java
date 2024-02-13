@@ -21,7 +21,11 @@ public enum ErrorCode {
 	FOLDER_CREATE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "폴더 생성 중 오류가 발생했습니다"),
 	UNAUTHORIZED_FOLDER_ACCESS(HttpStatus.FORBIDDEN, "비정상적인 요청입니다."),
 	DUPLICATE_FOLDER_NAME(HttpStatus.BAD_REQUEST, "폴더 업로드에 중복이 발생 했습니다"),
-	CANNOT_FOUND_FOLDER(HttpStatus.NOT_FOUND, "해당 폴더를 찾을 수 없습니다.");
+	CANNOT_FOUND_FOLDER(HttpStatus.NOT_FOUND, "해당 폴더를 찾을 수 없습니다."),
+
+	DUPLICATE_BASE_PATH(HttpStatus.BAD_REQUEST, "기본 경로 생성에 중복이 발생했습니다"),
+
+	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 맴버를 찾지 못했습니다");
 
 	private final HttpStatus httpStatus;
 	private final String message;

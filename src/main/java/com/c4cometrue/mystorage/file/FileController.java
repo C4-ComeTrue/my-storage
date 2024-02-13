@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.c4cometrue.mystorage.file.dto.FileDeleteRequest;
 import com.c4cometrue.mystorage.file.dto.FileDownloadRequest;
+import com.c4cometrue.mystorage.file.dto.FileMoveReq;
 import com.c4cometrue.mystorage.file.dto.FileUploadRequest;
 
 import jakarta.validation.Valid;
@@ -40,4 +41,9 @@ public class FileController {
 		fileService.downloadFile(request.fileId(), request.userPath(), request.userId());
 	}
 
+	@PostMapping("/move")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void moveFile(@Valid FileMoveReq req) {
+		fileService.moveFile(req.fileId(), req.userId(), req.destinationFolderId());
+	}
 }

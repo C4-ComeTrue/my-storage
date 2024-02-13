@@ -2,7 +2,8 @@ package com.c4cometrue.mystorage.folder;
 
 import java.util.UUID;
 
-import com.c4cometrue.mystorage.meta.MetadataType;
+import com.c4cometrue.mystorage.common.MetadataBaseEntity;
+import com.c4cometrue.mystorage.common.MetadataType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = @Index(name = "idx_folder_meta", columnList = "parentId, uploaderId, originalFolderName"))
-public class FolderMetadata {
+public class FolderMetadata extends MetadataBaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -47,6 +48,10 @@ public class FolderMetadata {
 
 	public void changeFolderName(String userFolderName) {
 		this.originalFolderName = userFolderName;
+	}
+
+	public void changeParentId(Long parentId) {
+		this.parentId = parentId;
 	}
 
 	@Builder

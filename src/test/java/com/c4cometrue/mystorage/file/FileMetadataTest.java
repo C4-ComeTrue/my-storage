@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.c4cometrue.mystorage.TestConstants;
+import com.c4cometrue.mystorage.common.MetadataType;
 
 @DisplayName("파일 엔티티 테스트")
 class FileMetadataTest {
@@ -22,13 +23,14 @@ class FileMetadataTest {
 
 	@Test
 	@DisplayName("메타데이터 생성")
-	void testMetadataCreation() {
+	void metadataCreationTest() {
 		FileMetadata data = FILE_METADATA;
 		Assertions.assertNotNull(data);
 		Assertions.assertEquals(ORIGINAL_FILE_NAME, data.getOriginalFileName());
 		Assertions.assertEquals(STORED_FILE_NAME, data.getStoredFileName());
 		Assertions.assertEquals(USER_PATH, data.getFilePath());
 		Assertions.assertEquals(USER_ID, data.getUploaderId());
+		Assertions.assertEquals(PARENT_ID, data.getParentId());
+		Assertions.assertEquals(MetadataType.FILE, data.getMetadataType());
 	}
-
 }

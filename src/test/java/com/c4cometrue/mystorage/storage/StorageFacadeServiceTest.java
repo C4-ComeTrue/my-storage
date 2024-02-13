@@ -1,11 +1,13 @@
-package com.c4cometrue.mystorage.metadata;
+package com.c4cometrue.mystorage.storage;
 
-import static com.c4cometrue.mystorage.TestConstants.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-
+import com.c4cometrue.mystorage.file.FileService;
+import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
+import com.c4cometrue.mystorage.file.dto.FileContent;
+import com.c4cometrue.mystorage.filedeletionlog.FileDeletionLogService;
+import com.c4cometrue.mystorage.folder.FolderService;
+import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
+import com.c4cometrue.mystorage.folder.dto.FolderContent;
+import com.c4cometrue.mystorage.util.PagingUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,25 +15,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.c4cometrue.mystorage.TestConstants;
-import com.c4cometrue.mystorage.file.FileService;
-import com.c4cometrue.mystorage.file.dto.CursorFileResponse;
-import com.c4cometrue.mystorage.file.dto.FileContent;
-import com.c4cometrue.mystorage.folder.FolderService;
-import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
-import com.c4cometrue.mystorage.folder.dto.FolderContent;
-import com.c4cometrue.mystorage.meta.StorageFacadeService;
-import com.c4cometrue.mystorage.util.PagingUtil;
+import java.util.List;
+
+import static com.c4cometrue.mystorage.TestConstants.*;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("스토리지 파사드 서비스 테스트")
-public class StorageFacadeServiceTest {
+class StorageFacadeServiceTest {
 	@InjectMocks
 	private StorageFacadeService storageFacadeService;
 	@Mock
 	private FolderService folderService;
 	@Mock
 	private FileService fileService;
+	@Mock
+	private FileDeletionLogService fileDeletionLogService;
+
 	@Test
 	@DisplayName("폴더조회테스트 flag가 true 일때")
 	void getFolderContentsTrueTest() {
@@ -59,5 +59,17 @@ public class StorageFacadeServiceTest {
 		storageFacadeService.getFolderContents(PARENT_ID, FOLDER_ID, USER_ID, 10, false);
 
 		verify(fileService, times(1)).getFiles(PARENT_ID, FILE_ID, USER_ID, PagingUtil.createPageable(10));
+	}
+	@Test
+	@DisplayName("폴더 삭제 테스트")
+	void deleteFolderContentsTest() {
+		doNothing().when(folderService).validateBy(FOLDER_ID, USER_ID);
+		when(folderService.findBy(FOLDER_ID, USER_ID)).thenReturn(FOLDER_METADATA);
+
+		storageFacadeService.deleteFolderContents(FOLDER_ID, USER_ID);
+
+		verify(folderService, times(1)).validateBy(FOLDER_ID, USER_ID);
+		verify(folderService, times(1)).findBy(FOLDER_ID, USER_ID);
+		verify(fileDeletionLogService, times(1)).saveFileDeleteLog(anyList());
 	}
 }

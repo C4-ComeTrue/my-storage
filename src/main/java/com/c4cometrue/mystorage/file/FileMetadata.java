@@ -2,7 +2,8 @@ package com.c4cometrue.mystorage.file;
 
 import java.util.UUID;
 
-import com.c4cometrue.mystorage.meta.MetadataType;
+import com.c4cometrue.mystorage.common.MetadataBaseEntity;
+import com.c4cometrue.mystorage.common.MetadataType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "file_metadata", indexes = @Index(name = "index_parentId", columnList = "parentId"))
-public class FileMetadata {
+public class FileMetadata extends MetadataBaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +44,10 @@ public class FileMetadata {
 
 	public static String storedName() {
 		return UUID.randomUUID().toString();
+	}
+
+	public void changeParentId(Long parentId) {
+		this.parentId = parentId;
 	}
 
 	@Builder

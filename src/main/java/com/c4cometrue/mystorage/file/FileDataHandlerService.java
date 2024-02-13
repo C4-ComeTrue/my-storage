@@ -33,26 +33,13 @@ public class FileDataHandlerService {
 	}
 
 	@Transactional
-	public void persist(FileMetadata fileMetadata, Long userId, Long parentId) {
-		validateFileOwnershipBy(parentId, userId);
-		duplicateBy(parentId, userId, fileMetadata.getOriginalFileName());
+	public void persist(FileMetadata fileMetadata) {
 		fileRepository.save(fileMetadata);
 	}
 
-	private void duplicateBy(Long parentId, Long userId, String fileName) {
+	public void duplicateBy(Long parentId, Long userId, String fileName) {
 		if (fileRepository.checkDuplicateFileName(parentId, userId, fileName)) {
 			throw ErrorCode.DUPLICATE_FILE_NAME.serviceException("fileName : {}", fileName);
-		}
-	}
-
-	public List<FileMetadata> findChildBy(Long parentId, Long userId) {
-		validateFileOwnershipBy(parentId, userId);
-		return fileRepository.findByParentIdAndUploaderId(parentId, userId);
-	}
-
-	private void validateFileOwnershipBy(Long folderId, Long userId) {
-		if (folderId != null && !fileRepository.existsByIdAndUploaderId(folderId, userId)) {
-			throw ErrorCode.UNAUTHORIZED_FILE_ACCESS.serviceException();
 		}
 	}
 
@@ -63,5 +50,13 @@ public class FileDataHandlerService {
 
 	public Boolean hashNext(Long parentId, Long userId, Long lastIdOfList) {
 		return fileRepository.existsByParentIdAndUploaderIdAndIdLessThan(parentId, userId, lastIdOfList);
+	}
+
+	public List<FileMetadata> findAllBy(Long parentId) {
+		return fileRepository.findAllByParentId(parentId);
+	}
+
+	public void deleteAll(List<FileMetadata> fileMetadataList) {
+		fileRepository.deleteAll(fileMetadataList);
 	}
 }

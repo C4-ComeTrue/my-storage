@@ -3,7 +3,6 @@ package com.c4cometrue.mystorage.file;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +14,7 @@ import com.c4cometrue.mystorage.file.dto.FileContent;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.util.FileUtil;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,12 +23,16 @@ public class FileService {
 	private final FileDataHandlerService fileDataHandlerService;
 	private final FolderService folderService;
 
+
 	@Value("${file.buffer}")
 	private int bufferSize;
 
 	public void uploadFile(MultipartFile file, Long userId, Long parentId) {
-		String basePath = folderService.findPathBy(parentId);
+		String basePath = folderService.findPathBy();
+
 		String originalFileName = file.getOriginalFilename();
+		fileDataHandlerService.duplicateBy(parentId, userId, originalFileName);
+
 		String storedFileName = FileMetadata.storedName();
 		Path path = Paths.get(basePath, storedFileName);
 		FileMetadata fileMetadata = FileMetadata.builder()
@@ -40,7 +44,7 @@ public class FileService {
 			.build();
 
 		FileUtil.uploadFile(file, path, bufferSize);
-		fileDataHandlerService.persist(fileMetadata, userId, parentId);
+		fileDataHandlerService.persist(fileMetadata);
 	}
 
 	public void downloadFile(Long fileId, String userPath, Long userId) {
@@ -67,5 +71,27 @@ public class FileService {
 			.toList();
 		Long lastIdOfList = files.isEmpty() ? null : files.get(files.size() - 1).getId();
 		return CursorFileResponse.of(fileContents, fileDataHandlerService.hashNext(parentId, userId, lastIdOfList));
+	}
+
+	@Transactional
+	public void moveFile(Long fileId, Long userId, Long destinationFolderId) {
+		// 해당 폴더가 접근 가능 한 폴더 인지 체크
+		folderService.validateBy(destinationFolderId, userId);
+
+		FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
+
+		// 부모 폴더(파일이 속한 폴더) 바꾸기
+		fileMetadata.changeParentId(destinationFolderId);
+
+		// 변경 사항을 저장
+		fileDataHandlerService.persist(fileMetadata);
+	}
+
+	public List<FileMetadata> findAllBy(Long parentId) {
+		return fileDataHandlerService.findAllBy(parentId);
+	}
+
+	public void deleteAll(List<FileMetadata> fileMetadataList) {
+		fileDataHandlerService.deleteAll(fileMetadataList);
 	}
 }

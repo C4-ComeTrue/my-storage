@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @DisplayName("폴더 엔티티 테스트")
 @ExtendWith(MockitoExtension.class)
-class FolderFileMetadataTest {
+class FolderMetadataTest {
 	@Test
 	@DisplayName("폴더 빌더 생성")
 	void testBuilderCreation() {

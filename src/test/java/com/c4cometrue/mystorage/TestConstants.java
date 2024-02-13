@@ -1,14 +1,13 @@
 package com.c4cometrue.mystorage;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import com.c4cometrue.mystorage.file.FileMetadata;
+import com.c4cometrue.mystorage.folder.FolderMetadata;
+import com.c4cometrue.mystorage.folder.dto.FolderNameChangeRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.c4cometrue.mystorage.folder.dto.FolderNameChangeRequest;
-import com.c4cometrue.mystorage.file.FileMetadata;
-import com.c4cometrue.mystorage.folder.FolderMetadata;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class TestConstants {
 	public static final Long USER_ID = 1L;
@@ -41,7 +40,7 @@ public class TestConstants {
 	public static final String STORED_FOLDER_NAME = "폴더@";
 	public static final String PARENT_PATH = FolderMetadata.storedName(USER_PATH);
 	public static final Path FOLDER_PATH = Paths.get(PARENT_PATH, STORED_FOLDER_NAME);
-	public static final FolderMetadata FOLDER_METADATA = FolderMetadata.builder().build();
+	public static final FolderMetadata FOLDER_METADATA = FolderMetadata.builder().parentId(PARENT_ID).build();
 
 	public static final Long FOLDER_ID = 1L;
 

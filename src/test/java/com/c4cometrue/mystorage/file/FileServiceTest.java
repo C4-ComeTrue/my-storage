@@ -48,7 +48,7 @@ class FileServiceTest {
 	@Test
 	@DisplayName("업로드 실패 테스트")
 	void uploadFileFailTest() throws IOException {
-		when(folderService.findPathBy(PARENT_ID)).thenReturn(PARENT_PATH);
+		when(folderService.findPathBy()).thenReturn(PARENT_PATH);
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
 			() -> fileService.uploadFile(MOCK_MULTIPART_FILE, USER_ID, PARENT_ID)
@@ -87,7 +87,7 @@ class FileServiceTest {
 		MultipartFile mockFile = mock(MultipartFile.class);
 		when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(MOCK_MULTIPART_FILE.getBytes()));
 		when(mockFile.getOriginalFilename()).thenReturn(ORIGINAL_FILE_NAME);
-		when(folderService.findPathBy(PARENT_ID)).thenReturn(PARENT_PATH);
+		when(folderService.findPathBy()).thenReturn(PARENT_PATH);
 
 		ServiceException thrown = assertThrows(
 			ServiceException.class,
@@ -104,7 +104,7 @@ class FileServiceTest {
 		var outStream = mock(OutputStream.class);
 		var files = mockStatic(Files.class);
 
-		given(folderService.findPathBy(PARENT_ID)).willReturn(PARENT_PATH);
+		given(folderService.findPathBy()).willReturn(PARENT_PATH);
 		given(multipartFile.getInputStream()).willReturn(inputStream);
 		given(multipartFile.getOriginalFilename()).willReturn(ORIGINAL_FILE_NAME);
 		given(Files.newOutputStream(any())).willReturn(outStream);
@@ -138,4 +138,42 @@ class FileServiceTest {
 		then(fileDataHandlerService).should(times(1)).hashNext(PARENT_ID, USER_ID, FILE_METADATA.getId());
 	}
 
+	@Test
+	@DisplayName("파일 이동 테스트")
+	void moveFileTest() {
+		Long destinationFolderID = 2L;
+		doNothing().when(folderService).validateBy(destinationFolderID, USER_ID);
+
+		when(fileDataHandlerService.findBy(FILE_ID, USER_ID)).thenReturn(FILE_METADATA);
+
+		fileService.moveFile(FILE_ID, USER_ID, destinationFolderID);
+
+
+		verify(folderService).validateBy(destinationFolderID, USER_ID);
+
+		verify(fileDataHandlerService).findBy(FILE_ID, USER_ID);
+	}
+
+	@Test
+	@DisplayName("파일 리스트 조회 테스트")
+	void findAllByTest() {
+		List<FileMetadata> expectedFileMetadataList = List.of(FILE_METADATA);
+		when(fileDataHandlerService.findAllBy(PARENT_ID)).thenReturn(expectedFileMetadataList);
+
+		List<FileMetadata> actualFileMetadataList = fileService.findAllBy(PARENT_ID);
+
+		assertEquals(expectedFileMetadataList, actualFileMetadataList);
+		verify(fileDataHandlerService, times(1)).findAllBy(PARENT_ID);
+	}
+
+	@Test
+	@DisplayName("파일 삭제 테스트")
+	void deleteAllTest() {
+		List<FileMetadata> fileMetadataList = List.of(FILE_METADATA);
+		doNothing().when(fileDataHandlerService).deleteAll(fileMetadataList);
+
+		fileService.deleteAll(fileMetadataList);
+
+		verify(fileDataHandlerService, times(1)).deleteAll(fileMetadataList);
+	}
 }
