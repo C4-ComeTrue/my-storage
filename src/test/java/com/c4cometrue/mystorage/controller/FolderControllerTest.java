@@ -9,9 +9,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 import com.c4cometrue.mystorage.dto.request.folder.CreateFolderReq;
+import com.c4cometrue.mystorage.dto.request.folder.DeleteFolderReq;
 import com.c4cometrue.mystorage.dto.request.folder.GetFolderReq;
+import com.c4cometrue.mystorage.dto.request.folder.MoveFolderReq;
 import com.c4cometrue.mystorage.dto.request.folder.UpdateFolderNameReq;
 import com.c4cometrue.mystorage.service.FolderService;
 
@@ -32,7 +35,37 @@ class FolderControllerTest {
 		folderController.getFolderData(req);
 
 		// then
-		verify(folderService, times(1)).getFolderData(req.folderId(), req.userName());
+		verify(folderService, times(1)).getFolderTotalInfo(req.folderId(), req.userName());
+	}
+
+	@Test
+	@DisplayName("폴더의 하위 폴더 n 페이지 조회")
+	void getFolderSubFolders() {
+		// given
+		var folderId = 1L;
+		var pageRequest = PageRequest.of(0, 50);
+
+		// when
+		folderController.getSubFolders(folderId, pageRequest);
+
+		// then
+		verify(folderService, times(1)).getFolders(folderId, pageRequest.getPageNumber());
+
+	}
+
+
+	@Test
+	@DisplayName("폴더의 하위 파일 n 페이지 조회")
+	void getFolderSubFiles() {
+		// given
+		var folderId = 1L;
+		var pageRequest = PageRequest.of(0, 50);
+
+		// when
+		folderController.getSubFiles(folderId, pageRequest);
+
+		// then
+		verify(folderService, times(1)).getFiles(folderId, pageRequest.getPageNumber());
 
 	}
 
@@ -61,6 +94,32 @@ class FolderControllerTest {
 		// then
 		verify(folderService, times(1)).updateFolderName(req.folderId(), req.parentFolderId(), req.userName(),
 			req.newFolderName());
+	}
+
+	@Test
+	@DisplayName("폴더 이동")
+	void moveFolder() {
+		// given
+		var req = new MoveFolderReq(1L, 99L, MOCK_USER_NAME);
+
+		// when
+		folderController.moveFolder(req);
+
+		// then
+		verify(folderService, times(1)).moveFolder(req.folderId(), req.targetFolderId(), req.userName());
+	}
+
+	@Test
+	@DisplayName("폴더 삭제")
+	void deleteFolder() {
+		// given
+		var req = new DeleteFolderReq(1L, MOCK_USER_NAME);
+
+		// when
+		folderController.deleteFolder(req);
+
+		// then
+		verify(folderService, times(1)).deleteFolder(req.folderId(), req.userName());
 	}
 
 }
