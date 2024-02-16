@@ -53,4 +53,7 @@ public class FileMetaData {
 		this.folderId = folderId;
 	}
 
+	public void setFolderId(Long folderId) {
+		this.folderId = folderId;
+	}
 }
