@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.c4cometrue.mystorage.folder.dto.FolderSummaryRes;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -72,5 +73,11 @@ public class FolderService {
 
 	public FolderMetadata findBy(long folderId, long userId) {
 		return folderDataHandlerService.findBy(folderId, userId);
+	}
+
+	public FolderSummaryRes getFolderSummary(Long folderId, Long userId) {
+		validateBy(folderId, userId);
+		FolderMetadata folder = folderDataHandlerService.findBy(folderId, userId);
+		return FolderSummaryRes.of(folder.getOriginalFolderName(), folder.getCreatedAt(), folder.getUpdatedAt());
 	}
 }
