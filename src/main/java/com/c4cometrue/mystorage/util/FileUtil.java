@@ -58,7 +58,7 @@ public class FileUtil {
 
 	public static void renameFolder(Path oldPath, Path newPath) {
 		if (!Files.exists(oldPath)) {
-			throw ErrorCd.FOLDER_NOT_EXIST.serviceException("[Rename Folder] folder name is duplicate");
+			throw ErrorCd.FOLDER_NOT_EXIST.serviceException("[Rename Folder] folder name is duplicated");
 		}
 
 		try {

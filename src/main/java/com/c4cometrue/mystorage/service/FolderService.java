@@ -159,8 +159,8 @@ public class FolderService {
 	}
 
 	/**
-	 * 폴더의
-	 * @param folderId
+	 * 폴더를 삭제하고, 해당 폴더의 모든 하위 폴더와 파일들을 삭제한다.
+	 * @param folderId 폴더 기본키
 	 */
 	@Transactional
 	public void deleteFolder(long folderId, String userName) {
