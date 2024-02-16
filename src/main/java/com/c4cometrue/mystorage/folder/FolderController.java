@@ -1,12 +1,11 @@
-package com.c4cometrue.mystorage.folder.dto;
+package com.c4cometrue.mystorage.folder;
 
-import com.c4cometrue.mystorage.folder.FolderService;
+import com.c4cometrue.mystorage.folder.dto.*;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/folders")
