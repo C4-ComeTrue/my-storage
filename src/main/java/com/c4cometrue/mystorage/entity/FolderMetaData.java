@@ -42,4 +42,8 @@ public class FolderMetaData {
 	public void setFolderName(String folderName) {
 		this.folderName = folderName;
 	}
+
+	public void setParentFolderId(Long parentFolderId) {
+		this.parentFolderId = parentFolderId;
+	}
 }
