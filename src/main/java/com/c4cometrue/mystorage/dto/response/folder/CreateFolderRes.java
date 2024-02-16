@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
  */
 public record CreateFolderRes(
 	@NotNull(message = "folder Number can't be null") long folderId,
-	@NotBlank(message = "folder name is blank") String folderName,
-	@NotBlank(message = "user name is blank") String userName
+	@NotBlank(message = "folder name is blank") String folderName
 ) {
 }

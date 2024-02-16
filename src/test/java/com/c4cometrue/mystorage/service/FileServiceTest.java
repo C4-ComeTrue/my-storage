@@ -21,9 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-import com.c4cometrue.mystorage.dto.request.file.FileReq;
 import com.c4cometrue.mystorage.dto.request.file.UploadFileReq;
-import com.c4cometrue.mystorage.entity.DeleteLog;
 import com.c4cometrue.mystorage.entity.FileMetaData;
 import com.c4cometrue.mystorage.entity.FolderMetaData;
 import com.c4cometrue.mystorage.exception.ErrorCd;
@@ -108,7 +106,6 @@ public class FileServiceTest {
 		given(MOCK_MULTIPART_FILE.getOriginalFilename()).willReturn(MOCK_FILE_NAME);
 		given(fileRepository.findByFolderIdAndUserNameAndFileName(folderId, MOCK_USER_NAME, MOCK_FILE_NAME))
 			.willReturn(Optional.of(new FileMetaData()));
-		var req = new UploadFileReq(MOCK_MULTIPART_FILE, MOCK_USER_NAME, folderId);
 
 		// when
 		var exception = assertThrows(ServiceException.class,
