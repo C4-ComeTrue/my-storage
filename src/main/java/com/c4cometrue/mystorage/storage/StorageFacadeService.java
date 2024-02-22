@@ -72,7 +72,7 @@ public class StorageFacadeService {
         Deque<FolderMetadata> deleteProcess = new ArrayDeque<>();
         deleteProcess.push(folderMetadata);
 
-        BigDecimal totalSizeOfFilesToDelete = new BigDecimal(0);
+        BigDecimal totalSizeOfFilesToDelete = BigDecimal.ZERO;
 
         while (!deleteProcess.isEmpty()) {
             FolderMetadata currentFolder = deleteProcess.pop();
@@ -88,10 +88,15 @@ public class StorageFacadeService {
             // 현재 폴더 삭제
             folderService.deleteFolder(currentFolder);
         }
+
+        long ownerId = folderMetadata.getUploaderId();
+        long rootId = folderMetadata.getRootId();
+
+        rootFolderService.updateUsedSpaceForDeletion(ownerId, rootId, totalSizeOfFilesToDelete);
     }
 
     private BigDecimal deleteFilesInCurrentFolder(Long folderId) {
-        BigDecimal sizeOfFilesToDelete = new BigDecimal(0);
+        BigDecimal sizeOfFilesToDelete = BigDecimal.ZERO;
         List<FileMetadata> subFileList = fileService.findAllBy(folderId);
         for (FileMetadata metadata : subFileList) {
             sizeOfFilesToDelete = sizeOfFilesToDelete.add(metadata.getSizeInBytes());
