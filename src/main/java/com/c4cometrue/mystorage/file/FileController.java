@@ -21,29 +21,29 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/files")
 @RequiredArgsConstructor
 public class FileController {
-	private final FileService fileService;
+    private final FileService fileService;
 
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public void uploadFile(@Valid @ModelAttribute FileUploadRequest req) {
-		fileService.uploadFile(req.multipartFile(), req.userId(), req.parentId());
-	}
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void uploadFile(@Valid FileUploadRequest req) {
+        fileService.uploadFile(req.multipartFile(), req.userId(), req.parentId(), req.rootId());
+    }
 
-	@DeleteMapping
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteFile(@Valid FileDeleteRequest request) {
-		fileService.deleteFile(request.fileId(), request.userId());
-	}
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFile(@Valid FileDeleteRequest request) {
+        fileService.deleteFile(request.fileId(), request.userId(), request.rootId());
+    }
 
-	@GetMapping
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void downloadFile(@Valid FileDownloadRequest request) {
-		fileService.downloadFile(request.fileId(), request.userPath(), request.userId());
-	}
+    @GetMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void downloadFile(@Valid FileDownloadRequest request) {
+        fileService.downloadFile(request.fileId(), request.userPath(), request.userId());
+    }
 
-	@PostMapping("/move")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void moveFile(@Valid FileMoveReq req) {
-		fileService.moveFile(req.fileId(), req.userId(), req.destinationFolderId());
-	}
+    @PostMapping("/move")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void moveFile(@Valid FileMoveReq req) {
+        fileService.moveFile(req.fileId(), req.userId(), req.destinationFolderId());
+    }
 }

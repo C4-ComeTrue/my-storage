@@ -1,5 +1,6 @@
 package com.c4cometrue.mystorage.filedeletionlog;
 
+import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
@@ -27,15 +28,17 @@ public class FileDeletionLog {
     private String filePath;
     @Column(nullable = false)
     private Long deleterId;
+    private BigDecimal sizeInBytes;
 
     @Column(updatable = false)
     private ZonedDateTime deleteAt;
 
     @Builder
-    public FileDeletionLog(String originalFileName, String filePath, Long deleterId) {
+    public FileDeletionLog(String originalFileName, String filePath, Long deleterId, BigDecimal sizeInBytes) {
         this.originalFileName = originalFileName;
         this.filePath = filePath;
         this.deleterId = deleterId;
+        this.sizeInBytes = sizeInBytes;
     }
 
     @PrePersist

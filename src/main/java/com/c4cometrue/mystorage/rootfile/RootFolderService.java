@@ -2,10 +2,13 @@ package com.c4cometrue.mystorage.rootfile;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
 import com.c4cometrue.mystorage.util.FolderUtil;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -35,6 +38,12 @@ public class RootFolderService {
         checkDuplicateBy(userId, userFolderName);
     }
 
+    private void checkValidateBy(Long userId, Long rootId) {
+        if (!rootFolderRepository.existsByIdAndOwnerId(rootId, userId)) {
+            throw ErrorCode.CANNOT_FOUND_FOLDER.serviceException();
+        }
+    }
+
     private void checkDuplicateBy(Long userId, String userFolderName) {
         if (rootFolderRepository.existsByOwnerIdAndOriginalFileName(userId, userFolderName)) {
             throw ErrorCode.DUPLICATE_FOLDER_NAME.serviceException();
@@ -45,5 +54,17 @@ public class RootFolderService {
         if (rootFolderRepository.existsByStoredFileName(storedFolderName)) {
             throw ErrorCode.DUPLICATE_SERVER_FOLDER_NAME.serviceException();
         }
+    }
+
+    public void updateUsedSpaceForUpload(Long userId, Long rootId, BigDecimal fileSize) {
+        checkValidateBy(userId, rootId);
+        RootFolderMetadata rootFolderMetadata = rootFolderRepository.findById(rootId).get();
+        rootFolderMetadata.increaseUsedSpace(fileSize);
+    }
+
+    public void updateUsedSpaceForDeletion(Long userId, Long rootId, BigDecimal fileSize) {
+        checkValidateBy(userId, rootId);
+        RootFolderMetadata rootFolderMetadata = rootFolderRepository.findById(rootId).get();
+        rootFolderMetadata.decreaseUsedSpace(fileSize);
     }
 }

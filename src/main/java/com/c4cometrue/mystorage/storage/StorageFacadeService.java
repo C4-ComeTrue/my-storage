@@ -8,6 +8,7 @@ import com.c4cometrue.mystorage.filedeletionlog.FileDeletionLogService;
 import com.c4cometrue.mystorage.folder.FolderMetadata;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
+import com.c4cometrue.mystorage.rootfile.RootFolderService;
 import com.c4cometrue.mystorage.storage.dto.CursorMetaRes;
 import com.c4cometrue.mystorage.util.PagingUtil;
 import jakarta.transaction.Transactional;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -25,6 +27,7 @@ public class StorageFacadeService {
     private final FolderService folderService;
     private final FileService fileService;
     private final FileDeletionLogService fileDeletionLogService;
+    private final RootFolderService rootFolderService;
 
     public CursorMetaRes getFolderContents(Long parentId, Long cursorId, Long userId, Integer size, boolean cursorFlag) {
         Integer contentsSize = PagingUtil.calculateSize(size);
@@ -64,25 +67,33 @@ public class StorageFacadeService {
         Deque<FolderMetadata> deleteProcess = new ArrayDeque<>();
         deleteProcess.push(folderMetadata);
 
+        BigDecimal totalSizeOfFilesToDelete = new BigDecimal(0);
+
         while (!deleteProcess.isEmpty()) {
             FolderMetadata currentFolder = deleteProcess.pop();
-            Long fodlerId = currentFolder.getId();
+            Long folderId = currentFolder.getId();
 
             // 파일 삭제
-            deleteFilesInCurrentFolder(fodlerId);
+            BigDecimal sizeOfFilesToDelete = deleteFilesInCurrentFolder(folderId);
+            totalSizeOfFilesToDelete = totalSizeOfFilesToDelete.add(sizeOfFilesToDelete);
 
             // 하위 폴더를 스택에 추가
-            pushFolderIdInStack(deleteProcess, fodlerId);
+            pushFolderIdInStack(deleteProcess, folderId);
 
             // 현재 폴더 삭제
             folderService.deleteFolder(currentFolder);
         }
     }
 
-    private void deleteFilesInCurrentFolder(Long folderId) {
+    private BigDecimal deleteFilesInCurrentFolder(Long folderId) {
+        BigDecimal sizeOfFilesToDelete = new BigDecimal(0);
         List<FileMetadata> subFileList = fileService.findAllBy(folderId);
+        for (FileMetadata metadata : subFileList) {
+            sizeOfFilesToDelete = sizeOfFilesToDelete.add(metadata.getSizeInBytes());
+        }
         fileService.deleteAll(subFileList);
         saveDeleteLog(subFileList);
+        return sizeOfFilesToDelete;
     }
 
     private void saveDeleteLog(List<FileMetadata> files) {

@@ -7,4 +7,6 @@ public interface RootFolderRepository extends JpaRepository<RootFolderMetadata, 
     boolean existsByStoredFileName(String storedFileName);
 
     boolean existsByOwnerIdAndOriginalFileName(Long userId, String userFolderName);
+
+    boolean existsByIdAndOwnerId(Long id, Long userId);
 }
