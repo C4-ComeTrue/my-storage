@@ -1,7 +1,13 @@
 package com.c4cometrue.mystorage.rootfile;
 
+import com.c4cometrue.mystorage.rootfile.dto.CreateRootFolderReq;
+import com.c4cometrue.mystorage.rootfile.dto.RootInfo;
+import com.c4cometrue.mystorage.rootfile.dto.RootInfoReq;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,7 +21,13 @@ public class RootFolderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createRootFolder(CreateRootFolderReq req) {
+    public void createRootFolder(@Valid CreateRootFolderReq req) {
         rootFolderService.createBy(req.userId(), req.userFolderName());
+    }
+
+    @GetMapping
+    public ResponseEntity<RootInfo> getRootInfo(@Valid RootInfoReq req) {
+        RootInfo rootInfo = rootFolderService.getRootInfo(req.rootId(), req.userId());
+        return ResponseEntity.ok(rootInfo);
     }
 }

@@ -11,15 +11,17 @@ import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
 import com.c4cometrue.mystorage.rootfile.RootFolderService;
 import com.c4cometrue.mystorage.storage.dto.CursorMetaRes;
 import com.c4cometrue.mystorage.util.PagingUtil;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +31,11 @@ public class StorageFacadeService {
     private final FileDeletionLogService fileDeletionLogService;
     private final RootFolderService rootFolderService;
 
-    public CursorMetaRes getFolderContents(Long parentId, Long cursorId, Long userId, Integer size, boolean cursorFlag) {
+    public CursorMetaRes getFolderContents(Long parentId, Long cursorId, Long userId, Integer size,
+                                           boolean cursorFlag) {
         Integer contentsSize = PagingUtil.calculateSize(size);
-        return cursorFlag ? handleFolderFirstStrategy(parentId, cursorId, userId, contentsSize) : handleFileFirstStrategy(parentId, cursorId, userId, contentsSize);
+        return cursorFlag ? handleFolderFirstStrategy(parentId, cursorId, userId, contentsSize) :
+            handleFileFirstStrategy(parentId, cursorId, userId, contentsSize);
     }
 
     private CursorMetaRes handleFolderFirstStrategy(Long parentId, Long cursorId, Long userId, Integer contentsSize) {
@@ -39,7 +43,8 @@ public class StorageFacadeService {
         CursorFolderResponse cursorFolderResponse = folderService.getFolders(parentId, cursorId, userId, page);
 
         if (Boolean.FALSE.equals(cursorFolderResponse.folderHasNext())) {
-            Pageable remainPage = PagingUtil.createPageable(contentsSize - cursorFolderResponse.folderMetadata().size());
+            Pageable remainPage =
+                PagingUtil.createPageable(contentsSize - cursorFolderResponse.folderMetadata().size());
             CursorFileResponse cursorFileResponse = fileService.getFiles(parentId, null, userId, remainPage);
             return CursorMetaRes.of(cursorFolderResponse, cursorFileResponse);
         }

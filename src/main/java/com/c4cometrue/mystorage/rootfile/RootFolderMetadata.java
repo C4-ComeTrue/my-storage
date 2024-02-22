@@ -69,4 +69,8 @@ public class RootFolderMetadata extends MetadataBaseEntity {
         }
         this.usedSpace = usedSpace.subtract(fileSize);
     }
+
+    public BigDecimal calRemainSpace() {
+        return this.availableSpace.subtract(this.usedSpace);
+    }
 }

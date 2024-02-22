@@ -1,6 +1,8 @@
 package com.c4cometrue.mystorage.rootfile;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
+import com.c4cometrue.mystorage.rootfile.dto.RootInfo;
+import com.c4cometrue.mystorage.util.DataSizeConverter;
 import com.c4cometrue.mystorage.util.FolderUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -66,5 +68,17 @@ public class RootFolderService {
         checkValidateBy(userId, rootId);
         RootFolderMetadata rootFolderMetadata = rootFolderRepository.findById(rootId).get();
         rootFolderMetadata.decreaseUsedSpace(fileSize);
+    }
+
+    public RootInfo getRootInfo(long rootId, long userId) {
+        checkValidateBy(userId, rootId);
+        RootFolderMetadata metadata = rootFolderRepository.findById(rootId).get();
+
+        String folderName = metadata.getOriginalFolderName();
+        BigDecimal availableSpaceInGb = DataSizeConverter.bytesToGigaBytes(metadata.getAvailableSpace());
+        BigDecimal usedSpaceInGb = DataSizeConverter.bytesToGigaBytes(metadata.getUsedSpace());
+        BigDecimal remainingSpace = metadata.calRemainSpace();
+        BigDecimal remainingSpaceInGb = DataSizeConverter.bytesToGigaBytes(remainingSpace);
+        return RootInfo.of(rootId, folderName, availableSpaceInGb, usedSpaceInGb, remainingSpaceInGb);
     }
 }
