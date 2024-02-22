@@ -31,13 +31,11 @@ public class FolderMetadata extends MetadataBaseEntity {
 	private String originalFolderName;
 	@Column(nullable = false)
 	private String storedFolderName;
-
-	private Long parentId;
 	@Column(nullable = false)
 	private String filePath;
 	@Column(nullable = false)
 	private Long uploaderId;
-
+	private Long parentId;
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private MetadataType metadataType;

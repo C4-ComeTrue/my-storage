@@ -22,9 +22,9 @@ public class RootFolderMetadata extends MetadataBaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private String originalFileName;
+    private String originalFolderName;
     @Column(nullable = false)
-    private String storedFileName;
+    private String storedFolderName;
     @Column(nullable = false)
     private String filePath;
     @Column(nullable = false)
@@ -33,9 +33,9 @@ public class RootFolderMetadata extends MetadataBaseEntity {
     private BigDecimal usedSpace;
 
     @Builder
-    public RootFolderMetadata(String originalFileName, String storedFileName, String filePath, Long ownerId) {
-        this.originalFileName = originalFileName;
-        this.storedFileName = storedFileName;
+    public RootFolderMetadata(String originalFolderName, String storedFolderName, String filePath, Long ownerId) {
+        this.originalFolderName = originalFolderName;
+        this.storedFolderName = storedFolderName;
         this.filePath = filePath;
         this.ownerId = ownerId;
         this.availableSpace = DataSizeConverter.gigabytesToBytes(2);

@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -26,12 +24,7 @@ public class RootFolderService {
 
         Path path = Paths.get(storagePath, storedFolderName);
 
-        RootFolderMetadata metadata = RootFolderMetadata.builder()
-                .originalFileName(userFolderName)
-                .storedFileName(storedFolderName)
-                .ownerId(userId)
-                .filePath(path.toString())
-                .build();
+        RootFolderMetadata metadata = RootFolderMetadata.builder().originalFolderName(storedFolderName).storedFolderName(userFolderName).ownerId(userId).filePath(path.toString()).build();
 
         FolderUtil.createFolder(path);
         rootFolderRepository.save(metadata);
