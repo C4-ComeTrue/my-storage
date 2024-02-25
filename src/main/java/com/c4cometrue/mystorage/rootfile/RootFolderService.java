@@ -30,7 +30,7 @@ public class RootFolderService {
         Path path = Paths.get(storagePath, storedFolderName);
 
         RootFolderMetadata metadata =
-            RootFolderMetadata.builder().originalFolderName(storedFolderName).storedFolderName(userFolderName)
+            RootFolderMetadata.builder().originalFolderName(userFolderName).storedFolderName(storedFolderName)
                 .ownerId(userId).filePath(path.toString()).build();
 
         FolderUtil.createFolder(path);

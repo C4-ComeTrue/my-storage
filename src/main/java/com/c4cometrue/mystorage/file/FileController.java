@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,25 +26,25 @@ public class FileController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void uploadFile(@Valid FileUploadRequest req) {
+    public void uploadFile(@RequestBody @Valid FileUploadRequest req) {
         fileService.uploadFile(req.multipartFile(), req.userId(), req.parentId(), req.rootId());
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteFile(@Valid FileDeleteRequest request) {
+    public void deleteFile(@RequestBody @Valid FileDeleteRequest request) {
         fileService.deleteFile(request.fileId(), request.userId(), request.rootId());
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void downloadFile(@Valid FileDownloadRequest request) {
+    public void downloadFile(@RequestBody @Valid FileDownloadRequest request) {
         fileService.downloadFile(request.fileId(), request.userPath(), request.userId());
     }
 
     @PostMapping("/move")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void moveFile(@Valid FileMoveReq req) {
+    public void moveFile(@RequestBody @Valid FileMoveReq req) {
         fileService.moveFile(req.fileId(), req.userId(), req.destinationFolderId());
     }
 }
