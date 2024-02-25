@@ -16,7 +16,7 @@ public class FolderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void createFolder(@RequestBody @Valid FolderCreateRequest req) {
-        folderService.createBy(req.userId(), req.userFolderName(), req.parentId());
+        folderService.createBy(req.userId(), req.userFolderName(), req.parentId(), req.rootId());
     }
 
     @PatchMapping

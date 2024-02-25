@@ -1,5 +1,6 @@
 package com.c4cometrue.mystorage.rootfile;
 
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RootFolderRepository extends JpaRepository<RootFolderMetadata, Long> {
@@ -9,4 +10,6 @@ public interface RootFolderRepository extends JpaRepository<RootFolderMetadata, 
     boolean existsByOwnerIdAndOriginalFolderName(Long userId, String userFolderName);
 
     boolean existsByIdAndOwnerId(Long id, Long userId);
+
+    Optional<RootFolderMetadata> findByOwnerIdAndId(Long ownerId, Long rootId);
 }

@@ -24,19 +24,21 @@ public class FolderDataHandlerService {
     }
 
     // 자신의 폴더나 null 밑에서만 폴더를 만들수 있어야 한다
-    public void persist(String userFolderName, String storedFolderName, String path, Long uploaderId, Long parentId) {
+    public void persist(String userFolderName, String storedFolderName, String path, Long uploaderId, Long parentId,
+                        Long rootId) {
         // 부모 폴더 주인이 가 유저와 같거나 부모 폴더 id 가 널이여야지 가능
         validateFolderOwnershipBy(parentId, uploaderId);
         // 중복된 폴더 이름 생성은 불가능
         checkDuplicateBy(userFolderName, parentId, uploaderId);
 
         FolderMetadata metadata = FolderMetadata.builder()
-                .originalFolderName(userFolderName)
-                .storedFolderName(storedFolderName)
-                .filePath(path)
-                .parentId(parentId)
-                .uploaderId(uploaderId)
-                .build();
+            .originalFolderName(userFolderName)
+            .storedFolderName(storedFolderName)
+            .filePath(path)
+            .parentId(parentId)
+            .uploaderId(uploaderId)
+            .rootId(rootId)
+            .build();
 
         folderRepository.save(metadata);
     }
@@ -67,12 +69,12 @@ public class FolderDataHandlerService {
 
     public FolderMetadata findBy(Long folderId, Long userId) {
         return folderRepository.findByIdAndUploaderId(folderId, userId)
-                .orElseThrow(() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("folderId { }", folderId));
+            .orElseThrow(() -> ErrorCode.CANNOT_FOUND_FOLDER.serviceException("folderId { }", folderId));
     }
 
     public List<FolderMetadata> getFolderList(Long parentId, Long cursorId, Long userId, Pageable page) {
         return cursorId == null ? folderRepository.findAllByParentIdAndUploaderIdOrderByIdDesc(parentId, userId, page) :
-                folderRepository.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(parentId, userId, cursorId, page);
+            folderRepository.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(parentId, userId, cursorId, page);
     }
 
     public Boolean hasNext(Long parentId, Long userId, Long id) {

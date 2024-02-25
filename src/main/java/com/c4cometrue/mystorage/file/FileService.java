@@ -37,19 +37,19 @@ public class FileService {
         rootFolderService.updateUsedSpaceForUpload(userId, rootId, fileSize);
 
         String basePath = folderService.findPathBy();
-
         String originalFileName = file.getOriginalFilename();
-        fileDataHandlerService.duplicateBy(parentId, userId, originalFileName);
+        fileDataHandlerService.duplicateBy(parentId, originalFileName);
 
         String storedFileName = FileMetadata.storedName();
         Path path = Paths.get(basePath, storedFileName);
         FileMetadata fileMetadata = FileMetadata.builder()
-                .originalFileName(originalFileName)
-                .storedFileName(storedFileName)
-                .filePath(path.toString())
-                .uploaderId(userId)
-                .parentId(parentId)
-                .build();
+            .originalFileName(originalFileName)
+            .storedFileName(storedFileName)
+            .filePath(path.toString())
+            .uploaderId(userId)
+            .parentId(parentId)
+            .sizeInBytes(fileSize)
+            .build();
 
         FileUtil.uploadFile(file, path, bufferSize);
         fileDataHandlerService.persist(fileMetadata);
@@ -78,8 +78,8 @@ public class FileService {
     public CursorFileResponse getFiles(Long parentId, Long cursorId, Long userId, Pageable page) {
         List<FileMetadata> files = fileDataHandlerService.getFileList(parentId, cursorId, userId, page);
         List<FileContent> fileContents = files.stream()
-                .map(file -> FileContent.of(file.getId(), file.getOriginalFileName()))
-                .toList();
+            .map(file -> FileContent.of(file.getId(), file.getOriginalFileName()))
+            .toList();
         Long lastIdOfList = files.isEmpty() ? null : files.get(files.size() - 1).getId();
         return CursorFileResponse.of(fileContents, fileDataHandlerService.hashNext(parentId, userId, lastIdOfList));
     }

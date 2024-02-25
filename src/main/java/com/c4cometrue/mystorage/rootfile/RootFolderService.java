@@ -27,7 +27,7 @@ public class RootFolderService {
 
         checkValidateBy(storedFolderName, userId, userFolderName);
 
-        Path path = Paths.get(storagePath, storedFolderName);
+        Path path = Paths.get(storagePath);
 
         RootFolderMetadata metadata =
             RootFolderMetadata.builder().originalFolderName(userFolderName).storedFolderName(storedFolderName)
@@ -42,10 +42,9 @@ public class RootFolderService {
         checkDuplicateBy(userId, userFolderName);
     }
 
-    private void checkValidateBy(Long userId, Long rootId) {
-        if (!rootFolderRepository.existsByIdAndOwnerId(rootId, userId)) {
-            throw ErrorCode.CANNOT_FOUND_FOLDER.serviceException();
-        }
+    public RootFolderMetadata getRootFolderMetadata(Long userId, Long rootId) {
+        return rootFolderRepository.findByOwnerIdAndId(userId, rootId)
+            .orElseThrow(ErrorCode.CANNOT_FOUND_FOLDER::serviceException);
     }
 
     private void checkDuplicateBy(Long userId, String userFolderName) {
@@ -61,20 +60,17 @@ public class RootFolderService {
     }
 
     public void updateUsedSpaceForUpload(Long userId, Long rootId, BigDecimal fileSize) {
-        checkValidateBy(userId, rootId);
-        RootFolderMetadata rootFolderMetadata = rootFolderRepository.findById(rootId).get();
+        RootFolderMetadata rootFolderMetadata = getRootFolderMetadata(userId, rootId);
         rootFolderMetadata.increaseUsedSpace(fileSize);
     }
 
     public void updateUsedSpaceForDeletion(Long userId, Long rootId, BigDecimal fileSize) {
-        checkValidateBy(userId, rootId);
-        RootFolderMetadata rootFolderMetadata = rootFolderRepository.findById(rootId).get();
+        RootFolderMetadata rootFolderMetadata = getRootFolderMetadata(userId, rootId);
         rootFolderMetadata.decreaseUsedSpace(fileSize);
     }
 
     public RootInfo getRootInfo(long rootId, long userId) {
-        checkValidateBy(userId, rootId);
-        RootFolderMetadata metadata = rootFolderRepository.findById(rootId).get();
+        RootFolderMetadata metadata = getRootFolderMetadata(userId, rootId);
 
         String folderName = metadata.getOriginalFolderName();
         BigDecimal availableSpaceInGb = DataSizeConverter.bytesToGigaBytes(metadata.getAvailableSpace());
@@ -82,5 +78,11 @@ public class RootFolderService {
         BigDecimal remainingSpace = metadata.calRemainSpace();
         BigDecimal remainingSpaceInGb = DataSizeConverter.bytesToGigaBytes(remainingSpace);
         return RootInfo.of(rootId, folderName, availableSpaceInGb, usedSpaceInGb, remainingSpaceInGb);
+    }
+
+    public void checkValidateBy(Long rootId, Long userId) {
+        if (rootFolderRepository.existsByIdAndOwnerId(rootId, userId)) {
+            throw ErrorCode.CANNOT_FOUND_FOLDER.serviceException();
+        }
     }
 }
