@@ -29,7 +29,9 @@ public class RootFolderService {
 
         Path path = Paths.get(storagePath, storedFolderName);
 
-        RootFolderMetadata metadata = RootFolderMetadata.builder().originalFolderName(storedFolderName).storedFolderName(userFolderName).ownerId(userId).filePath(path.toString()).build();
+        RootFolderMetadata metadata =
+            RootFolderMetadata.builder().originalFolderName(storedFolderName).storedFolderName(userFolderName)
+                .ownerId(userId).filePath(path.toString()).build();
 
         FolderUtil.createFolder(path);
         rootFolderRepository.save(metadata);
@@ -47,13 +49,13 @@ public class RootFolderService {
     }
 
     private void checkDuplicateBy(Long userId, String userFolderName) {
-        if (rootFolderRepository.existsByOwnerIdAndOriginalFileName(userId, userFolderName)) {
+        if (rootFolderRepository.existsByOwnerIdAndOriginalFolderName(userId, userFolderName)) {
             throw ErrorCode.DUPLICATE_FOLDER_NAME.serviceException();
         }
     }
 
     private void checkDuplicateBy(String storedFolderName) {
-        if (rootFolderRepository.existsByStoredFileName(storedFolderName)) {
+        if (rootFolderRepository.existsByStoredFolderName(storedFolderName)) {
             throw ErrorCode.DUPLICATE_SERVER_FOLDER_NAME.serviceException();
         }
     }

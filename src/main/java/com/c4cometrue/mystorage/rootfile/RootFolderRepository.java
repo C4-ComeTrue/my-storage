@@ -4,9 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RootFolderRepository extends JpaRepository<RootFolderMetadata, Long> {
 
-    boolean existsByStoredFileName(String storedFileName);
+    boolean existsByStoredFolderName(String storedFolderName);
 
-    boolean existsByOwnerIdAndOriginalFileName(Long userId, String userFolderName);
+    boolean existsByOwnerIdAndOriginalFolderName(Long userId, String userFolderName);
 
     boolean existsByIdAndOwnerId(Long id, Long userId);
 }
