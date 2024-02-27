@@ -33,7 +33,6 @@ public class FileDataHandlerService {
                 userId));
     }
 
-    @Transactional
     public void persist(FileMetadata fileMetadata) {
         fileRepository.save(fileMetadata);
     }

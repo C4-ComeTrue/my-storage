@@ -34,15 +34,16 @@ public class FileService {
     public void uploadFile(MultipartFile file, Long userId, Long parentId, Long rootId) {
         folderService.validateBy(parentId, userId);
 
-        BigDecimal fileSize = BigDecimal.valueOf(file.getSize());
-        rootFolderService.updateUsedSpaceForUpload(userId, rootId, fileSize);
-
-        String basePath = folderService.findPathBy();
         String originalFileName = file.getOriginalFilename();
         fileDataHandlerService.duplicateBy(parentId, originalFileName);
 
+        String basePath = folderService.findPathBy();
         String storedFileName = FileMetadata.storedName();
         Path path = Paths.get(basePath, storedFileName);
+
+        BigDecimal fileSize = BigDecimal.valueOf(file.getSize());
+
+
         FileMetadata fileMetadata = FileMetadata.builder()
             .originalFileName(originalFileName)
             .storedFileName(storedFileName)
@@ -53,6 +54,13 @@ public class FileService {
             .build();
 
         FileUtil.uploadFile(file, path, bufferSize);
+
+        uploadFile(userId, rootId, fileSize, fileMetadata);
+    }
+
+    @Transactional
+    private void uploadFile(Long userId, Long rootId, BigDecimal fileSize, FileMetadata fileMetadata) {
+        rootFolderService.updateUsedSpaceForUpload(userId, rootId, fileSize);
         fileDataHandlerService.persist(fileMetadata);
     }
 
