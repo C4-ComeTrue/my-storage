@@ -21,7 +21,7 @@ public class FolderService {
     private final RootFolderService rootFolderService;
 
     public void createBy(Long userId, String userFolderName, Long parentId, Long rootId) {
-        rootFolderService.checkValidateBy(userId, rootId);
+        rootFolderService.checkValidateBy(rootId, userId);
         String storedFolderName = FolderMetadata.storedName(userFolderName);
         String parentPath = folderDataHandlerService.findPathBy(parentId, userId);
 

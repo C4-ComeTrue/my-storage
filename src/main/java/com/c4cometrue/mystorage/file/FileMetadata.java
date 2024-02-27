@@ -38,7 +38,6 @@ public class FileMetadata extends MetadataBaseEntity {
     @Column(nullable = false)
     private Long uploaderId;
     private Long parentId;
-    private Long rootId;
     private BigDecimal sizeInBytes;
 
     @Column(nullable = false)
@@ -55,14 +54,13 @@ public class FileMetadata extends MetadataBaseEntity {
 
     @Builder
     public FileMetadata(String originalFileName, String storedFileName, String filePath, Long uploaderId,
-                        Long parentId, Long rootId, BigDecimal sizeInBytes) {
+                        Long parentId, BigDecimal sizeInBytes) {
         this.originalFileName = originalFileName;
         this.storedFileName = storedFileName;
         this.filePath = filePath;
         this.uploaderId = uploaderId;
         this.parentId = parentId;
         this.metadataType = MetadataType.FILE;
-        this.rootId = rootId;
         this.sizeInBytes = sizeInBytes;
     }
 }

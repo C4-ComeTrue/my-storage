@@ -31,8 +31,9 @@ public class FileService {
     @Value("${file.buffer}")
     private int bufferSize;
 
-    @Transactional
     public void uploadFile(MultipartFile file, Long userId, Long parentId, Long rootId) {
+        folderService.validateBy(parentId, userId);
+
         BigDecimal fileSize = BigDecimal.valueOf(file.getSize());
         rootFolderService.updateUsedSpaceForUpload(userId, rootId, fileSize);
 

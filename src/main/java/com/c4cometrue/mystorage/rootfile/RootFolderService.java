@@ -33,7 +33,6 @@ public class RootFolderService {
             RootFolderMetadata.builder().originalFolderName(userFolderName).storedFolderName(storedFolderName)
                 .ownerId(userId).filePath(path.toString()).build();
 
-        FolderUtil.createFolder(path);
         rootFolderRepository.save(metadata);
     }
 
@@ -81,7 +80,7 @@ public class RootFolderService {
     }
 
     public void checkValidateBy(Long rootId, Long userId) {
-        if (rootFolderRepository.existsByIdAndOwnerId(rootId, userId)) {
+        if (!rootFolderRepository.existsByIdAndOwnerId(rootId, userId)) {
             throw ErrorCode.CANNOT_FOUND_FOLDER.serviceException();
         }
     }

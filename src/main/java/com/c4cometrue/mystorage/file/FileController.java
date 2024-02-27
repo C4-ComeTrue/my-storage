@@ -27,7 +27,6 @@ public class FileController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void uploadFile(@Valid FileUploadRequest req) {
-        System.out.println("*************************************************");
         fileService.uploadFile(req.multipartFile(), req.userId(), req.parentId(), req.rootId());
     }
 
