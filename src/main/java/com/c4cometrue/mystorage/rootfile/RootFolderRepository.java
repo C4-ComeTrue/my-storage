@@ -11,5 +11,5 @@ public interface RootFolderRepository extends JpaRepository<RootFolderMetadata, 
 
     boolean existsByIdAndOwnerId(Long id, Long userId);
 
-    Optional<RootFolderMetadata> findByOwnerIdAndId(Long ownerId, Long rootId);
+    Optional<RootFolderMetadata> findByIdAndOwnerId(Long ownerId, Long rootId);
 }

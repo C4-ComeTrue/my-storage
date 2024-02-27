@@ -23,7 +23,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "file_metadata", indexes = @Index(name = "index_parentId", columnList = "parentId"))
+@Table(name = "file_metadata", indexes = {
+    @Index(name = "index_id_uploaderId", columnList = "id,uploaderId"),
+    @Index(name = "index_parentId_originalFileName", columnList = "parentId,originalFileName")
+})
 public class FileMetadata extends MetadataBaseEntity {
 
     @Id
@@ -44,14 +47,6 @@ public class FileMetadata extends MetadataBaseEntity {
     @Enumerated(EnumType.STRING)
     private MetadataType metadataType;
 
-    public static String storedName() {
-        return UUID.randomUUID().toString();
-    }
-
-    public void changeParentId(Long parentId) {
-        this.parentId = parentId;
-    }
-
     @Builder
     public FileMetadata(String originalFileName, String storedFileName, String filePath, Long uploaderId,
                         Long parentId, BigDecimal sizeInBytes) {
@@ -62,5 +57,13 @@ public class FileMetadata extends MetadataBaseEntity {
         this.parentId = parentId;
         this.metadataType = MetadataType.FILE;
         this.sizeInBytes = sizeInBytes;
+    }
+
+    public static String storedName() {
+        return UUID.randomUUID().toString();
+    }
+
+    public void changeParentId(Long parentId) {
+        this.parentId = parentId;
     }
 }

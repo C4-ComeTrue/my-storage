@@ -78,7 +78,7 @@ public class RootFolderService {
     }
 
     private RootFolderMetadata getRootFolderMetadata(Long userId, Long rootId) {
-        return rootFolderRepository.findByOwnerIdAndId(userId, rootId)
+        return rootFolderRepository.findByIdAndOwnerId(rootId, userId)
             .orElseThrow(ErrorCode.CANNOT_FOUND_FOLDER::serviceException);
     }
 
