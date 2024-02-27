@@ -1,6 +1,7 @@
 package com.c4cometrue.mystorage.rootfile;
 
 import com.c4cometrue.mystorage.exception.ErrorCode;
+import com.c4cometrue.mystorage.folder.FolderMetadata;
 import com.c4cometrue.mystorage.rootfile.dto.RootInfo;
 import com.c4cometrue.mystorage.util.DataSizeConverter;
 import com.c4cometrue.mystorage.util.FolderUtil;
@@ -29,9 +30,11 @@ public class RootFolderService {
 
         Path path = Paths.get(storagePath);
 
-        RootFolderMetadata metadata =
-            RootFolderMetadata.builder().originalFolderName(userFolderName).storedFolderName(storedFolderName)
-                .ownerId(userId).filePath(path.toString()).build();
+        RootFolderMetadata metadata = RootFolderMetadata.builder()
+            .originalFolderName(userFolderName)
+            .storedFolderName(storedFolderName)
+            .ownerId(userId)
+            .filePath(path.toString()).build();
 
         rootFolderRepository.save(metadata);
     }
@@ -41,20 +44,15 @@ public class RootFolderService {
         checkDuplicateBy(userId, userFolderName);
     }
 
-    public RootFolderMetadata getRootFolderMetadata(Long userId, Long rootId) {
-        return rootFolderRepository.findByOwnerIdAndId(userId, rootId)
-            .orElseThrow(ErrorCode.CANNOT_FOUND_FOLDER::serviceException);
+    private void checkDuplicateBy(String storedFolderName) {
+        if (rootFolderRepository.existsByStoredFolderName(storedFolderName)) {
+            throw ErrorCode.DUPLICATE_SERVER_FOLDER_NAME.serviceException();
+        }
     }
 
     private void checkDuplicateBy(Long userId, String userFolderName) {
         if (rootFolderRepository.existsByOwnerIdAndOriginalFolderName(userId, userFolderName)) {
             throw ErrorCode.DUPLICATE_FOLDER_NAME.serviceException();
-        }
-    }
-
-    private void checkDuplicateBy(String storedFolderName) {
-        if (rootFolderRepository.existsByStoredFolderName(storedFolderName)) {
-            throw ErrorCode.DUPLICATE_SERVER_FOLDER_NAME.serviceException();
         }
     }
 
@@ -77,6 +75,11 @@ public class RootFolderService {
         BigDecimal remainingSpace = metadata.calRemainSpace();
         BigDecimal remainingSpaceInGb = DataSizeConverter.bytesToGigaBytes(remainingSpace);
         return RootInfo.of(rootId, folderName, availableSpaceInGb, usedSpaceInGb, remainingSpaceInGb);
+    }
+
+    private RootFolderMetadata getRootFolderMetadata(Long userId, Long rootId) {
+        return rootFolderRepository.findByOwnerIdAndId(userId, rootId)
+            .orElseThrow(ErrorCode.CANNOT_FOUND_FOLDER::serviceException);
     }
 
     public void checkValidateBy(Long rootId, Long userId) {
