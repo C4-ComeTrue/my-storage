@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class DataSizeConverter {
-    private static final BigDecimal BYTES_PER_GIGABYTE = BigDecimal.valueOf(1024 * 1024 * 1024);
+    private static final long BYTES_IN_ONE_GIGABYTE = 1024 * 1024 * 1024L;
+    private static final BigDecimal BYTES_PER_GIGABYTE = BigDecimal.valueOf(BYTES_IN_ONE_GIGABYTE);
 
     private DataSizeConverter() {
         throw new AssertionError("DataSizeConverter should not be instantiated");
