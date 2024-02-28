@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import com.c4cometrue.mystorage.rootfile.RootFolderService;
+import com.c4cometrue.mystorage.rootfolder.RootFolderService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

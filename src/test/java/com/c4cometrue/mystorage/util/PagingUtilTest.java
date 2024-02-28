@@ -9,28 +9,28 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @DisplayName("페이징 유틸 테스트")
-@ExtendWith(MockitoExtension.class)
 class PagingUtilTest {
-	@Test
-	@DisplayName("페이지 사이즈 테스트")
-	void calculateSizeTest() {
-		Assertions.assertEquals(5, PagingUtil.calculateSize(5));
-	}
-	@Test
-	@DisplayName("페이지 사이즈 테스트 널일때")
-	void calculateSizeNullTest() {
-		Assertions.assertEquals(10, PagingUtil.calculateSize(null));
-	}
+    @Test
+    @DisplayName("페이지 사이즈 테스트")
+    void calculateSizeTest() {
+        Assertions.assertEquals(5, PagingUtil.calculateSize(5));
+    }
 
-	@Test
-	@DisplayName("페이지 생성 테스트")
-	void createPageableTest() {
-		Assertions.assertEquals(PageRequest.of(0, 10), PagingUtil.createPageable(10));
-	}
+    @Test
+    @DisplayName("페이지 사이즈 테스트 널일때")
+    void calculateSizeNullTest() {
+        Assertions.assertEquals(10, PagingUtil.calculateSize(null));
+    }
 
-	@Test
-	@DisplayName("페이지 디폴트 사이즈 테스트")
-	void createPageableDefaultTest() {
-		Assertions.assertEquals(PagingUtil.createPageable(100), PagingUtil.createPageable());
-	}
+    @Test
+    @DisplayName("페이지 생성 테스트")
+    void createPageableTest() {
+        Assertions.assertEquals(PageRequest.of(0, 10), PagingUtil.createPageable(10));
+    }
+
+    @Test
+    @DisplayName("페이지 디폴트 사이즈 테스트")
+    void createPageableDefaultTest() {
+        Assertions.assertEquals(PagingUtil.createPageable(100), PagingUtil.createPageable());
+    }
 }

@@ -1,4 +1,4 @@
-package com.c4cometrue.mystorage.rootfile.dto;
+package com.c4cometrue.mystorage.rootfolder.dto;
 
 import java.math.BigDecimal;
 

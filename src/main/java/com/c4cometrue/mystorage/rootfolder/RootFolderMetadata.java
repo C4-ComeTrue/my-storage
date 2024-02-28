@@ -1,4 +1,4 @@
-package com.c4cometrue.mystorage.rootfile;
+package com.c4cometrue.mystorage.rootfolder;
 
 import com.c4cometrue.mystorage.common.MetadataBaseEntity;
 import com.c4cometrue.mystorage.exception.ErrorCode;
@@ -38,8 +38,6 @@ public class RootFolderMetadata extends MetadataBaseEntity {
     @Column(nullable = false)
     private String storedFolderName;
     @Column(nullable = false)
-    private String filePath;
-    @Column(nullable = false)
     private Long ownerId;
     @PositiveOrZero
     private BigDecimal availableSpace;
@@ -47,10 +45,9 @@ public class RootFolderMetadata extends MetadataBaseEntity {
     private BigDecimal usedSpace;
 
     @Builder
-    public RootFolderMetadata(String originalFolderName, String storedFolderName, String filePath, Long ownerId) {
+    public RootFolderMetadata(String originalFolderName, String storedFolderName, Long ownerId) {
         this.originalFolderName = originalFolderName;
         this.storedFolderName = storedFolderName;
-        this.filePath = filePath;
         this.ownerId = ownerId;
         this.availableSpace = DataSizeConverter.gigabytesToBytes(2);
         this.usedSpace = BigDecimal.ZERO;

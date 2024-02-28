@@ -8,7 +8,7 @@ import com.c4cometrue.mystorage.filedeletionlog.FileDeletionLogService;
 import com.c4cometrue.mystorage.folder.FolderMetadata;
 import com.c4cometrue.mystorage.folder.FolderService;
 import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
-import com.c4cometrue.mystorage.rootfile.RootFolderService;
+import com.c4cometrue.mystorage.rootfolder.RootFolderService;
 import com.c4cometrue.mystorage.storage.dto.CursorMetaRes;
 import com.c4cometrue.mystorage.util.PagingUtil;
 

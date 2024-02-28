@@ -1,8 +1,8 @@
-package com.c4cometrue.mystorage.rootfile;
+package com.c4cometrue.mystorage.rootfolder;
 
-import com.c4cometrue.mystorage.rootfile.dto.CreateRootFolderReq;
-import com.c4cometrue.mystorage.rootfile.dto.RootInfo;
-import com.c4cometrue.mystorage.rootfile.dto.RootInfoReq;
+import com.c4cometrue.mystorage.rootfolder.dto.CreateRootFolderReq;
+import com.c4cometrue.mystorage.rootfolder.dto.RootInfo;
+import com.c4cometrue.mystorage.rootfolder.dto.RootInfoReq;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

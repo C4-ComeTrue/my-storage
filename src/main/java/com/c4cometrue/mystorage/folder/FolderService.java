@@ -1,6 +1,6 @@
 package com.c4cometrue.mystorage.folder;
 
-import com.c4cometrue.mystorage.rootfile.RootFolderService;
+import com.c4cometrue.mystorage.rootfolder.RootFolderService;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;

@@ -1,6 +1,7 @@
 package com.c4cometrue.mystorage.fileDeleteLog;
 
 import com.c4cometrue.mystorage.filedeletionlog.FileDeletionLog;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,11 +14,12 @@ class FileDeleteLogTest {
     @DisplayName("파일삭제로그 생성")
     void logCreationTest() {
         FileDeletionLog log = FileDeletionLog
-                .builder()
-                .originalFileName(FILE_METADATA.getOriginalFileName())
-                .filePath(FILE_METADATA.getFilePath())
-                .deleterId(FILE_METADATA.getUploaderId())
-                .build();
+            .builder()
+            .originalFileName(FILE_METADATA.getOriginalFileName())
+            .filePath(FILE_METADATA.getFilePath())
+            .deleterId(FILE_METADATA.getUploaderId())
+            .sizeInBytes(BigDecimal.ONE)
+            .build();
 
         log.prePersist();
 
