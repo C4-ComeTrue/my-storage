@@ -150,7 +150,6 @@ public class FolderService {
 	 * @return 하위 폴더 목록
 	 */
 	public List<FolderMetaDataRes> getFolders(long folderId, int page) {
-		Page<FolderMetaData> folderList = folderRepository.findAllByParentFolderId(folderId, PageRequest.of(page, 50));
 		Page<FolderMetaData> folderList = folderRepository.findAllByParentFolderId(folderId,
 			PageRequest.of(page, PAGE_SIZE));
 		LinkedList<FolderMetaDataRes> result = new LinkedList<>();
