@@ -1,5 +1,6 @@
 package com.c4cometrue.mystorage.file;
 
+import com.c4cometrue.mystorage.util.FileType;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -45,17 +46,17 @@ public class FileMetadata extends MetadataBaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private MetadataType metadataType;
+    private FileType mine;
 
     @Builder
     public FileMetadata(String originalFileName, String storedFileName, String filePath, Long uploaderId,
-                        Long parentId, BigDecimal sizeInBytes) {
+                        Long parentId, FileType mine, BigDecimal sizeInBytes) {
         this.originalFileName = originalFileName;
         this.storedFileName = storedFileName;
         this.filePath = filePath;
         this.uploaderId = uploaderId;
         this.parentId = parentId;
-        this.metadataType = MetadataType.FILE;
+        this.mine = mine;
         this.sizeInBytes = sizeInBytes;
     }
 

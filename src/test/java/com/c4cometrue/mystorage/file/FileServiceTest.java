@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 import com.c4cometrue.mystorage.rootfolder.RootFolderService;
+import com.c4cometrue.mystorage.util.FileType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,6 +91,7 @@ class FileServiceTest {
         MultipartFile mockFile = mock(MultipartFile.class);
         when(mockFile.getInputStream()).thenReturn(new ByteArrayInputStream(MOCK_MULTIPART_FILE.getBytes()));
         when(mockFile.getOriginalFilename()).thenReturn(ORIGINAL_FILE_NAME);
+        when(mockFile.getContentType()).thenReturn(MINETYPE);
         when(folderService.findPathBy()).thenReturn(PARENT_PATH);
 
         ServiceException thrown = assertThrows(
@@ -111,6 +113,7 @@ class FileServiceTest {
         given(multipartFile.getInputStream()).willReturn(inputStream);
         given(multipartFile.getOriginalFilename()).willReturn(ORIGINAL_FILE_NAME);
         given(Files.newOutputStream(any())).willReturn(outStream);
+        given(multipartFile.getContentType()).willReturn(MINETYPE);
         given(inputStream.read(any()))
             .willReturn(10)
             .willReturn(20)

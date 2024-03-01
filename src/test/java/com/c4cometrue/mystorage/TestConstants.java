@@ -4,6 +4,7 @@ import com.c4cometrue.mystorage.file.FileMetadata;
 import com.c4cometrue.mystorage.folder.FolderMetadata;
 import com.c4cometrue.mystorage.folder.dto.FolderNameChangeRequest;
 import com.c4cometrue.mystorage.rootfolder.RootFolderMetadata;
+import com.c4cometrue.mystorage.util.FileType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,12 +24,15 @@ public class TestConstants {
     public static final String STORED_FILE_NAME = "청천12345";
     public static final String USER_FOLDER_NAME = "폴더";
     public static final String STORED_FOLDER_NAME = "폴더@123";
+
+    public static final String MINETYPE = "image/jpeg";
     public static final FileMetadata FILE_METADATA = FileMetadata.builder()
         .originalFileName(ORIGINAL_FILE_NAME)
         .storedFileName(STORED_FILE_NAME)
         .filePath(USER_PATH)
         .uploaderId(USER_ID)
         .parentId(PARENT_ID)
+        .mine(FileType.classifyType(MINETYPE))
         .build();
 
     public static final RootFolderMetadata ROOT_FOLDER_METADATA = RootFolderMetadata.builder()

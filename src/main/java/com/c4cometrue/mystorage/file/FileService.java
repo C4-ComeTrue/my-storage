@@ -1,5 +1,6 @@
 package com.c4cometrue.mystorage.file;
 
+import com.c4cometrue.mystorage.util.FileType;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,6 +51,7 @@ public class FileService {
             .filePath(path.toString())
             .uploaderId(userId)
             .parentId(parentId)
+            .mine(FileType.classifyType(file.getContentType()))
             .sizeInBytes(fileSize)
             .build();
 

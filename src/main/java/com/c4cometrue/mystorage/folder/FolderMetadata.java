@@ -39,9 +39,6 @@ public class FolderMetadata extends MetadataBaseEntity {
     private Long parentId;
     @Column(nullable = false)
     private Long rootId;
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private MetadataType metadataType;
 
     public static String storedName(String userFolderName) {
         return userFolderName + UUID.randomUUID();
@@ -64,6 +61,5 @@ public class FolderMetadata extends MetadataBaseEntity {
         this.filePath = filePath;
         this.uploaderId = uploaderId;
         this.rootId = rootId;
-        this.metadataType = MetadataType.FOLDER;
     }
 }
