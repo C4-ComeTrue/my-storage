@@ -11,15 +11,12 @@ import com.c4cometrue.mystorage.folder.dto.CursorFolderResponse;
 import com.c4cometrue.mystorage.rootfolder.RootFolderService;
 import com.c4cometrue.mystorage.storage.dto.CursorMetaRes;
 import com.c4cometrue.mystorage.util.PagingUtil;
-
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 

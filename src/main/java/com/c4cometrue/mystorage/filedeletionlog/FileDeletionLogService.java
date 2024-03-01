@@ -1,6 +1,5 @@
 package com.c4cometrue.mystorage.filedeletionlog;
 
-
 import com.c4cometrue.mystorage.file.FileMetadata;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
