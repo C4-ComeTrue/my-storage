@@ -132,7 +132,7 @@ public class FileService {
 	 * @param userName 사용자 이름
 	 * @return 파일 메타 데이터
 	 */
-	FileMetaData getFileMetaData(long fileId, String userName) {
+	private FileMetaData getFileMetaData(long fileId, String userName) {
 		FileMetaData fileMetaData = fileRepository.findById(fileId)
 			.orElseThrow(() -> ErrorCd.FILE_NOT_EXIST
 				.serviceException("[getFileMetaData] file not exist - fileId: {}", fileId));
@@ -198,11 +198,11 @@ public class FileService {
 	 */
 	@Transactional
 	public void moveFile(long fileId, long targetFolderId, String userName) {
-		// 파일 메타 데이터 조회 및 권한 확인
-		FileMetaData fileMetaData = getFileMetaData(fileId, userName);
-
 		// 폴더 유무 및 권한 확인
 		checkFolder(targetFolderId, userName);
+
+		// 파일 메타 데이터 조회 및 권한 확인
+		FileMetaData fileMetaData = getFileMetaData(fileId, userName);
 
 		// 파일의 폴더 값 업데이트
 		fileMetaData.setFolderId(targetFolderId);

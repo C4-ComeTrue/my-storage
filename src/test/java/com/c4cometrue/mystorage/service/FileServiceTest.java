@@ -116,72 +116,6 @@ public class FileServiceTest {
 	}
 
 	@Test
-	@DisplayName("파일 데이터 DB 확인")
-	void getFileMetaData() {
-		// given
-		var fileId = 1L;
-		var folderId = 1L;
-		var mockFileMetaData = FileMetaData.builder()
-			.fileName(MOCK_FILE_NAME)
-			.fileStorageName(MOCK_FILE_STORAGE_NAME)
-			.userName(MOCK_USER_NAME)
-			.size(MOCK_SIZE)
-			.mime(MOCK_CONTENT_TYPE)
-			.folderId(1L)
-			.build();
-		given(fileRepository.findById(fileId)).willReturn(Optional.of(mockFileMetaData));
-
-		// when
-		var fileMetadata = fileService.getFileMetaData(folderId, MOCK_USER_NAME);
-
-		// then
-		assertThat(fileMetadata)
-			.matches(metadata -> StringUtils.equals(metadata.getFileName(), MOCK_FILE_NAME))
-			.matches(metadata -> metadata.getSize() == MOCK_SIZE)
-			.matches(metadata -> StringUtils.equals(metadata.getMime(), MOCK_CONTENT_TYPE))
-			.matches(metadata -> StringUtils.equals(metadata.getUserName(), MOCK_USER_NAME));
-	}
-
-	@Test
-	@DisplayName("파일 데이터 DB 확인 실패 - 파일 없음")
-	void getFileMetaDataFailWrongFileStorageName() {
-		// given
-		var wrongFileId = -1L;
-		given(fileRepository.findById(wrongFileId)).willReturn(Optional.empty());
-
-		// when
-		var exception = assertThrows(ServiceException.class,
-			() -> fileService.getFileMetaData(wrongFileId, MOCK_USER_NAME));
-
-		// then
-		assertEquals(ErrorCd.FILE_NOT_EXIST.name(), exception.getErrCode());
-	}
-
-	@Test
-	@DisplayName("파일 데이터 DB 확인 실패 - 요청자가 주인이 아님")
-	void getFileMetaDataFailNotOwner() {
-		// given
-		var fileId = 1L;
-		var folderId = 1L;
-		var mockFileMetaData = FileMetaData.builder()
-			.fileName(MOCK_FILE_NAME)
-			.fileStorageName(MOCK_FILE_STORAGE_NAME)
-			.userName(MOCK_USER_NAME)
-			.size(MOCK_SIZE)
-			.mime(MOCK_CONTENT_TYPE)
-			.folderId(folderId)
-			.build();
-		given(fileRepository.findById(fileId)).willReturn(Optional.of(mockFileMetaData));
-
-		// when
-		var exception = assertThrows(ServiceException.class,
-			() -> fileService.getFileMetaData(fileId, "anonymous"));
-
-		// then
-		assertEquals(ErrorCd.NO_PERMISSION.name(), exception.getErrCode());
-	}
-
-	@Test
 	@DisplayName("파일 삭제")
 	void deleteFile() {
 		// given
@@ -212,6 +146,53 @@ public class FileServiceTest {
 		verify(fileRepository, times(1)).findById(fileId);
 		verify(fileRepository, times(1)).delete(mockFileMetaData);
 		verify(deleteLogRepository, times(1)).save(any());
+	}
+
+	@Test
+	@DisplayName("파일 삭제 실패 - 파일 데이터 조회 실패")
+	void deleteFileFailByFileMetaDataNotFound() {
+		// given
+		var fileId = 1L;
+		var folderId = 1L;
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(0L)
+			.build();
+
+		given(folderRepository.findByFolderId(folderId)).willReturn(Optional.of(mockFolderMetaData));
+		given(fileRepository.findById(fileId)).willReturn(Optional.empty());
+
+		// when
+		var exception = assertThrows(ServiceException.class,
+			() -> fileService.deleteFile(fileId, MOCK_USER_NAME, folderId));
+
+		// then
+		assertEquals(ErrorCd.FILE_NOT_EXIST.name(), exception.getErrCode());
+		verify(folderRepository, times(1)).findByFolderId(folderId);
+		verify(fileRepository, times(1)).findById(fileId);
+	}
+
+	@Test
+	@DisplayName("파일 삭제 실패 - 권한이 없음")
+	void deleteFileFailByNoAuthority() {
+		// given
+		var fileId = 1L;
+		var folderId = 1L;
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(0L)
+			.build();
+		given(folderRepository.findByFolderId(folderId)).willReturn(Optional.of(mockFolderMetaData));
+
+		// when
+		var exception = assertThrows(ServiceException.class,
+			() -> fileService.deleteFile(fileId, "anonymous", folderId));
+
+		// then
+		assertEquals(ErrorCd.NO_PERMISSION.name(), exception.getErrCode());
+		verify(folderRepository, times(1)).findByFolderId(folderId);
 	}
 
 	@Test
@@ -252,8 +233,57 @@ public class FileServiceTest {
 	}
 
 	@Test
+	@DisplayName("파일 다운로드 실패 - 파일 데이터 조회 실패")
+	void downloadFileFailByFileMetaDataNotFound() {
+		// given
+		var fileId = 1L;
+		var folderId = 1L;
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(0L)
+			.build();
+
+		given(folderRepository.findByFolderId(folderId)).willReturn(Optional.of(mockFolderMetaData));
+		given(fileRepository.findById(fileId)).willReturn(Optional.empty());
+
+		// when
+		var exception = assertThrows(ServiceException.class,
+			() -> fileService.downloadFile(fileId, MOCK_USER_NAME, folderId));
+
+		// then
+		assertEquals(ErrorCd.FILE_NOT_EXIST.name(), exception.getErrCode());
+		verify(folderRepository, times(1)).findByFolderId(folderId);
+		verify(fileRepository, times(1)).findById(fileId);
+	}
+
+	@Test
+	@DisplayName("파일 다운로드 실패 - 권한이 없음")
+	void downloadFileFailByNoAuthority() {
+		// given
+		var fileId = 1L;
+		var folderId = 1L;
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(0L)
+			.build();
+
+		given(folderRepository.findByFolderId(folderId)).willReturn(Optional.of(mockFolderMetaData));
+
+		// when
+		var exception = assertThrows(ServiceException.class,
+			() -> fileService.downloadFile(fileId, "anonymous", folderId));
+
+		// then
+		assertEquals(ErrorCd.NO_PERMISSION.name(), exception.getErrCode());
+		verify(folderRepository, times(1)).findByFolderId(folderId);
+	}
+
+
+	@Test
 	@DisplayName("파일 다운로드 실패")
-	void downloadFileFail() {
+	void downloadFileFailByFileNotExist() {
 		// given
 		var fileId = 1L;
 		var folderId = 1L;
@@ -286,9 +316,9 @@ public class FileServiceTest {
 			() -> fileService.downloadFile(fileId, MOCK_USER_NAME, folderId));
 
 		// then
+		assertEquals(ErrorCd.FILE_NOT_EXIST.name(), exception.getErrCode());
 		verify(folderRepository, times(1)).findByFolderId(folderId);
 		verify(fileRepository, times(1)).findById(fileId);
-		assertEquals(ErrorCd.FILE_NOT_EXIST.name(), exception.getErrCode());
 	}
 
 	@Test
@@ -341,12 +371,18 @@ public class FileServiceTest {
 	}
 
 	@Test
-	@DisplayName("파일 이동 실패 - 파일 정보 없음")
-	void moveFileFailByFileNotFound() {
+	@DisplayName("파일 이동 실패 - 파일 데이터 조회 실패")
+	void moveFileFailByFileMetaDataNotFound() {
 		// given
 		var fileId = 1L;
-		var targetFolderId = 1234L;
+		var targetFolderId = 1L;
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(0L)
+			.build();
 
+		given(folderRepository.findByFolderId(targetFolderId)).willReturn(Optional.of(mockFolderMetaData));
 		given(fileRepository.findById(fileId)).willReturn(Optional.empty());
 
 		// when
@@ -355,8 +391,56 @@ public class FileServiceTest {
 
 		// then
 		assertEquals(ErrorCd.FILE_NOT_EXIST.name(), exception.getErrCode());
+		verify(folderRepository, times(1)).findByFolderId(targetFolderId);
 		verify(fileRepository, times(1)).findById(fileId);
-		verify(folderRepository, times(0)).findByFolderId(targetFolderId);
+	}
+
+	@Test
+	@DisplayName("파일 이동 실패 - 권한이 없음")
+	void moveFileFailByNoAuthority() {
+		// given
+		var fileId = 1L;
+		var targetFolderId = 1L;
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(0L)
+			.build();
+
+		given(folderRepository.findByFolderId(targetFolderId)).willReturn(Optional.of(mockFolderMetaData));
+
+		// when
+		var exception = assertThrows(ServiceException.class,
+			() -> fileService.moveFile(fileId, targetFolderId, "anonymous"));
+
+		// then
+		assertEquals(ErrorCd.NO_PERMISSION.name(), exception.getErrCode());
+		verify(folderRepository, times(1)).findByFolderId(targetFolderId);
+	}
+
+	@Test
+	@DisplayName("파일 이동 실패 - 파일 정보 없음")
+	void moveFileFailByFileNotFound() {
+		// given
+		var fileId = 1L;
+		var targetFolderId = 1234L;
+		var mockFolderMetaData = FolderMetaData.builder()
+			.folderName("folderName")
+			.userName(MOCK_USER_NAME)
+			.parentFolderId(0L)
+			.build();
+
+		given(folderRepository.findByFolderId(targetFolderId)).willReturn(Optional.of(mockFolderMetaData));
+		given(fileRepository.findById(fileId)).willReturn(Optional.empty());
+
+		// when
+		var exception = assertThrows(ServiceException.class,
+			() -> fileService.moveFile(fileId, targetFolderId, MOCK_USER_NAME));
+
+		// then
+		assertEquals(ErrorCd.FILE_NOT_EXIST.name(), exception.getErrCode());
+		verify(folderRepository, times(1)).findByFolderId(targetFolderId);
+		verify(fileRepository, times(1)).findById(fileId);
 	}
 
 	@Test
@@ -365,17 +449,6 @@ public class FileServiceTest {
 		// given
 		var fileId = 1L;
 		var targetFolderId = 1234L;
-
-		var mockFileMetaData = FileMetaData.builder()
-			.fileName(MOCK_FILE_NAME)
-			.fileStorageName(MOCK_FILE_STORAGE_NAME)
-			.userName(MOCK_USER_NAME)
-			.size(MOCK_SIZE)
-			.mime(MOCK_CONTENT_TYPE)
-			.folderId(1L)
-			.build();
-
-		given(fileRepository.findById(fileId)).willReturn(Optional.of(mockFileMetaData));
 		given(folderRepository.findByFolderId(targetFolderId)).willReturn(Optional.empty());
 
 		// when
@@ -384,7 +457,6 @@ public class FileServiceTest {
 
 		// then
 		assertEquals(ErrorCd.FOLDER_NOT_EXIST.name(), exception.getErrCode());
-		verify(fileRepository, times(1)).findById(fileId);
 		verify(folderRepository, times(1)).findByFolderId(targetFolderId);
 	}
 
