@@ -132,7 +132,6 @@ public class FolderService {
 	 * @return 파일 목록
 	 */
 	public List<FileMetaDataRes> getFiles(long folderId, int page) {
-		Page<FileMetaData> filePage = fileRepository.findAllByFolderId(folderId, PageRequest.of(page, 50));
 		Page<FileMetaData> filePage = fileRepository.findAllByFolderId(folderId, PageRequest.of(page, PAGE_SIZE));
 		LinkedList<FileMetaDataRes> result = new LinkedList<>();
 
