@@ -9,11 +9,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
 
 import com.c4cometrue.mystorage.dto.request.folder.CreateFolderReq;
 import com.c4cometrue.mystorage.dto.request.folder.DeleteFolderReq;
 import com.c4cometrue.mystorage.dto.request.folder.GetFolderReq;
+import com.c4cometrue.mystorage.dto.request.folder.GetSubInfoReq;
 import com.c4cometrue.mystorage.dto.request.folder.MoveFolderReq;
 import com.c4cometrue.mystorage.dto.request.folder.UpdateFolderNameReq;
 import com.c4cometrue.mystorage.service.FolderService;
@@ -43,13 +43,14 @@ class FolderControllerTest {
 	void getFolderSubFolders() {
 		// given
 		var folderId = 1L;
-		var pageRequest = PageRequest.of(0, 50);
+		var pageNumber = 1;
+		var req = new GetSubInfoReq(folderId, pageNumber);
 
 		// when
-		folderController.getSubFolders(folderId, pageRequest);
+		folderController.getSubFolders(req);
 
 		// then
-		verify(folderService, times(1)).getFolders(folderId, pageRequest.getPageNumber());
+		verify(folderService, times(1)).getFolders(folderId, pageNumber);
 
 	}
 
@@ -59,13 +60,14 @@ class FolderControllerTest {
 	void getFolderSubFiles() {
 		// given
 		var folderId = 1L;
-		var pageRequest = PageRequest.of(0, 50);
+		var pageNumber = 1;
+		var req = new GetSubInfoReq(folderId, pageNumber);
 
 		// when
-		folderController.getSubFiles(folderId, pageRequest);
+		folderController.getSubFiles(req);
 
 		// then
-		verify(folderService, times(1)).getFiles(folderId, pageRequest.getPageNumber());
+		verify(folderService, times(1)).getFiles(folderId, pageNumber);
 
 	}
 
@@ -73,7 +75,7 @@ class FolderControllerTest {
 	@DisplayName("폴더 생성")
 	void createFolder() {
 		// given
-		var req = new CreateFolderReq(0L, MOCK_USER_NAME, "my_folder");
+		var req = new CreateFolderReq(1L, MOCK_USER_NAME, "my_folder");
 
 		// when
 		folderController.createFolder(req);
@@ -86,7 +88,7 @@ class FolderControllerTest {
 	@DisplayName("폴더 이름 수정")
 	void updateFolderName() {
 		// given
-		var req = new UpdateFolderNameReq(1L, 0L, MOCK_USER_NAME, "new_folder");
+		var req = new UpdateFolderNameReq(2L, 1L, MOCK_USER_NAME, "new_folder");
 
 		// when
 		folderController.updateFolderName(req);

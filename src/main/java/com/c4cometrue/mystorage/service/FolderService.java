@@ -30,6 +30,7 @@ public class FolderService {
 	private final FolderRepository folderRepository;
 	private final FileRepository fileRepository;
 	private final DeleteLogRepository deleteLogRepository;
+	private static final int PAGE_SIZE = 50;
 
 	/**
 	 * 특정 폴더의 대략적인 정보 반환
@@ -132,6 +133,7 @@ public class FolderService {
 	 */
 	public List<FileMetaDataRes> getFiles(long folderId, int page) {
 		Page<FileMetaData> filePage = fileRepository.findAllByFolderId(folderId, PageRequest.of(page, 50));
+		Page<FileMetaData> filePage = fileRepository.findAllByFolderId(folderId, PageRequest.of(page, PAGE_SIZE));
 		LinkedList<FileMetaDataRes> result = new LinkedList<>();
 
 		for (FileMetaData fileMetaData : filePage) {
@@ -149,6 +151,8 @@ public class FolderService {
 	 */
 	public List<FolderMetaDataRes> getFolders(long folderId, int page) {
 		Page<FolderMetaData> folderList = folderRepository.findAllByParentFolderId(folderId, PageRequest.of(page, 50));
+		Page<FolderMetaData> folderList = folderRepository.findAllByParentFolderId(folderId,
+			PageRequest.of(page, PAGE_SIZE));
 		LinkedList<FolderMetaDataRes> result = new LinkedList<>();
 
 		for (FolderMetaData folderMetaData : folderList) {
@@ -205,7 +209,6 @@ public class FolderService {
 			fileRepository.deleteAllInBatch(fileList.get());
 		}
 	}
-
 
 	/**
 	 * 폴더를 이동한다.
