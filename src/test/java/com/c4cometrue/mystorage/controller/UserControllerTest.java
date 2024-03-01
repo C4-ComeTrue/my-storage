@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.c4cometrue.mystorage.dto.request.SignUpReq;
+import com.c4cometrue.mystorage.dto.request.file.SignUpReq;
 import com.c4cometrue.mystorage.service.UserService;
 
 @ExtendWith(MockitoExtension.class)

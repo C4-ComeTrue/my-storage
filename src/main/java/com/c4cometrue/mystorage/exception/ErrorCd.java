@@ -17,7 +17,7 @@ public enum ErrorCd {
     // Folder 관련 에러
     FOLDER_NOT_EXIST(HttpStatus.NOT_FOUND, "Folder doesn't exist"), // 폴더가 존재하지 않는 경우
     DUPLICATE_FOLDER(HttpStatus.BAD_REQUEST, "Duplicate Folder"), // 이미 존재하는 폴더명
-
+    FOLDER_CANT_BE_MOVED(HttpStatus.BAD_REQUEST, "folder route might have cycle"), // 하위 폴더로 이동하려는 경우
 
     // User 관련 에러
     DUPLICATE_USER(HttpStatus.BAD_REQUEST, "User name Duplicate"), // 이미 존재하는 유저 이름

@@ -19,7 +19,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.c4cometrue.mystorage.dto.request.SignUpReq;
+import com.c4cometrue.mystorage.dto.request.file.SignUpReq;
 import com.c4cometrue.mystorage.entity.FolderMetaData;
 import com.c4cometrue.mystorage.entity.UserData;
 import com.c4cometrue.mystorage.exception.ErrorCd;

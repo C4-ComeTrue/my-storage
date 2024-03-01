@@ -11,9 +11,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 
-import com.c4cometrue.mystorage.dto.request.FileReq;
-import com.c4cometrue.mystorage.dto.request.UploadFileReq;
-import com.c4cometrue.mystorage.dto.response.FileDownloadRes;
+import com.c4cometrue.mystorage.dto.request.file.FileReq;
+import com.c4cometrue.mystorage.dto.request.file.MoveFileReq;
+import com.c4cometrue.mystorage.dto.request.file.UploadFileReq;
+import com.c4cometrue.mystorage.dto.response.file.FileDownloadRes;
 import com.c4cometrue.mystorage.service.FileService;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,27 +40,40 @@ class FileControllerTest {
 	@DisplayName("파일 삭제")
 	void deleteFile() {
 		// given
-		var req = new FileReq(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L);
+		var req = new FileReq(1L, MOCK_USER_NAME, 1L);
 
 		// when
 		fileController.deleteFile(req);
 
 		// then
-		verify(fileService, times(1)).deleteFile(req.fileStorageName(), req.userName(), req.folderId());
+		verify(fileService, times(1)).deleteFile(req.fileId(), req.userName(), req.folderId());
 	}
 
 	@Test
 	@DisplayName("파일 다운로드")
 	void downloadFile() {
 		// given
-		var req = new FileReq(MOCK_FILE_STORAGE_NAME, MOCK_USER_NAME, 1L);
-		given(fileService.downloadFile(req.fileStorageName(), req.userName(), req.folderId())).willReturn(
+		var req = new FileReq(1L, MOCK_USER_NAME, 1L);
+		given(fileService.downloadFile(req.fileId(), req.userName(), req.folderId())).willReturn(
 			new FileDownloadRes(mock(Resource.class), MOCK_FILE_NAME, MOCK_CONTENT_TYPE));
 
 		// when
 		fileController.downloadFile(req);
 
 		// then
-		verify(fileService, times(1)).downloadFile(req.fileStorageName(), req.userName(), req.folderId());
+		verify(fileService, times(1)).downloadFile(req.fileId(), req.userName(), req.folderId());
+	}
+
+	@Test
+	@DisplayName("파일 이동")
+	void moveFile() {
+		// given
+		var req = new MoveFileReq(1L, 1L, MOCK_USER_NAME);
+
+		// when
+		fileController.moveFile(req);
+
+		// then
+		verify(fileService, times(1)).moveFile(req.fileId(), req.folderId(), req.userName());
 	}
 }
