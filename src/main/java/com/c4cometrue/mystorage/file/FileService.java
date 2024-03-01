@@ -1,9 +1,12 @@
 package com.c4cometrue.mystorage.file;
 
+import com.c4cometrue.mystorage.util.FileType;
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.c4cometrue.mystorage.rootfolder.RootFolderService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,78 +23,97 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class FileService {
-	private final FileDataHandlerService fileDataHandlerService;
-	private final FolderService folderService;
+    private final FileDataHandlerService fileDataHandlerService;
+    private final FolderService folderService;
+
+    private final RootFolderService rootFolderService;
 
 
-	@Value("${file.buffer}")
-	private int bufferSize;
+    @Value("${file.buffer}")
+    private int bufferSize;
 
-	public void uploadFile(MultipartFile file, Long userId, Long parentId) {
-		String basePath = folderService.findPathBy();
+    public void uploadFile(MultipartFile file, Long userId, Long parentId, Long rootId) {
+        folderService.validateBy(parentId, userId);
 
-		String originalFileName = file.getOriginalFilename();
-		fileDataHandlerService.duplicateBy(parentId, userId, originalFileName);
+        String originalFileName = file.getOriginalFilename();
+        fileDataHandlerService.duplicateBy(parentId, originalFileName);
 
-		String storedFileName = FileMetadata.storedName();
-		Path path = Paths.get(basePath, storedFileName);
-		FileMetadata fileMetadata = FileMetadata.builder()
-			.originalFileName(originalFileName)
-			.storedFileName(storedFileName)
-			.filePath(path.toString())
-			.uploaderId(userId)
-			.parentId(parentId)
-			.build();
+        String basePath = folderService.findPathBy();
+        String storedFileName = FileMetadata.storedName();
+        Path path = Paths.get(basePath, storedFileName);
 
-		FileUtil.uploadFile(file, path, bufferSize);
-		fileDataHandlerService.persist(fileMetadata);
-	}
+        BigDecimal fileSize = BigDecimal.valueOf(file.getSize());
 
-	public void downloadFile(Long fileId, String userPath, Long userId) {
-		FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
-		Path originalPath = Paths.get(fileMetadata.getFilePath());
-		Path userDesignatedPath = Paths.get(userPath).resolve(fileMetadata.getOriginalFileName()).normalize();
 
-		FileUtil.download(originalPath, userDesignatedPath, bufferSize);
-	}
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .originalFileName(originalFileName)
+            .storedFileName(storedFileName)
+            .filePath(path.toString())
+            .uploaderId(userId)
+            .parentId(parentId)
+            .mine(FileType.classifyType(file.getContentType()))
+            .sizeInBytes(fileSize)
+            .build();
 
-	public void deleteFile(Long fileId, Long userId) {
-		FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
-		Path path = Paths.get(fileMetadata.getFilePath());
+        FileUtil.uploadFile(file, path, bufferSize);
 
-		FileUtil.delete(path);
+        uploadFile(userId, rootId, fileSize, fileMetadata);
+    }
 
-		fileDataHandlerService.deleteBy(fileId);
-	}
+    @Transactional
+    private void uploadFile(Long userId, Long rootId, BigDecimal fileSize, FileMetadata fileMetadata) {
+        rootFolderService.updateUsedSpaceForUpload(userId, rootId, fileSize);
+        fileDataHandlerService.persist(fileMetadata);
+    }
 
-	public CursorFileResponse getFiles(Long parentId, Long cursorId, Long userId, Pageable page) {
-		List<FileMetadata> files = fileDataHandlerService.getFileList(parentId, cursorId, userId, page);
-		List<FileContent> fileContents = files.stream()
-			.map(file -> FileContent.of(file.getId(), file.getOriginalFileName()))
-			.toList();
-		Long lastIdOfList = files.isEmpty() ? null : files.get(files.size() - 1).getId();
-		return CursorFileResponse.of(fileContents, fileDataHandlerService.hashNext(parentId, userId, lastIdOfList));
-	}
+    public void downloadFile(Long fileId, String userPath, Long userId) {
+        FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
+        Path originalPath = Paths.get(fileMetadata.getFilePath());
+        Path userDesignatedPath = Paths.get(userPath).resolve(fileMetadata.getOriginalFileName()).normalize();
 
-	@Transactional
-	public void moveFile(Long fileId, Long userId, Long destinationFolderId) {
-		// 해당 폴더가 접근 가능 한 폴더 인지 체크
-		folderService.validateBy(destinationFolderId, userId);
+        FileUtil.download(originalPath, userDesignatedPath, bufferSize);
+    }
 
-		FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
+    @Transactional
+    public void deleteFile(Long fileId, Long userId, Long rootId) {
+        FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
+        BigDecimal fileSize = fileMetadata.getSizeInBytes();
+        rootFolderService.updateUsedSpaceForDeletion(userId, rootId, fileSize);
+        Path path = Paths.get(fileMetadata.getFilePath());
 
-		// 부모 폴더(파일이 속한 폴더) 바꾸기
-		fileMetadata.changeParentId(destinationFolderId);
+        FileUtil.delete(path);
 
-		// 변경 사항을 저장
-		fileDataHandlerService.persist(fileMetadata);
-	}
+        fileDataHandlerService.deleteBy(fileId);
+    }
 
-	public List<FileMetadata> findAllBy(Long parentId) {
-		return fileDataHandlerService.findAllBy(parentId);
-	}
+    public CursorFileResponse getFiles(Long parentId, Long cursorId, Long userId, Pageable page) {
+        List<FileMetadata> files = fileDataHandlerService.getFileList(parentId, cursorId, userId, page);
+        List<FileContent> fileContents = files.stream()
+            .map(file -> FileContent.of(file.getId(), file.getOriginalFileName()))
+            .toList();
+        Long lastIdOfList = files.isEmpty() ? null : files.get(files.size() - 1).getId();
+        return CursorFileResponse.of(fileContents, fileDataHandlerService.hashNext(parentId, userId, lastIdOfList));
+    }
 
-	public void deleteAll(List<FileMetadata> fileMetadataList) {
-		fileDataHandlerService.deleteAll(fileMetadataList);
-	}
+    @Transactional
+    public void moveFile(Long fileId, Long userId, Long destinationFolderId) {
+        // 해당 폴더가 접근 가능 한 폴더 인지 체크
+        folderService.validateBy(destinationFolderId, userId);
+
+        FileMetadata fileMetadata = fileDataHandlerService.findBy(fileId, userId);
+
+        // 부모 폴더(파일이 속한 폴더) 바꾸기
+        fileMetadata.changeParentId(destinationFolderId);
+
+        // 변경 사항을 저장
+        fileDataHandlerService.persist(fileMetadata);
+    }
+
+    public List<FileMetadata> findAllBy(Long parentId) {
+        return fileDataHandlerService.findAllBy(parentId);
+    }
+
+    public void deleteAll(List<FileMetadata> fileMetadataList) {
+        fileDataHandlerService.deleteAll(fileMetadataList);
+    }
 }

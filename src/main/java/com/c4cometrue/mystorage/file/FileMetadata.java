@@ -1,5 +1,7 @@
 package com.c4cometrue.mystorage.file;
 
+import com.c4cometrue.mystorage.util.FileType;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.c4cometrue.mystorage.common.MetadataBaseEntity;
@@ -22,42 +24,47 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "file_metadata", indexes = @Index(name = "index_parentId", columnList = "parentId"))
+@Table(name = "file_metadata", indexes = {
+    @Index(name = "index_id_uploaderId", columnList = "id,uploaderId"),
+    @Index(name = "index_parentId_originalFileName", columnList = "parentId,originalFileName")
+})
 public class FileMetadata extends MetadataBaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	@Column(nullable = false)
-	private String originalFileName;
-	@Column(nullable = false)
-	private String storedFileName;
-	@Column(nullable = false)
-	private String filePath;
-	@Column(nullable = false)
-	private Long uploaderId;
-	private Long parentId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false)
+    private String originalFileName;
+    @Column(nullable = false)
+    private String storedFileName;
+    @Column(nullable = false)
+    private String filePath;
+    @Column(nullable = false)
+    private Long uploaderId;
+    private Long parentId;
+    private BigDecimal sizeInBytes;
 
-	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
-	private MetadataType metadataType;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private FileType mine;
 
-	public static String storedName() {
-		return UUID.randomUUID().toString();
-	}
+    @Builder
+    public FileMetadata(String originalFileName, String storedFileName, String filePath, Long uploaderId,
+                        Long parentId, FileType mine, BigDecimal sizeInBytes) {
+        this.originalFileName = originalFileName;
+        this.storedFileName = storedFileName;
+        this.filePath = filePath;
+        this.uploaderId = uploaderId;
+        this.parentId = parentId;
+        this.mine = mine;
+        this.sizeInBytes = sizeInBytes;
+    }
 
-	public void changeParentId(Long parentId) {
-		this.parentId = parentId;
-	}
+    public static String storedName() {
+        return UUID.randomUUID().toString();
+    }
 
-	@Builder
-	public FileMetadata(String originalFileName, String storedFileName, String filePath, Long uploaderId,
-		Long parentId) {
-		this.originalFileName = originalFileName;
-		this.storedFileName = storedFileName;
-		this.filePath = filePath;
-		this.uploaderId = uploaderId;
-		this.parentId = parentId;
-		this.metadataType = MetadataType.FILE;
-	}
+    public void changeParentId(Long parentId) {
+        this.parentId = parentId;
+    }
 }

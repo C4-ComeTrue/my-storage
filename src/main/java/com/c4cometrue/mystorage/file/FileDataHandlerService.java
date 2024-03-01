@@ -13,50 +13,50 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class FileDataHandlerService {
-	private final FileRepository fileRepository;
-	@Transactional
-	public void deleteBy(Long fileId) {
-		existBy(fileId);
-		fileRepository.deleteById(fileId);
-	}
+    private final FileRepository fileRepository;
 
-	private void existBy(Long fileId) {
-		if (!fileRepository.existsById(fileId)) {
-			throw ErrorCode.CANNOT_FOUND_FILE.serviceException("fileId : {}", fileId);
-		}
-	}
+    @Transactional
+    public void deleteBy(Long fileId) {
+        existBy(fileId);
+        fileRepository.deleteById(fileId);
+    }
 
-	public FileMetadata findBy(Long fileId, Long userId) {
-		return fileRepository.findByIdAndUploaderId(fileId, userId)
-			.orElseThrow(() -> ErrorCode.CANNOT_FOUND_FILE.serviceException("fileId : {}, userId : {}", fileId,
-				userId));
-	}
+    private void existBy(Long fileId) {
+        if (!fileRepository.existsById(fileId)) {
+            throw ErrorCode.CANNOT_FOUND_FILE.serviceException("fileId : {}", fileId);
+        }
+    }
 
-	@Transactional
-	public void persist(FileMetadata fileMetadata) {
-		fileRepository.save(fileMetadata);
-	}
+    public FileMetadata findBy(Long fileId, Long userId) {
+        return fileRepository.findByIdAndUploaderId(fileId, userId)
+            .orElseThrow(() -> ErrorCode.CANNOT_FOUND_FILE.serviceException("fileId : {}, userId : {}", fileId,
+                userId));
+    }
 
-	public void duplicateBy(Long parentId, Long userId, String fileName) {
-		if (fileRepository.checkDuplicateFileName(parentId, userId, fileName)) {
-			throw ErrorCode.DUPLICATE_FILE_NAME.serviceException("fileName : {}", fileName);
-		}
-	}
+    public void persist(FileMetadata fileMetadata) {
+        fileRepository.save(fileMetadata);
+    }
 
-	public List<FileMetadata> getFileList(Long parentId, Long cursorId, Long userId, Pageable page) {
-		return cursorId == null ? fileRepository.findAllByParentIdAndUploaderIdOrderByIdDesc(parentId, userId, page)
-			: fileRepository.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(parentId, cursorId, userId, page);
-	}
+    public void duplicateBy(Long parentId, String fileName) {
+        if (fileRepository.existsByParentIdAndOriginalFileName(parentId, fileName)) {
+            throw ErrorCode.DUPLICATE_FILE_NAME.serviceException("fileName : {}", fileName);
+        }
+    }
 
-	public Boolean hashNext(Long parentId, Long userId, Long lastIdOfList) {
-		return fileRepository.existsByParentIdAndUploaderIdAndIdLessThan(parentId, userId, lastIdOfList);
-	}
+    public List<FileMetadata> getFileList(Long parentId, Long cursorId, Long userId, Pageable page) {
+        return cursorId == null ? fileRepository.findAllByParentIdAndUploaderIdOrderByIdDesc(parentId, userId, page)
+            : fileRepository.findByParentIdAndUploaderIdAndIdLessThanOrderByIdDesc(parentId, cursorId, userId, page);
+    }
 
-	public List<FileMetadata> findAllBy(Long parentId) {
-		return fileRepository.findAllByParentId(parentId);
-	}
+    public Boolean hashNext(Long parentId, Long userId, Long lastIdOfList) {
+        return fileRepository.existsByParentIdAndUploaderIdAndIdLessThan(parentId, userId, lastIdOfList);
+    }
 
-	public void deleteAll(List<FileMetadata> fileMetadataList) {
-		fileRepository.deleteAll(fileMetadataList);
-	}
+    public List<FileMetadata> findAllBy(Long parentId) {
+        return fileRepository.findAllByParentId(parentId);
+    }
+
+    public void deleteAll(List<FileMetadata> fileMetadataList) {
+        fileRepository.deleteAll(fileMetadataList);
+    }
 }
