@@ -2,7 +2,6 @@ package com.c4cometrue.mystorage.controller;
 
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.c4cometrue.mystorage.dto.request.folder.CreateFolderReq;
 import com.c4cometrue.mystorage.dto.request.folder.DeleteFolderReq;
 import com.c4cometrue.mystorage.dto.request.folder.GetFolderReq;
+import com.c4cometrue.mystorage.dto.request.folder.GetSubInfoReq;
 import com.c4cometrue.mystorage.dto.request.folder.MoveFolderReq;
 import com.c4cometrue.mystorage.dto.request.folder.UpdateFolderNameReq;
 import com.c4cometrue.mystorage.dto.response.file.FileMetaDataRes;
@@ -49,26 +49,24 @@ public class FolderController {
 
 	/**
 	 * 폴더의 하위 폴더들을 페이징으로 조회
-	 * @param folderId 폴더 기본키
-	 * @param pageable paging을 위한 파라미터
+	 * @param req (폴더 기본키, 페이지 번호)
 	 * @return page 번호에 맞는 하위 폴더 목록
 	 */
 	@GetMapping("/subFolder")
 	@ResponseStatus(HttpStatus.OK)
-	public List<FolderMetaDataRes> getSubFolders(long folderId, Pageable pageable) {
-		return folderService.getFolders(folderId, pageable.getPageNumber());
+	public List<FolderMetaDataRes> getSubFolders(@Valid GetSubInfoReq req) {
+		return folderService.getFolders(req.folderId(), req.page());
 	}
 
 	/**
 	 * 폴더의 하위 파일들을 페이징으로 조회
-	 * @param folderId 폴더 기본키
-	 * @param pageable paging을 위한 파라미터
+	 * @param req (폴더 기본키, 페이지 번호)
 	 * @return page 번호에 맞는 하위 파일 목록
 	 */
 	@GetMapping("/subFile")
 	@ResponseStatus(HttpStatus.OK)
-	public List<FileMetaDataRes> getSubFiles(long folderId, Pageable pageable) {
-		return folderService.getFiles(folderId, pageable.getPageNumber());
+	public List<FileMetaDataRes> getSubFiles(@Valid GetSubInfoReq req) {
+		return folderService.getFiles(req.folderId(), req.page());
 	}
 
 	/**
@@ -108,7 +106,7 @@ public class FolderController {
 	 * @param req (폴더 기본키, 이동할 폴더 기본키, 사용자 이름)
 	 */
 	@PatchMapping
-	@ResponseStatus(HttpStatus.MOVED_PERMANENTLY)
+	@ResponseStatus(HttpStatus.OK)
 	public void moveFolder(@RequestBody @Valid MoveFolderReq req) {
 		folderService.moveFolder(req.folderId(), req.targetFolderId(), req.userName());
 	}
